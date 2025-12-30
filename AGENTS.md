@@ -13,3 +13,4 @@
 - All private properties should be prefixed with an underscore.
 - Use getter's and setter's to modify private properties when needed.
 - Use conventional commits (feat:, fix:, chore:, doc:).
+- Don't include a default parameter in a list of parameters in methods (example, myFunction(num = 0))

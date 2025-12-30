@@ -8,12 +8,8 @@ export class Application {
     constructor(private serverConfig: ServerConfig) {}
 
     public init() {
-        if (!this._server) {
-            this._server = new Server(this.serverConfig);
-            console.log(`[INFO] Server initialized on port ${this.serverConfig.port}`);
-        } else {
-            console.log(`[WARN] Server is already initialized on port ${this.serverConfig.port}`);
-        }
+        this._server = new Server(this.serverConfig);
+        this._server.start();
     }
 
     get server(): Server | undefined {
