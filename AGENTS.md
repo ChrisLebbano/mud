@@ -1,0 +1,15 @@
+- Use object-oriented programming whenever possible.
+- All directories should be named after the class they represent, with an index.ts file at the directory root. (An example is the config/ directory has a ServerConfig class in the index.ts file)
+- All directory names should be lower-kebab-case.
+- All filenames should be lower-kebab-case case.
+- All types and interfaces should be placed in the types/ directory.
+- All types, interfaces, and class declarations should be in PascalCase.
+- Use dependency injection whenever possible, and where it makes sense to do so.
+- Imports should be in alphabetical order.
+- Class method declarations should be in alphabetical order.
+- All class properties should be private
+- All files should have an empty line before the EOF.
+- All class methods should have an associated test in the test directory, in a corresponding directory.  The file should be named [class-name].spec.ts.
+- All private properties should be prefixed with an underscore.
+- Use getter's and setter's to modify private properties when needed.
+- Use conventional commits (feat:, fix:, chore:, doc:).

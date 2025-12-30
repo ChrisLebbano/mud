@@ -1,2 +1,1 @@
-# mud
-A Multi User Dungeon game that is interfaced purely with text.
+A server to connect to a MUD game world.
