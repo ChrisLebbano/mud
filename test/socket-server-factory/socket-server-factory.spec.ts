@@ -1,16 +1,15 @@
+import { SocketServerFactory } from "../../src/socket-server-factory";
 import { expect } from "chai";
 import { createServer } from "node:http";
-import { SocketServerFactory } from "../../src/socket-server-factory";
 
 describe(`[Class] SocketServerFactory`, () => {
 
-    describe(`[Method] createServer`, () => {
+    describe(`[Method] createSocketIOServer`, () => {
 
         it(`should create a socket server instance`, () => {
             const httpServer = createServer();
-            const socketServerFactory = new SocketServerFactory();
 
-            const socketServer = socketServerFactory.createServer(httpServer);
+            const socketServer = SocketServerFactory.createSocketIOServer(httpServer);
 
             expect(socketServer.close).to.be.a("function");
             socketServer.close();
@@ -20,4 +19,3 @@ describe(`[Class] SocketServerFactory`, () => {
     });
 
 });
-
