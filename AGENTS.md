@@ -4,14 +4,12 @@
 - All filenames should be lower-kebab-case case.
 - All types and interfaces should be placed in the types/ directory.
 - All types, interfaces, and class declarations should be in PascalCase.
-- Use dependency injection whenever possible, and where it makes sense to do so.
 - Imports should be in alphabetical order.
 - Class method declarations should be in alphabetical order.
 - All class properties should be private
-- All files should have an empty line before the EOF.
-- All class methods should have an associated test in the test directory, in a corresponding directory.  The file should be named [class-name].spec.ts.
-- All private properties should be prefixed with an underscore.
+- All files should have an empty line before the EOF.All private properties should be prefixed with an underscore.
 - Use getter's and setter's to modify private properties when needed.
 - Use conventional commits (feat:, fix:, chore:, doc:).
 - Don't include a default parameter in a list of parameters in methods (example, myFunction(num = 0))
 - Don't create non-static classes as factories.  If we need a factory, make it a static class.  Also, no need to create an interface for those classes.
+- Don't write any tests unless there is an empty 'describe' or 'it' block in the test suite.  
