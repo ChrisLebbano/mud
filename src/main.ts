@@ -1,6 +1,6 @@
-import { loadEnvFile } from "node:process";
 import { Application } from "./application";
 import { type ServerConfig } from "./types";
+import { loadEnvFile } from "node:process";
 
 /**
  * The main entry point for the application.
