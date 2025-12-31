@@ -1,9 +1,9 @@
 import { Server as SocketIOServer } from "socket.io";
-import { type ServerInstance, type SocketServerFactory as SocketServerFactoryType, type SocketServerInstance } from "../types";
+import { NodeHttpServer, SocketServer } from "../types";
 
-export class SocketServerFactory implements SocketServerFactoryType {
+export class SocketServerFactory   {
 
-    public createServer(server: ServerInstance): SocketServerInstance {
+    public static createSocketIOServer(server: NodeHttpServer): SocketServer {
         return new SocketIOServer(server);
     }
 

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { HttpServerFactory } from "../../src/http-server-factory";
+import { HttpServerFactory } from "../../src/node-http-server-factory";
 
 describe(`[Class] HttpServerFactory`, () => {
 

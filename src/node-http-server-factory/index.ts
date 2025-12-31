@@ -1,14 +1,16 @@
 import { createServer } from "node:http";
-import { ServerFactory, ServerInstance } from "../types";
+import { NodeHttpServer } from '../types';
 
-export class HttpServerFactory implements ServerFactory {
+export class NodeHttpServerFactory {
 
-    public createServer(): ServerInstance {
+    public static createServer(): NodeHttpServer {
+
         return createServer((request, response) => {
             response.statusCode = 200;
             response.setHeader("Content-Type", "text/plain");
             response.end("OK");
         });
+
     }
 
 }

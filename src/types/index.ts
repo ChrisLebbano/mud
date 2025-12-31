@@ -1,21 +1,9 @@
+import { Server } from 'node:http';
+import { Server as SocketIOServer } from 'socket.io';
+
 export interface ServerConfig {
     port: number;
 }
 
-export interface ServerFactory {
-    createServer(): ServerInstance;
-}
-
-export interface ServerInstance {
-    close(callback?: (error?: Error) => void): void;
-    listen(port: number, callback?: () => void): void;
-    on(event: "listening", listener: () => void): void;
-}
-
-export interface SocketServerFactory {
-    createServer(server: ServerInstance): SocketServerInstance;
-}
-
-export interface SocketServerInstance {
-    close(callback?: (error?: Error) => void): void;
-}
+export type NodeHttpServer = Server;
+export type SocketServer = SocketIOServer;

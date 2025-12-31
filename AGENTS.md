@@ -14,3 +14,4 @@
 - Use getter's and setter's to modify private properties when needed.
 - Use conventional commits (feat:, fix:, chore:, doc:).
 - Don't include a default parameter in a list of parameters in methods (example, myFunction(num = 0))
+- Don't create non-static classes as factories.  If we need a factory, make it a static class.  Also, no need to create an interface for those classes.
