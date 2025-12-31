@@ -8,7 +8,6 @@ import { join } from "node:path";
 
 export class Server {
 
-    private _gameClientHtml: string;
     private _httpServer?: NodeHttpServer;
     private _serverConfig: ServerConfig;
     private _serverRouter: ServerRouter;
@@ -16,14 +15,9 @@ export class Server {
 
     constructor(serverConfig: ServerConfig, serverRouter: ServerRouter) {
         const filePath = join(__dirname, "game-client.html");
-        this._gameClientHtml = readFileSync(filePath, { encoding: "utf-8" });
+
         this._serverConfig = serverConfig;
         this._serverRouter = serverRouter;
-        this._serverRouter.addRoute(new ServerRoute("/game-client", (request, response) => {
-            response.statusCode = 200;
-            response.setHeader("Content-Type", "text/html");
-            response.end(this._gameClientHtml);
-        }));
     }
 
     public start(): NodeHttpServer {
