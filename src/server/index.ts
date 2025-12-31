@@ -1,35 +1,34 @@
-import { readFileSync } from "node:fs";
-import { type IncomingMessage, type ServerResponse } from "node:http";
-import { join } from "node:path";
 import { NodeHttpServerFactory } from "../node-http-server-factory";
+import { ServerRoute } from "../server-route";
+import { ServerRouter } from "../server-router";
 import { SocketServerFactory } from "../socket-server-factory";
 import { type NodeHttpServer, type ServerConfig, type SocketServer } from "../types";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 export class Server {
 
     private _gameClientHtml: string;
     private _httpServer?: NodeHttpServer;
     private _serverConfig: ServerConfig;
+    private _serverRouter: ServerRouter;
     private _socketServer?: SocketServer;
 
-    constructor(serverConfig: ServerConfig) {
+    constructor(serverConfig: ServerConfig, serverRouter: ServerRouter) {
         const filePath = join(__dirname, "game-client.html");
         this._gameClientHtml = readFileSync(filePath, { encoding: "utf-8" });
         this._serverConfig = serverConfig;
+        this._serverRouter = serverRouter;
+        this._serverRouter.addRoute(new ServerRoute("/game-client", (request, response) => {
+            response.statusCode = 200;
+            response.setHeader("Content-Type", "text/html");
+            response.end(this._gameClientHtml);
+        }));
     }
 
     public start(): NodeHttpServer {
-        this._httpServer = NodeHttpServerFactory.createServer((request: IncomingMessage, response: ServerResponse) => {
-            if (request.url === "/game-client") {
-                response.statusCode = 200;
-                response.setHeader("Content-Type", "text/html");
-                response.end(this._gameClientHtml);
-                return;
-            }
-
-            response.statusCode = 404;
-            response.setHeader("Content-Type", "text/plain");
-            response.end("Not Found");
+        this._httpServer = NodeHttpServerFactory.createServer((request, response) => {
+            this._serverRouter.handle(request, response);
         });
 
         this._httpServer.on("listening", () => {
@@ -45,3 +44,4 @@ export class Server {
     }
 
 }
+

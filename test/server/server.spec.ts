@@ -1,5 +1,6 @@
 import { NodeHttpServerFactory } from "../../src/node-http-server-factory";
 import { Server } from "../../src/server";
+import { ServerRouter } from "../../src/server-router";
 import { SocketServerFactory } from "../../src/socket-server-factory";
 import { type HttpRequestHandler, type NodeHttpServer, type SocketServer } from "../../src/types";
 import { expect } from "chai";
@@ -109,7 +110,8 @@ describe(`[Class] Server`, () => {
                 return createdSocketServer as unknown as SocketServer;
             };
 
-            const server = new Server({ port: 4321 });
+            const serverRouter = new ServerRouter([]);
+            const server = new Server({ port: 4321 }, serverRouter);
 
             const startedServer = server.start();
 
@@ -136,7 +138,8 @@ describe(`[Class] Server`, () => {
                 return new FakeSocketServer() as unknown as SocketServer;
             };
 
-            const server = new Server({ port: 4321 });
+            const serverRouter = new ServerRouter([]);
+            const server = new Server({ port: 4321 }, serverRouter);
 
             server.start();
 
@@ -156,3 +159,4 @@ describe(`[Class] Server`, () => {
     });
 
 });
+

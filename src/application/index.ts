@@ -1,4 +1,5 @@
 import { Server } from "../server";
+import { ServerRouter } from "../server-router";
 import { type ServerConfig } from "../types";
 
 export class Application {
@@ -15,8 +16,10 @@ export class Application {
     }
 
     public init(): void {
-        this._server = new Server(this._serverConfig);
+        const serverRouter = new ServerRouter([]);
+        this._server = new Server(this._serverConfig, serverRouter);
         this._server.start();
     }
 
 }
+
