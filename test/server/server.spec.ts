@@ -5,6 +5,7 @@ import { type ServerFactory, type ServerInstance, type SocketServerFactory, type
 class FakeServer implements ServerInstance {
 
     private _listenPort?: number;
+    private _listeningListeners: Array<() => void> = [];
 
     public close(callback?: (error?: Error) => void): void {
         if (callback) {
@@ -18,8 +19,15 @@ class FakeServer implements ServerInstance {
 
     public listen(port: number, callback?: () => void): void {
         this._listenPort = port;
+        this._listeningListeners.forEach((listener) => listener());
         if (callback) {
             callback();
+        }
+    }
+
+    public on(event: "listening", listener: () => void): void {
+        if (event === "listening") {
+            this._listeningListeners.push(listener);
         }
     }
 
