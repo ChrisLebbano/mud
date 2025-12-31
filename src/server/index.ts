@@ -21,6 +21,7 @@ export class Server {
             this._server = this._serverFactory.createServer();
             this._server.on("listening", () => {
                 this._socketServer = this._socketServerFactory.createServer(this._server as ServerInstance);
+                console.log(`[INFO] Socket Server started`);
             });
             this._server.listen(this._serverConfig.port, () => {
                 console.log(`[INFO] Server started on port ${this._serverConfig.port}`);
