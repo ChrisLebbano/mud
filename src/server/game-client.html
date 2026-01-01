@@ -77,9 +77,23 @@
         <p>Welcome to the MUD game client.</p>
     </main>
     <div class="input-bar">
-        <input type="text" aria-label="Command input" placeholder="Enter command...">
-        <button type="button">Submit</button>
+        <input id="command-input" type="text" aria-label="Command input" placeholder="Enter command...">
+        <button id="submit-button" type="button">Submit</button>
     </div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        const commandInput = document.getElementById("command-input");
+        const submitButton = document.getElementById("submit-button");
+
+        submitButton.addEventListener("click", () => {
+            const command = commandInput.value.trim();
+            if (!command) {
+                return;
+            }
+            socket.emit("submit", command);
+            commandInput.value = "";
+        });
+    </script>
 </body>
 </html>
-
