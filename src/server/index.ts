@@ -21,8 +21,10 @@ export class Server {
         }
 
         this._socketServer.on("connection", (socket) => {
+            socket.emit("message", "Connected to the server.");
             socket.on("submit", (command) => {
                 console.log(`[INFO] Received command: ${command}`);
+                socket.emit("message", `Server received: ${command}`);
             });
         });
     }
