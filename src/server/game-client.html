@@ -4,11 +4,82 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Game Client</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            font-family: "Courier New", Courier, monospace;
+            min-height: 100vh;
+            margin: 0;
+            padding: 32px;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        .input-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .input-bar input {
+            animation: blink-caret 1s step-end infinite;
+            background-color: #000;
+            border: 1px solid #fff;
+            color: #fff;
+            flex: 1;
+            font-family: inherit;
+            font-size: 16px;
+            padding: 10px 12px;
+        }
+
+        .input-bar input:focus {
+            outline: none;
+        }
+
+        .input-bar button {
+            background-color: #000;
+            border: 1px solid #fff;
+            color: #fff;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 16px;
+            padding: 10px 16px;
+        }
+
+        .input-bar button:focus {
+            outline: none;
+        }
+
+        @keyframes blink-caret {
+            0%,
+            49% {
+                caret-color: #fff;
+            }
+            50%,
+            100% {
+                caret-color: transparent;
+            }
+        }
+    </style>
 </head>
 <body>
     <main>
         <h1>Game Client</h1>
         <p>Welcome to the MUD game client.</p>
     </main>
+    <div class="input-bar">
+        <input type="text" aria-label="Command input" placeholder="Enter command...">
+        <button type="button">Submit</button>
+    </div>
 </body>
 </html>
+
