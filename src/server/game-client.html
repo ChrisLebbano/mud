@@ -86,13 +86,28 @@
         const commandInput = document.getElementById("command-input");
         const submitButton = document.getElementById("submit-button");
 
-        submitButton.addEventListener("click", () => {
+        const submitCommand = () => {
             const command = commandInput.value.trim();
             if (!command) {
                 return;
             }
             socket.emit("submit", command);
             commandInput.value = "";
+            commandInput.focus();
+        };
+
+        commandInput.focus();
+
+        commandInput.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter") {
+                return;
+            }
+            event.preventDefault();
+            submitCommand();
+        });
+
+        submitButton.addEventListener("click", () => {
+            submitCommand();
         });
     </script>
 </body>
