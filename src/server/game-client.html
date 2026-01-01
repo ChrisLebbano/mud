@@ -76,14 +76,15 @@
         <h1>Game Client</h1>
         <p>Welcome to the MUD game client.</p>
     </main>
-    <div class="input-bar">
+    <form class="input-bar" id="command-form">
         <input id="command-input" type="text" aria-label="Command input" placeholder="Enter command...">
-        <button id="submit-button" type="button">Submit</button>
-    </div>
+        <button id="submit-button" type="submit">Submit</button>
+    </form>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
         const socket = io();
         const commandInput = document.getElementById("command-input");
+        const commandForm = document.getElementById("command-form");
         const submitButton = document.getElementById("submit-button");
 
         const submitCommand = () => {
@@ -98,10 +99,7 @@
 
         commandInput.focus();
 
-        commandInput.addEventListener("keydown", (event) => {
-            if (event.key !== "Enter") {
-                return;
-            }
+        commandForm.addEventListener("submit", (event) => {
             event.preventDefault();
             submitCommand();
         });
