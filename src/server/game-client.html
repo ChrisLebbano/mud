@@ -22,6 +22,9 @@
 
         main {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
         .log {
@@ -33,6 +36,35 @@
             max-height: 70vh;
             overflow-y: auto;
             padding: 16px;
+        }
+
+        .room-details {
+            border: 1px solid #0f0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px;
+        }
+
+        .room-details h1,
+        .room-details h2 {
+            margin: 0;
+        }
+
+        .room-details p {
+            margin: 0;
+        }
+
+        .room-grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        }
+
+        .room-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
         }
 
         .input-bar {
@@ -84,6 +116,20 @@
 </head>
 <body>
     <main>
+        <section class="room-details" aria-live="polite">
+            <h1 id="room-name">Connecting...</h1>
+            <p id="room-description"></p>
+            <div class="room-grid">
+                <div>
+                    <h2>Exits</h2>
+                    <ul id="room-exits" class="room-list"></ul>
+                </div>
+                <div>
+                    <h2>Players</h2>
+                    <ul id="room-players" class="room-list"></ul>
+                </div>
+            </div>
+        </section>
         <div id="log" class="log" role="log" aria-live="polite" aria-label="Server messages"></div>
     </main>
     <div class="input-bar">
@@ -95,6 +141,10 @@
         const socket = io();
         const commandInput = document.getElementById("command-input");
         const logContainer = document.getElementById("log");
+        const roomDescription = document.getElementById("room-description");
+        const roomExits = document.getElementById("room-exits");
+        const roomName = document.getElementById("room-name");
+        const roomPlayers = document.getElementById("room-players");
         const submitButton = document.getElementById("submit-button");
 
         const appendLog = (message) => {
@@ -102,6 +152,21 @@
             line.textContent = message;
             logContainer.appendChild(line);
             logContainer.scrollTop = logContainer.scrollHeight;
+        };
+
+        const renderList = (listElement, items) => {
+            listElement.innerHTML = "";
+            if (!items.length) {
+                const emptyItem = document.createElement("li");
+                emptyItem.textContent = "None";
+                listElement.appendChild(emptyItem);
+                return;
+            }
+            items.forEach((item) => {
+                const listItem = document.createElement("li");
+                listItem.textContent = item;
+                listElement.appendChild(listItem);
+            });
         };
 
         const submitCommand = () => {
@@ -114,8 +179,19 @@
             commandInput.focus();
         };
 
-        socket.on("message", (message) => {
-            appendLog(message);
+        socket.on("world:chat", (chatMessage) => {
+            appendLog(`${chatMessage.playerName}: ${chatMessage.message}`);
+        });
+
+        socket.on("world:room", (roomSnapshot) => {
+            roomName.textContent = roomSnapshot.name;
+            roomDescription.textContent = roomSnapshot.description;
+            renderList(roomExits, roomSnapshot.exits);
+            renderList(roomPlayers, roomSnapshot.players);
+        });
+
+        socket.on("world:system", (message) => {
+            appendLog(`[system] ${message}`);
         });
 
         commandInput.focus();

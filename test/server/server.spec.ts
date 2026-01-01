@@ -84,6 +84,7 @@ class FakeResponse {
 class FakeSocketServer {
 
     private _connectionListeners: Array<(socket: FakeSocket) => void> = [];
+    private _roomEmits: Array<Record<string, unknown>> = [];
 
     public close(callback?: (error?: Error) => void): void {
         if (callback) {
@@ -95,26 +96,87 @@ class FakeSocketServer {
         return this._connectionListeners;
     }
 
+    public get roomEmits(): Array<Record<string, unknown>> {
+        return this._roomEmits;
+    }
+
     public on(event: "connection", listener: (socket: FakeSocket) => void): void {
         if (event === "connection") {
             this._connectionListeners.push(listener);
         }
     }
 
+    public to(roomId: string): { emit: (event: string, payload: unknown) => void } {
+        return {
+            emit: (event: string, payload: unknown) => {
+                this._roomEmits.push({ event, payload, roomId });
+            }
+        };
+    }
+
 }
 
 class FakeSocket {
 
+    private _id: string;
+    private _disconnectListeners: Array<() => void> = [];
+    private _emits: Array<Record<string, unknown>> = [];
+    private _joinedRooms: Set<string> = new Set();
     private _submitListeners: Array<(command: string) => void> = [];
+
+    constructor(id?: string) {
+        this._id = id ? id : "fake-socket";
+    }
+
+    public emit(event: string, payload: unknown): void {
+        this._emits.push({ event, payload });
+    }
+
+    public get disconnectListeners(): Array<() => void> {
+        return this._disconnectListeners;
+    }
+
+    public get emits(): Array<Record<string, unknown>> {
+        return this._emits;
+    }
+
+    public get id(): string {
+        return this._id;
+    }
+
+    public get joinedRooms(): string[] {
+        return Array.from(this._joinedRooms.values());
+    }
 
     public get submitListeners(): Array<(command: string) => void> {
         return this._submitListeners;
     }
 
-    public on(event: "submit", listener: (command: string) => void): void {
+    public join(roomId: string): void {
+        this._joinedRooms.add(roomId);
+    }
+
+    public leave(roomId: string): void {
+        this._joinedRooms.delete(roomId);
+    }
+
+    public on(event: "disconnect" | "submit", listener: ((command: string) => void) | (() => void)): void {
         if (event === "submit") {
-            this._submitListeners.push(listener);
+            this._submitListeners.push(listener as (command: string) => void);
+            return;
         }
+
+        if (event === "disconnect") {
+            this._disconnectListeners.push(listener);
+        }
+    }
+
+    public to(roomId: string): { emit: (event: string, payload: unknown) => void } {
+        return {
+            emit: (event: string, payload: unknown) => {
+                this._emits.push({ event: `room:${roomId}:${event}`, payload });
+            }
+        };
     }
 
 }
