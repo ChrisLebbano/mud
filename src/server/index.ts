@@ -15,6 +15,18 @@ export class Server {
         this._serverRouter = serverRouter;
     }
 
+    private configureSocketServer(): void {
+        if (!this._socketServer) {
+            return;
+        }
+
+        this._socketServer.on("connection", (socket) => {
+            socket.on("submit", (command) => {
+                console.log(`[INFO] Received command: ${command}`);
+            });
+        });
+    }
+
     public start(): NodeHttpServer {
         this._httpServer = NodeHttpServerFactory.createServer((request, response) => {
             this._serverRouter.handle(request, response);
@@ -22,6 +34,7 @@ export class Server {
 
         this._httpServer.on("listening", () => {
             this._socketServer = SocketServerFactory.createSocketIOServer(this._httpServer as NodeHttpServer);
+            this.configureSocketServer();
             console.log(`[INFO] Socket Server started`);
         });
 
@@ -33,4 +46,3 @@ export class Server {
     }
 
 }
-

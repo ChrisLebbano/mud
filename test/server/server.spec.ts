@@ -53,26 +53,26 @@ class FakeResponse {
     private _headers: Record<string, string> = {};
     private _statusCode = 0;
 
-    public get body(): string {
-        return this._body;
-    }
-
     public end(body?: string): void {
         if (body) {
             this._body = body;
         }
     }
 
+    public get body(): string {
+        return this._body;
+    }
+
     public get headers(): Record<string, string> {
         return this._headers;
     }
 
-    public setHeader(name: string, value: string): void {
-        this._headers[name] = value;
-    }
-
     public get statusCode(): number {
         return this._statusCode;
+    }
+
+    public setHeader(name: string, value: string): void {
+        this._headers[name] = value;
     }
 
     public set statusCode(statusCode: number) {
@@ -83,9 +83,37 @@ class FakeResponse {
 
 class FakeSocketServer {
 
+    private _connectionListeners: Array<(socket: FakeSocket) => void> = [];
+
     public close(callback?: (error?: Error) => void): void {
         if (callback) {
             callback();
+        }
+    }
+
+    public get connectionListeners(): Array<(socket: FakeSocket) => void> {
+        return this._connectionListeners;
+    }
+
+    public on(event: "connection", listener: (socket: FakeSocket) => void): void {
+        if (event === "connection") {
+            this._connectionListeners.push(listener);
+        }
+    }
+
+}
+
+class FakeSocket {
+
+    private _submitListeners: Array<(command: string) => void> = [];
+
+    public get submitListeners(): Array<(command: string) => void> {
+        return this._submitListeners;
+    }
+
+    public on(event: "submit", listener: (command: string) => void): void {
+        if (event === "submit") {
+            this._submitListeners.push(listener);
         }
     }
 
@@ -157,7 +185,52 @@ describe(`[Class] Server`, () => {
             SocketServerFactory.createSocketIOServer = originalSocketServerFactory;
         });
 
+        it(`should log submitted commands from socket connections`, () => {
+            const originalHttpServerFactory = NodeHttpServerFactory.createServer;
+            const originalSocketServerFactory = SocketServerFactory.createSocketIOServer;
+            const originalConsoleLog = console.log;
+            const fakeServer = new FakeHttpServer();
+            const logMessages: string[] = [];
+            let createdSocketServer: FakeSocketServer | undefined;
+
+            console.log = (message?: unknown) => {
+                if (message) {
+                    logMessages.push(String(message));
+                }
+            };
+
+            NodeHttpServerFactory.createServer = (handler: HttpRequestHandler): NodeHttpServer => {
+                fakeServer.handler = handler;
+                return fakeServer as unknown as NodeHttpServer;
+            };
+
+            SocketServerFactory.createSocketIOServer = (): SocketServer => {
+                createdSocketServer = new FakeSocketServer();
+                return createdSocketServer as unknown as SocketServer;
+            };
+
+            const serverRouter = new ServerRouter([]);
+            const server = new Server({ port: 4321 }, serverRouter);
+
+            server.start();
+
+            const fakeSocket = new FakeSocket();
+
+            expect(createdSocketServer).to.be.ok;
+            createdSocketServer?.connectionListeners.forEach((listener) => listener(fakeSocket));
+            fakeSocket.submitListeners.forEach((listener) => listener("look"));
+
+            expect(logMessages).to.deep.equal([
+                "[INFO] Socket Server started",
+                "[INFO] Server started on port 4321",
+                "[INFO] Received command: look"
+            ]);
+
+            console.log = originalConsoleLog;
+            NodeHttpServerFactory.createServer = originalHttpServerFactory;
+            SocketServerFactory.createSocketIOServer = originalSocketServerFactory;
+        });
+
     });
 
 });
-
