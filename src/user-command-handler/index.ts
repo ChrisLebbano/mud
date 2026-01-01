@@ -1,0 +1,76 @@
+import { type ChatMessage, type GameSocket, type MoveCommand, type RoomSnapshot, type SocketServer } from "../types";
+import { World } from "../world";
+
+export class UserCommandHandler {
+
+    private _socketServer?: SocketServer;
+    private _world: World;
+
+    constructor(world: World) {
+        this._world = world;
+    }
+
+    public handleCommand(socket: GameSocket, command: string): void {
+        const trimmedCommand = command.trim();
+        if (!trimmedCommand) {
+            return;
+        }
+
+        const [verb, ...rest] = trimmedCommand.split(" ");
+        const lowerVerb = verb.toLowerCase();
+
+        if (lowerVerb === "say") {
+            const message = rest.join(" ");
+            const sayResult = this._world.say(socket.id, message);
+            if ("error" in sayResult) {
+                socket.emit("world:system", sayResult.error);
+                return;
+            }
+
+            const chatMessage: ChatMessage = sayResult.chatMessage;
+            this._socketServer?.to(chatMessage.roomId).emit("world:chat", chatMessage);
+            return;
+        }
+
+        if (lowerVerb === "look") {
+            const player = this._world.getPlayer(socket.id);
+            if (!player) {
+                socket.emit("world:system", "Player not found.");
+                return;
+            }
+
+            const roomSnapshot: RoomSnapshot = this._world.getRoomSnapshot(player.roomId);
+            socket.emit("world:room", roomSnapshot);
+            return;
+        }
+
+        const isMoveVerb = lowerVerb === "move" || lowerVerb === "go";
+        const isDirectMove = ["north", "south", "east", "west"].includes(lowerVerb);
+        const direction = isMoveVerb ? rest[0] : (isDirectMove ? lowerVerb : "");
+
+        if (direction) {
+            const moveCommand: MoveCommand = { direction };
+            const moveResult = this._world.movePlayer(socket.id, moveCommand.direction);
+            if ("error" in moveResult) {
+                socket.emit("world:system", moveResult.error);
+                return;
+            }
+
+            socket.leave(moveResult.fromRoomId);
+            socket.join(moveResult.toRoomId);
+
+            socket.emit("world:room", moveResult.roomSnapshot);
+            socket.to(moveResult.fromRoomId).emit("world:system", `${moveResult.playerName} leaves to the ${moveResult.direction}.`);
+            socket.to(moveResult.toRoomId).emit("world:system", `${moveResult.playerName} arrives from the ${moveResult.direction}.`);
+            return;
+        }
+
+        socket.emit("world:system", `Unknown command: ${trimmedCommand}`);
+    }
+
+    public setSocketServer(socketServer: SocketServer): void {
+        this._socketServer = socketServer;
+    }
+
+}
+
