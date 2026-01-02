@@ -3,11 +3,17 @@ import { World } from "../world";
 
 export class UserCommandHandler {
 
+    private _allowedDirections: string[];
     private _socketServer?: SocketServer;
     private _world: World;
 
     constructor(world: World) {
+        this._allowedDirections = ["north", "south", "east", "west"];
         this._world = world;
+    }
+
+    public get allowedDirections(): string[] {
+        return this._allowedDirections;
     }
 
     public handleCommand(socket: GameSocket, command: string): void {
@@ -63,11 +69,17 @@ export class UserCommandHandler {
         }
 
         const isMoveVerb = lowerVerb === "move" || lowerVerb === "go";
-        const isDirectMove = ["north", "south", "east", "west"].includes(lowerVerb);
+        const isDirectMove = this.allowedDirections.includes(lowerVerb);
         const direction = isMoveVerb ? rest[0] : (isDirectMove ? lowerVerb : "");
+        const normalizedDirection = direction ? direction.toLowerCase() : "";
 
-        if (direction) {
-            const moveCommand: MoveCommand = { direction };
+        if (isMoveVerb && direction && !this.allowedDirections.includes(normalizedDirection)) {
+            socket.emit("world:system", `${direction} is not a direction, please use 'north', 'south', 'east', or 'west'`);
+            return;
+        }
+
+        if (normalizedDirection) {
+            const moveCommand: MoveCommand = { direction: normalizedDirection };
             const moveResult = this._world.movePlayer(socket.id, moveCommand.direction);
             if ("error" in moveResult) {
                 socket.emit("world:system", moveResult.error);

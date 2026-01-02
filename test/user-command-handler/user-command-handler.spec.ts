@@ -136,6 +136,22 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits[3].event).to.equal("room:lounge:world:system");
         });
 
+        it(`should warn when using an unknown move direction`, () => {
+            const world = createWorld();
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "move j");
+
+            expect(fakeSocket.leftRooms).to.deep.equal([]);
+            expect(fakeSocket.joinedRooms).to.deep.equal([]);
+            expect(fakeSocket.emits).to.have.lengthOf(1);
+            expect(fakeSocket.emits[0].event).to.equal("world:system");
+            expect(fakeSocket.emits[0].payload).to.equal("j is not a direction, please use 'north', 'south', 'east', or 'west'");
+        });
+
         it(`should list players when using who`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
