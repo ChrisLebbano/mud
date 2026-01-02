@@ -55,6 +55,10 @@ export class World {
         return this._players.get(playerId);
     }
 
+    public getPlayerNames(): string[] {
+        return Array.from(this._players.values()).map((player) => player.name);
+    }
+
     public getRoom(roomId: string): Room | undefined {
         return this._rooms.get(roomId);
     }

@@ -1,9 +1,9 @@
+import { expect } from "chai";
 import { Room } from "../../src/room";
 import { type SocketServer } from "../../src/types";
 import { UserCommandHandler } from "../../src/user-command-handler";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
-import { expect } from "chai";
 
 class FakeSocketServer {
 
@@ -132,6 +132,21 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits[0].event).to.equal("world:room");
             expect(fakeSocket.emits[1].event).to.equal("room:atrium:world:system");
             expect(fakeSocket.emits[2].event).to.equal("room:lounge:world:system");
+        });
+
+        it(`should list players when using who`, () => {
+            const world = createWorld();
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer("player-2", "Guest");
+
+            handler.handleCommand(fakeSocket, "who");
+
+            expect(fakeSocket.emits).to.have.lengthOf(1);
+            expect(fakeSocket.emits[0].event).to.equal("world:system");
+            expect(fakeSocket.emits[0].payload).to.equal("Tester\nGuest");
         });
 
         it(`should warn on unknown commands`, () => {

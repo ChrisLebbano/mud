@@ -44,6 +44,13 @@ export class UserCommandHandler {
             return;
         }
 
+        if (lowerVerb === "who") {
+            const playerNames = this._world.getPlayerNames();
+            const listMessage = playerNames.join("\n");
+            socket.emit("world:system", listMessage);
+            return;
+        }
+
         const isMoveVerb = lowerVerb === "move" || lowerVerb === "go";
         const isDirectMove = ["north", "south", "east", "west"].includes(lowerVerb);
         const direction = isMoveVerb ? rest[0] : (isDirectMove ? lowerVerb : "");
