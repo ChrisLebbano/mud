@@ -135,18 +135,26 @@ describe(`[Class] UserCommandHandler`, () => {
         });
 
         it(`should list players when using who`, () => {
-            const world = createWorld();
+            const world = new World([
+                new Zone("starter-zone", "Starter Zone", [
+                    new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { east: "market" })
+                ], "atrium"),
+                new Zone("market-zone", "Market Zone", [
+                    new Room("market", "Market", "A bustling market with vendors and neon signs.", { west: "atrium" })
+                ], "market")
+            ], "starter-zone", "atrium");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
             world.addPlayer(fakeSocket.id, "Tester");
             world.addPlayer("player-2", "Guest");
+            world.movePlayer("player-2", "east");
 
             handler.handleCommand(fakeSocket, "who");
 
             expect(fakeSocket.emits).to.have.lengthOf(1);
             expect(fakeSocket.emits[0].event).to.equal("world:system");
-            expect(fakeSocket.emits[0].payload).to.equal("Tester\nGuest");
+            expect(fakeSocket.emits[0].payload).to.equal("Tester");
         });
 
         it(`should warn on unknown commands`, () => {

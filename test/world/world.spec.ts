@@ -136,19 +136,23 @@ describe(`[Class] World`, () => {
 
     });
 
-    describe(`[Method] getPlayerNames`, () => {
+    describe(`[Method] getPlayerNamesForZone`, () => {
 
-        it(`should return all player names in the world`, () => {
+        it(`should return player names for a zone`, () => {
             const rooms = [
-                new Room("atrium", "Atrium", "A bright room.", { north: "lounge" })
+                new Room("atrium", "Atrium", "A bright room.", { east: "market" })
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const marketZone = new Zone("market-zone", "Market Zone", [
+                new Room("market", "Market", "A bustling market.", { west: "atrium" })
+            ], "market");
+            const world = new World([zone, marketZone], "starter-zone", "atrium");
 
             world.addPlayer("player-1", "Alex");
             world.addPlayer("player-2", "Riley");
+            world.movePlayer("player-2", "east");
 
-            expect(world.getPlayerNames()).to.deep.equal(["Alex", "Riley"]);
+            expect(world.getPlayerNamesForZone("starter-zone")).to.deep.equal(["Alex"]);
         });
 
     });

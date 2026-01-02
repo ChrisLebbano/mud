@@ -55,8 +55,10 @@ export class World {
         return this._players.get(playerId);
     }
 
-    public getPlayerNames(): string[] {
-        return Array.from(this._players.values()).map((player) => player.name);
+    public getPlayerNamesForZone(zoneId: string): string[] {
+        return Array.from(this._players.values())
+            .filter((player) => this.getZoneForRoom(player.roomId).id === zoneId)
+            .map((player) => player.name);
     }
 
     public getRoom(roomId: string): Room | undefined {
