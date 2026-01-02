@@ -9,6 +9,8 @@ describe(`[Class] Character`, () => {
         it(`should initialize the character with id, name, and room`, () => {
             const character = new Character("character-1", "Alex", "atrium");
 
+            expect(character.attributes.health).to.equal(40);
+            expect(character.attributes.mana).to.equal(20);
             expect(character.id).to.equal("character-1");
             expect(character.name).to.equal("Alex");
             expect(character.roomId).to.equal("atrium");
@@ -29,4 +31,3 @@ describe(`[Class] Character`, () => {
     });
 
 });
-

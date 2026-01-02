@@ -16,5 +16,19 @@ describe(`[Class] PlayerCharacter`, () => {
 
     });
 
-});
+    describe(`[Method] toSnapshot`, () => {
 
+        it(`should return a snapshot with attributes`, () => {
+            const playerCharacter = new PlayerCharacter("player-2", "Riley", "lounge");
+
+            expect(playerCharacter.toSnapshot()).to.deep.equal({
+                attributes: { health: 40, mana: 20 },
+                id: "player-2",
+                name: "Riley",
+                roomId: "lounge"
+            });
+        });
+
+    });
+
+});

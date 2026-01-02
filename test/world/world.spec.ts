@@ -122,9 +122,15 @@ describe(`[Class] World`, () => {
             const world = new World([zone], "starter-zone", "atrium");
 
             world.addPlayer("player-1", "Alex");
-            const snapshot = world.getRoomSnapshot("atrium");
+            const snapshot = world.getRoomSnapshot("atrium", "player-1");
 
             expect(snapshot.players).to.deep.equal(["Alex"]);
+            expect(snapshot.player).to.deep.equal({
+                attributes: { health: 40, mana: 20 },
+                id: "player-1",
+                name: "Alex",
+                roomId: "atrium"
+            });
             expect(snapshot.zone).to.deep.equal({ id: "starter-zone", name: "Starter Zone" });
         });
 

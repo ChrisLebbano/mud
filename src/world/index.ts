@@ -46,7 +46,7 @@ export class World {
 
         return {
             roomId: room.id,
-            roomSnapshot: this.getRoomSnapshot(room.id),
+            roomSnapshot: this.getRoomSnapshot(room.id, playerId),
             systemMessage: `${playerName} has entered the room.`
         };
     }
@@ -67,15 +67,23 @@ export class World {
         return room;
     }
 
-    public getRoomSnapshot(roomId: string): RoomSnapshot {
+    public getRoomSnapshot(roomId: string, playerId?: string): RoomSnapshot {
         const room = this.getRoomById(roomId);
         const zone = this.getZoneForRoom(roomId);
-        const playerNames = room.playerIds.map((playerId) => {
-            const player = this._players.get(playerId);
-            return player ? player.name : playerId;
+        const playerNames = room.playerIds.map((listedPlayerId) => {
+            const player = this._players.get(listedPlayerId);
+            return player ? player.name : listedPlayerId;
         });
 
-        return room.toSnapshot(playerNames, zone.toSnapshot());
+        const roomSnapshot = room.toSnapshot(playerNames, zone.toSnapshot());
+        if (playerId) {
+            const player = this._players.get(playerId);
+            if (player) {
+                roomSnapshot.player = player.toSnapshot();
+            }
+        }
+
+        return roomSnapshot;
     }
 
     public getZone(zoneId: string): Zone | undefined {
@@ -121,7 +129,7 @@ export class World {
             direction,
             fromRoomId: currentRoom.id,
             playerName: player.name,
-            roomSnapshot: this.getRoomSnapshot(nextRoom.id),
+            roomSnapshot: this.getRoomSnapshot(nextRoom.id, playerId),
             toRoomId: nextRoom.id
         };
     }

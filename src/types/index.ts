@@ -1,6 +1,11 @@
 import { type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { Server as SocketIOServer } from "socket.io";
 
+export interface CharacterAttributesSnapshot {
+    health: number;
+    mana: number;
+}
+
 export interface ChatMessage {
     message: string;
     playerId: string;
@@ -20,6 +25,13 @@ export interface MoveCommand {
     direction: string;
 }
 
+export interface PlayerSnapshot {
+    attributes: CharacterAttributesSnapshot;
+    id: string;
+    name: string;
+    roomId: string;
+}
+
 export interface ZoneSnapshot {
     id: string;
     name: string;
@@ -30,6 +42,7 @@ export interface RoomSnapshot {
     exits: string[];
     id: string;
     name: string;
+    player?: PlayerSnapshot;
     players: string[];
     zone: ZoneSnapshot;
 }
@@ -41,4 +54,3 @@ export interface ServerConfig {
 export type HttpRequestHandler = (request: IncomingMessage, response: ServerResponse) => void;
 export type NodeHttpServer = Server;
 export type SocketServer = SocketIOServer;
-
