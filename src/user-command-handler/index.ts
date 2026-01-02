@@ -78,6 +78,7 @@ export class UserCommandHandler {
             socket.join(moveResult.toRoomId);
 
             socket.emit("world:room", moveResult.roomSnapshot);
+            socket.emit("world:system", `You move ${moveResult.direction}, you have entered ${moveResult.roomSnapshot.name}`);
             socket.to(moveResult.fromRoomId).emit("world:system", `${moveResult.playerName} leaves to the ${moveResult.direction}.`);
             socket.to(moveResult.toRoomId).emit("world:system", `${moveResult.playerName} arrives from the ${moveResult.direction}.`);
             return;

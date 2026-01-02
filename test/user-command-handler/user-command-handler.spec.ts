@@ -130,8 +130,10 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.leftRooms).to.deep.equal(["atrium"]);
             expect(fakeSocket.joinedRooms).to.deep.equal(["lounge"]);
             expect(fakeSocket.emits[0].event).to.equal("world:room");
-            expect(fakeSocket.emits[1].event).to.equal("room:atrium:world:system");
-            expect(fakeSocket.emits[2].event).to.equal("room:lounge:world:system");
+            expect(fakeSocket.emits[1].event).to.equal("world:system");
+            expect(fakeSocket.emits[1].payload).to.equal("You move north, you have entered Lounge");
+            expect(fakeSocket.emits[2].event).to.equal("room:atrium:world:system");
+            expect(fakeSocket.emits[3].event).to.equal("room:lounge:world:system");
         });
 
         it(`should list players when using who`, () => {
