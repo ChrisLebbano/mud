@@ -5,6 +5,7 @@ import { SocketServerFactory } from "../socket-server-factory";
 import { type NodeHttpServer, type ServerConfig, type SocketServer } from "../types";
 import { UserCommandHandler } from "../user-command-handler";
 import { World } from "../world";
+import { Zone } from "../zone";
 
 export class Server {
 
@@ -19,9 +20,11 @@ export class Server {
         this._serverConfig = serverConfig;
         this._serverRouter = serverRouter;
         this._world = world ? world : new World([
-            new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }),
-            new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
-        ], "atrium");
+            new Zone("starter-zone", "Starter Zone", [
+                new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }),
+                new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
+            ], "atrium")
+        ], "starter-zone", "atrium");
         this._userCommandHandler = userCommandHandler ? userCommandHandler : new UserCommandHandler(this._world);
     }
 
@@ -73,3 +76,4 @@ export class Server {
     }
 
 }
+

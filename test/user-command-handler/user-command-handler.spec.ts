@@ -1,8 +1,9 @@
-import { expect } from "chai";
 import { Room } from "../../src/room";
 import { type SocketServer } from "../../src/types";
 import { UserCommandHandler } from "../../src/user-command-handler";
 import { World } from "../../src/world";
+import { Zone } from "../../src/zone";
+import { expect } from "chai";
 
 class FakeSocketServer {
 
@@ -76,9 +77,11 @@ describe(`[Class] UserCommandHandler`, () => {
 
     const createWorld = (): World => {
         return new World([
-            new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }),
-            new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
-        ], "atrium");
+            new Zone("starter-zone", "Starter Zone", [
+                new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }),
+                new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
+            ], "atrium")
+        ], "starter-zone", "atrium");
     };
 
     describe(`[Method] handleCommand`, () => {
@@ -112,6 +115,7 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits).to.have.lengthOf(1);
             expect(fakeSocket.emits[0].event).to.equal("world:room");
             expect(fakeSocket.emits[0].payload).to.include({ id: "atrium", name: "Atrium" });
+            expect(fakeSocket.emits[0].payload.zone).to.deep.equal({ id: "starter-zone", name: "Starter Zone" });
         });
 
         it(`should move players when using directions`, () => {
@@ -145,3 +149,4 @@ describe(`[Class] UserCommandHandler`, () => {
     });
 
 });
+

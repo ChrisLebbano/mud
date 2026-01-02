@@ -20,12 +20,18 @@ export interface MoveCommand {
     direction: string;
 }
 
+export interface ZoneSnapshot {
+    id: string;
+    name: string;
+}
+
 export interface RoomSnapshot {
     description: string;
     exits: string[];
     id: string;
     name: string;
     players: string[];
+    zone: ZoneSnapshot;
 }
 
 export interface ServerConfig {
@@ -35,3 +41,4 @@ export interface ServerConfig {
 export type HttpRequestHandler = (request: IncomingMessage, response: ServerResponse) => void;
 export type NodeHttpServer = Server;
 export type SocketServer = SocketIOServer;
+
