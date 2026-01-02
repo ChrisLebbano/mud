@@ -154,7 +154,7 @@ describe(`[Class] UserCommandHandler`, () => {
 
             expect(fakeSocket.emits).to.have.lengthOf(1);
             expect(fakeSocket.emits[0].event).to.equal("world:system");
-            expect(fakeSocket.emits[0].payload).to.equal("Tester");
+            expect(fakeSocket.emits[0].payload).to.equal("Tester\nThere are 1 players in Starter Zone");
         });
 
         it(`should warn on unknown commands`, () => {

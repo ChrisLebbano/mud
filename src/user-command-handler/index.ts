@@ -53,7 +53,11 @@ export class UserCommandHandler {
 
             const zone = this._world.getRoomSnapshot(player.roomId, player.id).zone;
             const playerNames = this._world.getPlayerNamesForZone(zone.id);
-            const listMessage = playerNames.join("\n");
+            const listItems = [
+                ...playerNames,
+                `There are ${playerNames.length} players in ${zone.name}`
+            ];
+            const listMessage = listItems.join("\n");
             socket.emit("world:system", listMessage);
             return;
         }
