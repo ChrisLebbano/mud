@@ -145,13 +145,14 @@ export class World {
             return { error: "Player not found." };
         }
 
-        if (!message.trim()) {
+        const trimmedMessage = message.trim();
+        if (!trimmedMessage) {
             return { error: "Say what?" };
         }
 
         return {
             chatMessage: {
-                message,
+                message: `${player.name} says, "${trimmedMessage}".`,
                 playerId: player.id,
                 playerName: player.name,
                 roomId: player.roomId
@@ -160,4 +161,3 @@ export class World {
     }
 
 }
-
