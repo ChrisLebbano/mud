@@ -1,7 +1,7 @@
+import { expect } from "chai";
 import { Room } from "../../src/room";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
-import { expect } from "chai";
 
 describe(`[Class] World`, () => {
 
@@ -132,6 +132,27 @@ describe(`[Class] World`, () => {
                 roomId: "atrium"
             });
             expect(snapshot.zone).to.deep.equal({ id: "starter-zone", name: "Starter Zone" });
+        });
+
+    });
+
+    describe(`[Method] getPlayerNamesForZone`, () => {
+
+        it(`should return player names for a zone`, () => {
+            const rooms = [
+                new Room("atrium", "Atrium", "A bright room.", { east: "market" })
+            ];
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const marketZone = new Zone("market-zone", "Market Zone", [
+                new Room("market", "Market", "A bustling market.", { west: "atrium" })
+            ], "market");
+            const world = new World([zone, marketZone], "starter-zone", "atrium");
+
+            world.addPlayer("player-1", "Alex");
+            world.addPlayer("player-2", "Riley");
+            world.movePlayer("player-2", "east");
+
+            expect(world.getPlayerNamesForZone("starter-zone")).to.deep.equal(["Alex"]);
         });
 
     });

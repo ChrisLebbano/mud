@@ -44,6 +44,24 @@ export class UserCommandHandler {
             return;
         }
 
+        if (lowerVerb === "who") {
+            const player = this._world.getPlayer(socket.id);
+            if (!player) {
+                socket.emit("world:system", "Player not found.");
+                return;
+            }
+
+            const zone = this._world.getRoomSnapshot(player.roomId, player.id).zone;
+            const playerNames = this._world.getPlayerNamesForZone(zone.id);
+            const listItems = [
+                ...playerNames,
+                `There are ${playerNames.length} players in ${zone.name}`
+            ];
+            const listMessage = listItems.join("\n");
+            socket.emit("world:system", listMessage);
+            return;
+        }
+
         const isMoveVerb = lowerVerb === "move" || lowerVerb === "go";
         const isDirectMove = ["north", "south", "east", "west"].includes(lowerVerb);
         const direction = isMoveVerb ? rest[0] : (isDirectMove ? lowerVerb : "");
