@@ -39,7 +39,7 @@ export class UserCommandHandler {
                 return;
             }
 
-            const roomSnapshot: RoomSnapshot = this._world.getRoomSnapshot(player.roomId);
+            const roomSnapshot: RoomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
             socket.emit("world:room", roomSnapshot);
             return;
         }
@@ -73,4 +73,3 @@ export class UserCommandHandler {
     }
 
 }
-

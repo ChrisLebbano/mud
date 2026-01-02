@@ -129,6 +129,11 @@
                     <h2>Players</h2>
                     <ul id="room-players" class="room-list"></ul>
                 </div>
+                <div>
+                    <h2>Character</h2>
+                    <h3>Attributes</h3>
+                    <ul id="player-attributes" class="room-list"></ul>
+                </div>
             </div>
         </section>
         <div id="log" class="log" role="log" aria-live="polite" aria-label="Server messages"></div>
@@ -146,6 +151,7 @@
         const roomExits = document.getElementById("room-exits");
         const roomName = document.getElementById("room-name");
         const roomPlayers = document.getElementById("room-players");
+        const playerAttributes = document.getElementById("player-attributes");
         const zoneName = document.getElementById("zone-name");
         const submitButton = document.getElementById("submit-button");
 
@@ -171,6 +177,18 @@
             });
         };
 
+        const renderVitals = (listElement, snapshot) => {
+            if (!snapshot) {
+                renderList(listElement, []);
+                return;
+            }
+
+            renderList(listElement, [
+                `Health: ${snapshot.health}`,
+                `Mana: ${snapshot.mana}`
+            ]);
+        };
+
         const submitCommand = () => {
             const command = commandInput.value.trim();
             if (!command) {
@@ -191,6 +209,7 @@
             roomDescription.textContent = roomSnapshot.description;
             renderList(roomExits, roomSnapshot.exits);
             renderList(roomPlayers, roomSnapshot.players);
+            renderVitals(playerAttributes, roomSnapshot.player ? roomSnapshot.player.attributes : null);
         });
 
         socket.on("world:system", (message) => {
@@ -213,4 +232,3 @@
     </script>
 </body>
 </html>
-

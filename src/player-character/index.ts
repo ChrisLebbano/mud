@@ -1,4 +1,5 @@
 import { Character } from "../character";
+import { type PlayerSnapshot } from "../types";
 
 export class PlayerCharacter extends Character {
 
@@ -6,5 +7,13 @@ export class PlayerCharacter extends Character {
         super(id, name, roomId);
     }
 
-}
+    public toSnapshot(): PlayerSnapshot {
+        return {
+            attributes: this.attributes.toSnapshot(),
+            id: this.id,
+            name: this.name,
+            roomId: this.roomId
+        };
+    }
 
+}
