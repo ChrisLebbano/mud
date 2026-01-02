@@ -1,11 +1,11 @@
-import { Player } from "../player";
+import { PlayerCharacter } from "../player-character";
 import { Room } from "../room";
 import { type ChatMessage, type RoomSnapshot } from "../types";
 import { Zone } from "../zone";
 
 export class World {
 
-    private _players: Map<string, Player>;
+    private _players: Map<string, PlayerCharacter>;
     private _rooms: Map<string, Room>;
     private _startingRoomId: string;
     private _startingZoneId: string;
@@ -39,7 +39,7 @@ export class World {
 
     public addPlayer(playerId: string, playerName: string) {
         const room = this.getRoomById(this._startingRoomId);
-        const player = new Player(playerId, playerName, room.id);
+        const player = new PlayerCharacter(playerId, playerName, room.id);
 
         this._players.set(playerId, player);
         room.addPlayer(playerId);
@@ -51,7 +51,7 @@ export class World {
         };
     }
 
-    public getPlayer(playerId: string): Player | undefined {
+    public getPlayer(playerId: string): PlayerCharacter | undefined {
         return this._players.get(playerId);
     }
 
