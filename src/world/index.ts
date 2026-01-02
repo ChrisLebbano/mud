@@ -147,7 +147,7 @@ export class World {
 
         const trimmedMessage = message.trim();
         if (!trimmedMessage) {
-            return { error: "Say what?" };
+            return { error: "What would you like to say? (say [message here])" };
         }
 
         return {

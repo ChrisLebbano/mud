@@ -182,7 +182,7 @@
         };
 
         socket.on("world:chat", (chatMessage) => {
-            appendLog(`${chatMessage.playerName}: ${chatMessage.message}`);
+            appendLog(chatMessage.message);
         });
 
         socket.on("world:room", (roomSnapshot) => {
@@ -194,7 +194,7 @@
         });
 
         socket.on("world:system", (message) => {
-            appendLog(`[system] ${message}`);
+            appendLog(message);
         });
 
         commandInput.focus();
