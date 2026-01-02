@@ -1,7 +1,28 @@
-import { Room } from "../../src/room";
 import { expect } from "chai";
 
+import { NonPlayerCharacter } from "../../src/non-player-character";
+import { Room } from "../../src/room";
+
 describe(`[Class] Room`, () => {
+
+    describe(`[Method] addNonPlayerCharacter`, () => {
+
+        it(`should track non-player characters in the room`, () => {
+            const room = new Room("atrium", "Atrium", "A bright room.", { north: "lounge" });
+            const guide = new NonPlayerCharacter("npc-guide", "Guide", "atrium");
+            const mechanic = new NonPlayerCharacter("npc-mechanic", "Mechanic", "atrium");
+
+            room.addNonPlayerCharacter(guide);
+            room.addNonPlayerCharacter(mechanic);
+
+            expect(room.nonPlayerCharacters.map((character) => character.name)).to.deep.equal(["Guide", "Mechanic"]);
+
+            room.removeNonPlayerCharacter("npc-guide");
+
+            expect(room.nonPlayerCharacters.map((character) => character.name)).to.deep.equal(["Mechanic"]);
+        });
+
+    });
 
     describe(`[Method] addPlayer`, () => {
 
@@ -29,6 +50,7 @@ describe(`[Class] Room`, () => {
             expect(room.exitMap).to.deep.equal({ north: "lounge" });
             expect(room.id).to.equal("atrium");
             expect(room.name).to.equal("Atrium");
+            expect(room.nonPlayerCharacters).to.deep.equal([]);
         });
 
     });
@@ -36,7 +58,10 @@ describe(`[Class] Room`, () => {
     describe(`[Method] toSnapshot`, () => {
 
         it(`should return a snapshot of the room`, () => {
-            const room = new Room("atrium", "Atrium", "A bright room.", { north: "lounge", south: "garden" });
+            const room = new Room("atrium", "Atrium", "A bright room.", { north: "lounge", south: "garden" }, [
+                new NonPlayerCharacter("npc-guide", "Guide", "atrium"),
+                new NonPlayerCharacter("npc-scribe", "Scribe", "atrium")
+            ]);
             const snapshot = room.toSnapshot(["Zoe", "Alex"], { id: "starter-zone", name: "Starter Zone" });
 
             expect(snapshot).to.deep.equal({
@@ -44,6 +69,10 @@ describe(`[Class] Room`, () => {
                 exits: ["north", "south"],
                 id: "atrium",
                 name: "Atrium",
+                nonPlayerCharacters: [
+                    { id: "npc-guide", name: "Guide" },
+                    { id: "npc-scribe", name: "Scribe" }
+                ],
                 players: ["Alex", "Zoe"],
                 zone: { id: "starter-zone", name: "Starter Zone" }
             });

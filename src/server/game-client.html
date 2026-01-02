@@ -139,6 +139,10 @@
                     <ul id="room-exits" class="room-list"></ul>
                 </div>
                 <div>
+                    <h2>Residents</h2>
+                    <ul id="room-npcs" class="room-list"></ul>
+                </div>
+                <div>
                     <h2>Character</h2>
                     <h3>Attributes</h3>
                     <ul id="player-attributes" class="room-list"></ul>
@@ -158,6 +162,7 @@
         const roomDescription = document.getElementById("room-description");
         const roomExits = document.getElementById("room-exits");
         const roomName = document.getElementById("room-name");
+        const roomNpcs = document.getElementById("room-npcs");
         const playerAttributes = document.getElementById("player-attributes");
         const zoneName = document.getElementById("zone-name");
         const submitButton = document.getElementById("submit-button");
@@ -228,6 +233,7 @@
             zoneName.textContent = `Zone: ${roomSnapshot.zone.name}`;
             roomDescription.textContent = roomSnapshot.description;
             renderList(roomExits, roomSnapshot.exits);
+            renderList(roomNpcs, roomSnapshot.nonPlayerCharacters.map((nonPlayerCharacter) => nonPlayerCharacter.name));
             renderVitals(playerAttributes, roomSnapshot.player ? roomSnapshot.player.attributes : null);
         });
 
@@ -251,3 +257,4 @@
     </script>
 </body>
 </html>
+
