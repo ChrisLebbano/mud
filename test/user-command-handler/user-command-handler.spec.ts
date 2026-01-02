@@ -100,7 +100,7 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocketServer.roomEmits).to.have.lengthOf(1);
             expect(fakeSocketServer.roomEmits[0].event).to.equal("world:chat");
             expect(fakeSocketServer.roomEmits[0].roomId).to.equal("atrium");
-            expect(fakeSocketServer.roomEmits[0].payload).to.include({ message: "hello there", playerName: "Tester" });
+            expect(fakeSocketServer.roomEmits[0].payload).to.include({ message: "Tester says, \"hello there\".", playerName: "Tester" });
         });
 
         it(`should emit room snapshots when looking`, () => {
@@ -149,4 +149,3 @@ describe(`[Class] UserCommandHandler`, () => {
     });
 
 });
-

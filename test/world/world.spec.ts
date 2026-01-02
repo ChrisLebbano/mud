@@ -89,6 +89,7 @@ describe(`[Class] World`, () => {
                 throw new Error(chatResult.error);
             }
 
+            expect(chatResult.chatMessage.message).to.equal("Riley says, \"Hello from the lounge\".");
             expect(chatResult.chatMessage.roomId).to.equal("lounge");
             expect(chatResult.chatMessage.playerName).to.equal("Riley");
         });
@@ -130,4 +131,3 @@ describe(`[Class] World`, () => {
     });
 
 });
-
