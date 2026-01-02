@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { NonPlayerCharacter } from "../../src/non-player-character";
 import { Room } from "../../src/room";
 import { type SocketServer } from "../../src/types";
 import { UserCommandHandler } from "../../src/user-command-handler";
@@ -101,6 +102,29 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocketServer.roomEmits[0].event).to.equal("world:chat");
             expect(fakeSocketServer.roomEmits[0].roomId).to.equal("atrium");
             expect(fakeSocketServer.roomEmits[0].payload).to.include({ message: "Tester says, \"hello there\".", playerName: "Tester" });
+        });
+
+        it(`should let non-player characters respond to hails`, () => {
+            const world = new World([
+                new Zone("starter-zone", "Starter Zone", [
+                    new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", "Welcome aboard.")
+                    ]),
+                    new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
+                ], "atrium")
+            ], "starter-zone", "atrium");
+            const handler = new UserCommandHandler(world);
+            const fakeSocketServer = new FakeSocketServer();
+            const fakeSocket = new FakeSocket("player-1");
+
+            handler.setSocketServer(fakeSocketServer as unknown as SocketServer);
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "say Hail Greeter");
+
+            expect(fakeSocketServer.roomEmits).to.have.lengthOf(2);
+            expect(fakeSocketServer.roomEmits[1].event).to.equal("world:chat");
+            expect(fakeSocketServer.roomEmits[1].payload).to.include({ message: "Greeter says, \"Welcome aboard.\"", playerName: "Greeter" });
         });
 
         it(`should emit room snapshots when looking`, () => {

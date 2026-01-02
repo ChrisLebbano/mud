@@ -16,5 +16,30 @@ describe(`[Class] NonPlayerCharacter`, () => {
 
     });
 
-});
+    describe(`[Method] hailResponse`, () => {
 
+        it(`should return the hail response when set`, () => {
+            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Guide", "atrium", "Greetings traveler.");
+
+            expect(nonPlayerCharacter.hailResponse).to.equal("Greetings traveler.");
+        });
+
+    });
+
+    describe(`[Method] respondToHail`, () => {
+
+        it(`should return the hail response when available`, () => {
+            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Guide", "atrium", "Hello there.");
+
+            expect(nonPlayerCharacter.respondToHail()).to.equal("Hello there.");
+        });
+
+        it(`should return undefined when no hail response is configured`, () => {
+            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Guide", "atrium");
+
+            expect(nonPlayerCharacter.respondToHail()).to.equal(undefined);
+        });
+
+    });
+
+});

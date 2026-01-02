@@ -35,6 +35,28 @@ export class UserCommandHandler {
 
             const chatMessage: ChatMessage = sayResult.chatMessage;
             this._socketServer?.to(chatMessage.roomId).emit("world:chat", chatMessage);
+            const trimmedMessage = message.trim();
+            const hailMatch = trimmedMessage.match(/^hail\s+(.+)/i);
+            if (hailMatch) {
+                const targetName = hailMatch[1].trim().toLowerCase();
+                const room = this._world.getRoom(chatMessage.roomId);
+                if (room) {
+                    const matchingNonPlayerCharacter = room.nonPlayerCharacters
+                        .find((nonPlayerCharacter) => nonPlayerCharacter.name.toLowerCase() === targetName);
+                    const hailResponse = matchingNonPlayerCharacter?.respondToHail();
+                    if (matchingNonPlayerCharacter && hailResponse) {
+                        const trimmedResponse = hailResponse.trim();
+                        const punctuationSuffix = /[.!?]$/.test(trimmedResponse) ? "" : ".";
+                        const nonPlayerChatMessage: ChatMessage = {
+                            message: `${matchingNonPlayerCharacter.name} says, "${trimmedResponse}${punctuationSuffix}"`,
+                            playerId: matchingNonPlayerCharacter.id,
+                            playerName: matchingNonPlayerCharacter.name,
+                            roomId: chatMessage.roomId
+                        };
+                        this._socketServer?.to(chatMessage.roomId).emit("world:chat", nonPlayerChatMessage);
+                    }
+                }
+            }
             return;
         }
 
