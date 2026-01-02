@@ -27,7 +27,7 @@ export class Server {
                     north: "lounge",
                     west: "workshop"
                 }, [
-                    new NonPlayerCharacter("npc-guide", "Terminal Guide", "atrium")
+                    new NonPlayerCharacter("npc-guide", "Terminal Guide", "atrium", "Welcome to the terminal atrium. Need a hand getting started?")
                 ]),
                 new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", {
                     north: "observatory",
@@ -103,4 +103,3 @@ export class Server {
     }
 
 }
-
