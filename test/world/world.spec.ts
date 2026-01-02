@@ -131,6 +131,7 @@ describe(`[Class] World`, () => {
                 name: "Alex",
                 roomId: "atrium"
             });
+            expect(snapshot.nonPlayerCharacters).to.deep.equal([]);
             expect(snapshot.zone).to.deep.equal({ id: "starter-zone", name: "Starter Zone" });
         });
 
@@ -158,3 +159,4 @@ describe(`[Class] World`, () => {
     });
 
 });
+

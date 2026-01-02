@@ -25,6 +25,11 @@ export interface MoveCommand {
     direction: string;
 }
 
+export interface NonPlayerCharacterSnapshot {
+    id: string;
+    name: string;
+}
+
 export interface PlayerSnapshot {
     attributes: CharacterAttributesSnapshot;
     id: string;
@@ -42,6 +47,7 @@ export interface RoomSnapshot {
     exits: string[];
     id: string;
     name: string;
+    nonPlayerCharacters: NonPlayerCharacterSnapshot[];
     player?: PlayerSnapshot;
     players: string[];
     zone: ZoneSnapshot;
@@ -54,3 +60,4 @@ export interface ServerConfig {
 export type HttpRequestHandler = (request: IncomingMessage, response: ServerResponse) => void;
 export type NodeHttpServer = Server;
 export type SocketServer = SocketIOServer;
+
