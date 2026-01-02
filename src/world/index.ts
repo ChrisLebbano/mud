@@ -1,17 +1,40 @@
 import { Player } from "../player";
 import { Room } from "../room";
 import { type ChatMessage, type RoomSnapshot } from "../types";
+import { Zone } from "../zone";
 
 export class World {
 
     private _players: Map<string, Player>;
     private _rooms: Map<string, Room>;
     private _startingRoomId: string;
+    private _startingZoneId: string;
+    private _zones: Map<string, Zone>;
+    private _roomZones: Map<string, Zone>;
 
-    constructor(rooms: Room[], startingRoomId: string) {
+    constructor(zones: Zone[], startingZoneId: string, startingRoomId: string) {
         this._players = new Map();
-        this._rooms = new Map(rooms.map((room) => [room.id, room]));
+        this._rooms = new Map();
         this._startingRoomId = startingRoomId;
+        this._startingZoneId = startingZoneId;
+        this._zones = new Map(zones.map((zone) => [zone.id, zone]));
+        this._roomZones = new Map();
+
+        zones.forEach((zone) => {
+            zone.rooms.forEach((room) => {
+                if (this._rooms.has(room.id)) {
+                    throw new Error(`Duplicate room id detected: ${room.id}`);
+                }
+                this._rooms.set(room.id, room);
+                this._roomZones.set(room.id, zone);
+            });
+        });
+
+        const startingZone = this.getZoneById(this._startingZoneId);
+        const startingRoom = startingZone.getRoom(this._startingRoomId);
+        if (!startingRoom) {
+            throw new Error(`Room not found: ${this._startingRoomId}`);
+        }
     }
 
     public addPlayer(playerId: string, playerName: string) {
@@ -46,12 +69,33 @@ export class World {
 
     public getRoomSnapshot(roomId: string): RoomSnapshot {
         const room = this.getRoomById(roomId);
+        const zone = this.getZoneForRoom(roomId);
         const playerNames = room.playerIds.map((playerId) => {
             const player = this._players.get(playerId);
             return player ? player.name : playerId;
         });
 
-        return room.toSnapshot(playerNames);
+        return room.toSnapshot(playerNames, zone.toSnapshot());
+    }
+
+    public getZone(zoneId: string): Zone | undefined {
+        return this._zones.get(zoneId);
+    }
+
+    private getZoneById(zoneId: string): Zone {
+        const zone = this._zones.get(zoneId);
+        if (!zone) {
+            throw new Error(`Zone not found: ${zoneId}`);
+        }
+        return zone;
+    }
+
+    private getZoneForRoom(roomId: string): Zone {
+        const zone = this._roomZones.get(roomId);
+        if (!zone) {
+            throw new Error(`Zone not found for room: ${roomId}`);
+        }
+        return zone;
     }
 
     public movePlayer(playerId: string, direction: string) {
@@ -116,3 +160,4 @@ export class World {
     }
 
 }
+

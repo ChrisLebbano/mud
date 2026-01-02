@@ -1,5 +1,6 @@
 import { Room } from "../../src/room";
 import { World } from "../../src/world";
+import { Zone } from "../../src/zone";
 import { expect } from "chai";
 
 describe(`[Class] World`, () => {
@@ -11,7 +12,8 @@ describe(`[Class] World`, () => {
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }),
                 new Room("lounge", "Lounge", "A quiet lounge.", { south: "atrium" })
             ];
-            const world = new World(rooms, "atrium");
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], "starter-zone", "atrium");
 
             const result = world.addPlayer("player-1", "Alex");
 
@@ -28,7 +30,8 @@ describe(`[Class] World`, () => {
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }),
                 new Room("lounge", "Lounge", "A quiet lounge.", { south: "atrium" })
             ];
-            const world = new World(rooms, "atrium");
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], "starter-zone", "atrium");
 
             world.addPlayer("player-1", "Alex");
             const moveResult = world.movePlayer("player-1", "north");
@@ -51,7 +54,8 @@ describe(`[Class] World`, () => {
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }),
                 new Room("lounge", "Lounge", "A quiet lounge.", { south: "atrium" })
             ];
-            const world = new World(rooms, "atrium");
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], "starter-zone", "atrium");
 
             world.addPlayer("player-1", "Alex");
             const removed = world.removePlayer("player-1");
@@ -69,7 +73,8 @@ describe(`[Class] World`, () => {
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }),
                 new Room("lounge", "Lounge", "A quiet lounge.", { south: "atrium" })
             ];
-            const world = new World(rooms, "atrium");
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], "starter-zone", "atrium");
 
             world.addPlayer("player-1", "Alex");
             world.addPlayer("player-2", "Riley");
@@ -96,7 +101,8 @@ describe(`[Class] World`, () => {
             const rooms = [
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" })
             ];
-            const world = new World(rooms, "atrium");
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], "starter-zone", "atrium");
 
             const room = world.getRoom("atrium");
 
@@ -111,14 +117,17 @@ describe(`[Class] World`, () => {
             const rooms = [
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" })
             ];
-            const world = new World(rooms, "atrium");
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], "starter-zone", "atrium");
 
             world.addPlayer("player-1", "Alex");
             const snapshot = world.getRoomSnapshot("atrium");
 
             expect(snapshot.players).to.deep.equal(["Alex"]);
+            expect(snapshot.zone).to.deep.equal({ id: "starter-zone", name: "Starter Zone" });
         });
 
     });
 
 });
+

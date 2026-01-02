@@ -37,17 +37,19 @@ describe(`[Class] Room`, () => {
 
         it(`should return a snapshot of the room`, () => {
             const room = new Room("atrium", "Atrium", "A bright room.", { north: "lounge", south: "garden" });
-            const snapshot = room.toSnapshot(["Zoe", "Alex"]);
+            const snapshot = room.toSnapshot(["Zoe", "Alex"], { id: "starter-zone", name: "Starter Zone" });
 
             expect(snapshot).to.deep.equal({
                 description: "A bright room.",
                 exits: ["north", "south"],
                 id: "atrium",
                 name: "Atrium",
-                players: ["Alex", "Zoe"]
+                players: ["Alex", "Zoe"],
+                zone: { id: "starter-zone", name: "Starter Zone" }
             });
         });
 
     });
 
 });
+

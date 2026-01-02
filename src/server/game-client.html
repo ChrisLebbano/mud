@@ -118,6 +118,7 @@
     <main>
         <section class="room-details" aria-live="polite">
             <h1 id="room-name">Connecting...</h1>
+            <h2 id="zone-name"></h2>
             <p id="room-description"></p>
             <div class="room-grid">
                 <div>
@@ -145,6 +146,7 @@
         const roomExits = document.getElementById("room-exits");
         const roomName = document.getElementById("room-name");
         const roomPlayers = document.getElementById("room-players");
+        const zoneName = document.getElementById("zone-name");
         const submitButton = document.getElementById("submit-button");
 
         const appendLog = (message) => {
@@ -185,6 +187,7 @@
 
         socket.on("world:room", (roomSnapshot) => {
             roomName.textContent = roomSnapshot.name;
+            zoneName.textContent = `Zone: ${roomSnapshot.zone.name}`;
             roomDescription.textContent = roomSnapshot.description;
             renderList(roomExits, roomSnapshot.exits);
             renderList(roomPlayers, roomSnapshot.players);
@@ -210,3 +213,4 @@
     </script>
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-import { type RoomSnapshot } from "../types";
+import { type RoomSnapshot, type ZoneSnapshot } from "../types";
 
 export class Room {
 
@@ -44,13 +44,14 @@ export class Room {
         this._players.delete(playerId);
     }
 
-    public toSnapshot(playerNames: string[]): RoomSnapshot {
+    public toSnapshot(playerNames: string[], zoneSnapshot: ZoneSnapshot): RoomSnapshot {
         return {
             description: this._description,
             exits: Object.keys(this._exits).sort(),
             id: this._id,
             name: this._name,
-            players: [...playerNames].sort()
+            players: [...playerNames].sort(),
+            zone: zoneSnapshot
         };
     }
 
