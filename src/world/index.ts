@@ -1,6 +1,7 @@
+import { NonPlayerCharacter } from "../non-player-character";
 import { PlayerCharacter } from "../player-character";
 import { Room } from "../room";
-import { type ChatMessage, type RoomSnapshot } from "../types";
+import { type ChatMessage, type RoomSnapshot, type WorldData } from "../types";
 import { Zone } from "../zone";
 
 export class World {
@@ -49,6 +50,31 @@ export class World {
             roomSnapshot: this.getRoomSnapshot(room.id, playerId),
             systemMessage: `${playerName} has entered the room.`
         };
+    }
+
+    public static fromData(worldData: WorldData): World {
+        const zones = worldData.zones.map((zoneData) => {
+            const rooms = zoneData.rooms.map((roomData) => {
+                const nonPlayerCharacters = (roomData.nonPlayerCharacters ?? []).map((nonPlayerCharacterData) => new NonPlayerCharacter(
+                    nonPlayerCharacterData.id,
+                    nonPlayerCharacterData.name,
+                    roomData.id,
+                    nonPlayerCharacterData.hailResponse
+                ));
+
+                return new Room(
+                    roomData.id,
+                    roomData.name,
+                    roomData.description,
+                    roomData.exits,
+                    nonPlayerCharacters
+                );
+            });
+
+            return new Zone(zoneData.id, zoneData.name, rooms, zoneData.startingRoomId);
+        });
+
+        return new World(zones, worldData.startingZoneId, worldData.startingRoomId);
     }
 
     public getPlayer(playerId: string): PlayerCharacter | undefined {
