@@ -1,9 +1,12 @@
 import { GameClientRoute } from "../../src/game-client-route";
 import { NodeHttpServerFactory } from "../../src/node-http-server-factory";
+import { Room } from "../../src/room";
 import { Server } from "../../src/server";
 import { ServerRouter } from "../../src/server-router";
 import { SocketServerFactory } from "../../src/socket-server-factory";
 import { type HttpRequestHandler, type NodeHttpServer, type SocketServer } from "../../src/types";
+import { World } from "../../src/world";
+import { Zone } from "../../src/zone";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 
@@ -181,6 +184,12 @@ class FakeSocket {
 
 }
 
+const createWorld = (): World => {
+    return new World([new Zone("test-zone", "Test Zone", [
+        new Room("test-room", "Test Room", "A test room.", {})
+    ], "test-room")], "test-zone", "test-room");
+};
+
 describe(`[Class] Server`, () => {
 
     describe(`[Method] start`, () => {
@@ -202,7 +211,7 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([]);
-            const server = new Server({ port: 4321 }, serverRouter);
+            const server = new Server({ port: 4321 }, serverRouter, createWorld());
 
             const startedServer = server.start();
 
@@ -230,7 +239,7 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([new GameClientRoute()]);
-            const server = new Server({ port: 4321 }, serverRouter);
+            const server = new Server({ port: 4321 }, serverRouter, createWorld());
 
             server.start();
 
@@ -272,7 +281,7 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([]);
-            const server = new Server({ port: 4321 }, serverRouter);
+            const server = new Server({ port: 4321 }, serverRouter, createWorld());
 
             server.start();
 
