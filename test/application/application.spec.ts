@@ -1,9 +1,18 @@
 import { Application } from "../../src/application";
+import { Room } from "../../src/room";
 import { Server } from "../../src/server";
 import { type NodeHttpServer } from "../../src/types";
+import { World } from "../../src/world";
+import { Zone } from "../../src/zone";
 import { expect } from "chai";
 
 describe(`[Class] Application`, () => {
+
+    const createWorld = (): World => {
+        return new World([new Zone("test-zone", "Test Zone", [
+            new Room("test-room", "Test Room", "A test room.", {})
+        ], "test-room")], "test-zone", "test-room");
+    };
 
     describe(`[Method] init`, () => {
 
@@ -16,7 +25,7 @@ describe(`[Class] Application`, () => {
                 return {} as NodeHttpServer;
             };
 
-            const app = new Application({ port: 8000 });
+            const app = new Application({ port: 8000 }, createWorld());
 
             expect(app.server).to.be.undefined;
 
