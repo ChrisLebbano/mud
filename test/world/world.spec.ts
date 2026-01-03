@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { Room } from "../../src/room";
+import { type WorldData } from "../../src/types";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
 
@@ -19,6 +20,51 @@ describe(`[Class] World`, () => {
 
             expect(result.roomId).to.equal("atrium");
             expect(result.roomSnapshot.players).to.include("Alex");
+        });
+
+    });
+
+    describe(`[Method] fromData`, () => {
+
+        it(`should build a world from data`, () => {
+            const worldData: WorldData = {
+                startingRoomId: "atrium",
+                startingZoneId: "starter-zone",
+                zones: [
+                    {
+                        id: "starter-zone",
+                        name: "Starter Zone",
+                        rooms: [
+                            {
+                                description: "A bright room.",
+                                exits: { north: "lounge" },
+                                id: "atrium",
+                                name: "Atrium",
+                                nonPlayerCharacters: [
+                                    {
+                                        hailResponse: "Hello there.",
+                                        id: "npc-1",
+                                        name: "Greeter"
+                                    }
+                                ]
+                            },
+                            {
+                                description: "A quiet lounge.",
+                                exits: { south: "atrium" },
+                                id: "lounge",
+                                name: "Lounge"
+                            }
+                        ],
+                        startingRoomId: "atrium"
+                    }
+                ]
+            };
+
+            const world = World.fromData(worldData);
+            const room = world.getRoom("atrium");
+
+            expect(room?.name).to.equal("Atrium");
+            expect(room?.nonPlayerCharacters.map((npc) => npc.name)).to.deep.equal(["Greeter"]);
         });
 
     });
@@ -159,4 +205,3 @@ describe(`[Class] World`, () => {
     });
 
 });
-

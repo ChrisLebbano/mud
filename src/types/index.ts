@@ -57,7 +57,33 @@ export interface ServerConfig {
     port: number;
 }
 
+export interface WorldData {
+    startingRoomId: string;
+    startingZoneId: string;
+    zones: WorldZoneData[];
+}
+
+export interface WorldNonPlayerCharacterData {
+    hailResponse?: string;
+    id: string;
+    name: string;
+}
+
+export interface WorldRoomData {
+    description: string;
+    exits: Record<string, string>;
+    id: string;
+    name: string;
+    nonPlayerCharacters?: WorldNonPlayerCharacterData[];
+}
+
+export interface WorldZoneData {
+    id: string;
+    name: string;
+    rooms: WorldRoomData[];
+    startingRoomId: string;
+}
+
 export type HttpRequestHandler = (request: IncomingMessage, response: ServerResponse) => void;
 export type NodeHttpServer = Server;
 export type SocketServer = SocketIOServer;
-

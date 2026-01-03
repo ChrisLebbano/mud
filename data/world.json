@@ -1,0 +1,103 @@
+{
+  "startingRoomId": "atrium",
+  "startingZoneId": "starter-zone",
+  "zones": [
+    {
+      "id": "starter-zone",
+      "name": "Starter Zone",
+      "rooms": [
+        {
+          "description": "A neon-lit atrium with flickering signage and a humming terminal.",
+          "exits": {
+            "east": "library",
+            "north": "lounge",
+            "west": "workshop"
+          },
+          "id": "atrium",
+          "name": "Atrium",
+          "nonPlayerCharacters": [
+            {
+              "hailResponse": "Welcome to the terminal atrium. Need a hand getting started?",
+              "id": "npc-guide",
+              "name": "Terminal Guide"
+            }
+          ]
+        },
+        {
+          "description": "A quiet lounge with battered sofas and a wall of monitors.",
+          "exits": {
+            "north": "observatory",
+            "south": "atrium"
+          },
+          "id": "lounge",
+          "name": "Lounge",
+          "nonPlayerCharacters": [
+            {
+              "id": "npc-analyst",
+              "name": "Caffeinated Analyst"
+            }
+          ]
+        },
+        {
+          "description": "A hushed library of holographic shelves and whispering index lights.",
+          "exits": {
+            "west": "atrium"
+          },
+          "id": "library",
+          "name": "Library",
+          "nonPlayerCharacters": [
+            {
+              "id": "npc-librarian",
+              "name": "Archivist Imani"
+            }
+          ]
+        },
+        {
+          "description": "A workshop lined with humming tools and half-built drones.",
+          "exits": {
+            "east": "atrium",
+            "south": "courtyard"
+          },
+          "id": "workshop",
+          "name": "Workshop",
+          "nonPlayerCharacters": [
+            {
+              "id": "npc-mechanic",
+              "name": "Gearwright Tamsin"
+            }
+          ]
+        },
+        {
+          "description": "A domed observatory with rotating lenses and a sky-map projector.",
+          "exits": {
+            "south": "lounge"
+          },
+          "id": "observatory",
+          "name": "Observatory",
+          "nonPlayerCharacters": [
+            {
+              "id": "npc-starwatcher",
+              "name": "Starwatcher Orin"
+            }
+          ]
+        },
+        {
+          "description": "An open courtyard with bioluminescent planters and soft mist.",
+          "exits": {
+            "north": "workshop"
+          },
+          "id": "courtyard",
+          "name": "Courtyard",
+          "nonPlayerCharacters": [
+            {
+              "id": "npc-gardener",
+              "name": "Gardener Rue"
+            }
+          ]
+        }
+      ],
+      "startingRoomId": "atrium"
+    }
+  ]
+}
+
