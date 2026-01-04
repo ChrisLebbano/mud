@@ -72,6 +72,33 @@ export class UserCommandHandler {
             return;
         }
 
+        if (lowerVerb === "char") {
+            const player = this._world.getPlayer(socket.id);
+            if (!player) {
+                socket.emit("world:system", "Player not found.");
+                return;
+            }
+
+            const attributes = player.attributes;
+            const listItems = [
+                `Name: ${player.name}`,
+                `Strength: ${attributes.strength}`,
+                `Agility: ${attributes.agility}`,
+                `Dexterity: ${attributes.dexterity}`,
+                `Perception: ${attributes.perception}`,
+                `Constitution: ${attributes.constitution}`,
+                `Wisdom: ${attributes.wisdom}`,
+                `Intelligence: ${attributes.intelligence}`,
+                `Charisma: ${attributes.charisma}`,
+                `Resolve: ${attributes.resolve}`,
+                `Health: ${attributes.health}`,
+                `Mana: ${attributes.mana}`
+            ];
+            const listMessage = listItems.join("\n");
+            socket.emit("world:system", listMessage);
+            return;
+        }
+
         if (lowerVerb === "who") {
             const player = this._world.getPlayer(socket.id);
             if (!player) {

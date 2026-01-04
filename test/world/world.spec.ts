@@ -173,7 +173,19 @@ describe(`[Class] World`, () => {
 
             expect(snapshot.players).to.deep.equal(["Alex"]);
             expect(snapshot.player).to.deep.equal({
-                attributes: { health: 40, mana: 20 },
+                attributes: {
+                    agility: 10,
+                    charisma: 10,
+                    constitution: 10,
+                    dexterity: 10,
+                    health: 40,
+                    intelligence: 10,
+                    mana: 20,
+                    perception: 10,
+                    resolve: 10,
+                    strength: 10,
+                    wisdom: 10
+                },
                 id: "player-1",
                 name: "Alex",
                 primaryTargetName: undefined,

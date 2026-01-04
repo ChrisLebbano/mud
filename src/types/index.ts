@@ -2,8 +2,17 @@ import { type IncomingMessage, type Server, type ServerResponse } from "node:htt
 import { Server as SocketIOServer } from "socket.io";
 
 export interface CharacterAttributesSnapshot {
+    agility: number;
+    charisma: number;
+    constitution: number;
+    dexterity: number;
     health: number;
+    intelligence: number;
     mana: number;
+    perception: number;
+    resolve: number;
+    strength: number;
+    wisdom: number;
 }
 
 export interface ChatMessage {
