@@ -21,7 +21,15 @@ describe(`[Class] World`, () => {
 
             expect(result.roomId).to.equal("atrium");
             expect(result.roomSnapshot.players).to.include("Alex");
-        });
+});
+
+
+
+
+
+
+
+
 
     });
 
@@ -214,7 +222,9 @@ describe(`[Class] World`, () => {
                     strength: 10,
                     wisdom: 10
                 },
+                currentHealth: 40,
                 id: "player-1",
+                maxHealth: 40,
                 name: "Alex",
                 primaryTargetName: undefined,
                 primaryTargetVitals: undefined,
@@ -354,3 +364,4 @@ describe(`[Class] World`, () => {
     });
 
 });
+

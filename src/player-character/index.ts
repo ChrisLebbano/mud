@@ -16,7 +16,9 @@ export class PlayerCharacter extends Character {
 
         return {
             attributes: this.attributes.toSnapshot(),
+            currentHealth: this.secondaryAttributes.currentHealth,
             id: this.id,
+            maxHealth: this.secondaryAttributes.maxHealth,
             name: this.name,
             primaryTargetName: this.primaryTarget?.name,
             primaryTargetVitals,
@@ -25,3 +27,5 @@ export class PlayerCharacter extends Character {
     }
 
 }
+
+

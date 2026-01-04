@@ -47,7 +47,9 @@ export interface NonPlayerCharacterSnapshot {
 
 export interface PlayerSnapshot {
     attributes: CharacterAttributesSnapshot;
+    currentHealth: number;
     id: string;
+    maxHealth: number;
     name: string;
     primaryTargetName?: string;
     primaryTargetVitals?: TargetVitalsSnapshot;
@@ -110,3 +112,4 @@ export interface WorldZoneData {
 export type HttpRequestHandler = (request: IncomingMessage, response: ServerResponse) => void;
 export type NodeHttpServer = Server;
 export type SocketServer = SocketIOServer;
+

@@ -314,15 +314,15 @@
             listElement.appendChild(healthBarItem);
         };
 
-        const renderVitals = (listElement, snapshot) => {
-            if (!snapshot) {
+        const renderVitals = (listElement, playerSnapshot) => {
+            if (!playerSnapshot) {
                 renderList(listElement, []);
                 return;
             }
 
             renderList(listElement, [
-                `Health: ${snapshot.health}`,
-                `Mana: ${snapshot.mana}`
+                `Health: ${playerSnapshot.currentHealth}/${playerSnapshot.maxHealth}`,
+                `Mana: ${playerSnapshot.attributes.mana}`
             ]);
         };
 
@@ -350,7 +350,7 @@
             roomDescription.textContent = roomSnapshot.description;
             renderList(roomExits, roomSnapshot.exits);
             renderTargetList(roomNpcs, roomSnapshot.nonPlayerCharacters.map((nonPlayerCharacter) => nonPlayerCharacter.name));
-            renderVitals(playerAttributes, roomSnapshot.player ? roomSnapshot.player.attributes : null);
+            renderVitals(playerAttributes, roomSnapshot.player ?? null);
             renderTargetSummary(
                 playerTarget,
                 roomSnapshot.player ? roomSnapshot.player.primaryTargetName : null,
@@ -387,3 +387,4 @@
     </script>
 </body>
 </html>
+
