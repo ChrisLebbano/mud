@@ -5,6 +5,7 @@ export class Character {
     private _attributes: CharacterAttributes;
     private _id: string;
     private _name: string;
+    private _primaryTarget?: Character;
     private _roomId: string;
     constructor(id: string, name: string, roomId: string) {
         this._attributes = new CharacterAttributes(40, 20);
@@ -25,8 +26,16 @@ export class Character {
         return this._name;
     }
 
+    public get primaryTarget(): Character | undefined {
+        return this._primaryTarget;
+    }
+
     public get roomId(): string {
         return this._roomId;
+    }
+
+    public set primaryTarget(primaryTarget: Character | undefined) {
+        this._primaryTarget = primaryTarget;
     }
 
     public set roomId(roomId: string) {
