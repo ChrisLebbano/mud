@@ -12,17 +12,17 @@ export class CharacterSecondaryAttributes {
         this._currentHealth = maxHealth;
     }
 
+    public applyDamage(amount: number): number {
+        this._currentHealth -= amount;
+        return this._currentHealth;
+    }
+
     public get attackDelaySeconds(): number {
         return this._attackDelaySeconds;
     }
 
     public set attackDelaySeconds(attackDelaySeconds: number) {
         this._attackDelaySeconds = attackDelaySeconds;
-    }
-
-    public applyDamage(amount: number): number {
-        this._currentHealth -= amount;
-        return this._currentHealth;
     }
 
     public get currentHealth(): number {
@@ -50,4 +50,3 @@ export class CharacterSecondaryAttributes {
     }
 
 }
-

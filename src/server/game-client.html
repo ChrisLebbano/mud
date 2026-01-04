@@ -96,6 +96,10 @@
             padding: 10px 12px;
         }
 
+        .input-bar input.attack-active {
+            animation: blink-caret 1s step-end infinite, attack-border 0.6s linear infinite;
+        }
+
         .input-bar input:focus {
             outline: none;
         }
@@ -131,6 +135,16 @@
             50%,
             100% {
                 caret-color: transparent;
+            }
+        }
+
+        @keyframes attack-border {
+            0%,
+            100% {
+                border-color: #f00;
+            }
+            50% {
+                border-color: #000;
             }
         }
     </style>
@@ -255,6 +269,10 @@
             ]);
         };
 
+        const setAttackIndicator = (isAttacking) => {
+            commandInput.classList.toggle("attack-active", isAttacking);
+        };
+
         const submitCommand = () => {
             const command = commandInput.value.trim();
             if (!command) {
@@ -281,6 +299,14 @@
 
         socket.on("world:system", (message) => {
             appendLog(message);
+            if (message.startsWith("You are now attacking ")) {
+                setAttackIndicator(true);
+                return;
+            }
+
+            if (message === "You stop attacking." || message.includes("already dead.")) {
+                setAttackIndicator(false);
+            }
         });
 
         commandInput.focus();

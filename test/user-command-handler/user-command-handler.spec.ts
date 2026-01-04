@@ -166,6 +166,8 @@ describe(`[Class] UserCommandHandler`, () => {
                 "Resolve: 10",
                 "Health: 40",
                 "Current Health: 40",
+                "Damage: 10",
+                "Attack Delay: 5s",
                 "Mana: 20"
             ].join("\n"));
         });
@@ -261,6 +263,29 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits).to.have.lengthOf(1);
             expect(fakeSocket.emits[0].event).to.equal("world:system");
             expect(fakeSocket.emits[0].payload).to.equal("No primary target selected.");
+        });
+
+        it(`should toggle attacking off when issuing attack again`, () => {
+            const world = new World([
+                new Zone("starter-zone", "Starter Zone", [
+                    new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium")
+                    ])
+                ], "atrium")
+            ], "starter-zone", "atrium");
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "target Greeter");
+            handler.handleCommand(fakeSocket, "attack");
+            handler.handleCommand(fakeSocket, "attack");
+
+            expect(fakeSocket.emits[2].event).to.equal("world:system");
+            expect(fakeSocket.emits[2].payload).to.equal("You are now attacking Greeter.");
+            expect(fakeSocket.emits[4].event).to.equal("world:system");
+            expect(fakeSocket.emits[4].payload).to.equal("You stop attacking.");
         });
 
         it(`should warn on unknown commands`, () => {

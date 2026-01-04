@@ -82,6 +82,7 @@ export class UserCommandHandler {
             }
 
             const attributes = player.attributes;
+            const secondaryAttributes = player.secondaryAttributes;
             const listItems = [
                 `Name: ${player.name}`,
                 `Strength: ${attributes.strength}`,
@@ -94,7 +95,9 @@ export class UserCommandHandler {
                 `Charisma: ${attributes.charisma}`,
                 `Resolve: ${attributes.resolve}`,
                 `Health: ${attributes.health}`,
-                `Current Health: ${player.secondaryAttributes.currentHealth}`,
+                `Current Health: ${secondaryAttributes.currentHealth}`,
+                `Damage: ${secondaryAttributes.damage}`,
+                `Attack Delay: ${secondaryAttributes.attackDelaySeconds}s`,
                 `Mana: ${attributes.mana}`
             ];
             const listMessage = listItems.join("\n");
@@ -109,10 +112,10 @@ export class UserCommandHandler {
                 return;
             }
 
-            const attackTimeout = this._attackTimeouts.get(socket.id);
-            if (attackTimeout) {
-                clearTimeout(attackTimeout);
-                this._attackTimeouts.delete(socket.id);
+            if (player.isAttacking) {
+                this.stopAttacking(socket.id);
+                socket.emit("world:system", "You stop attacking.");
+                return;
             }
 
             const attackResult = this._world.performAttack(socket.id);
@@ -131,25 +134,24 @@ export class UserCommandHandler {
             }
 
             player.isAttacking = true;
+            socket.emit("world:system", `You are now attacking ${attackResult.targetName}.`);
             socket.emit("world:system", `You hit ${attackResult.targetName} for ${attackResult.damage} damage.`);
 
             const scheduleAttack = (): void => {
                 const nextTimeout = setTimeout(() => {
                     const nextAttackResult = this._world.performAttack(socket.id);
                     if ("error" in nextAttackResult) {
-                        player.isAttacking = false;
+                        this.stopAttacking(socket.id);
                         socket.emit("world:system", nextAttackResult.error);
-                        this._attackTimeouts.delete(socket.id);
                         return;
                     }
 
                     if ("warning" in nextAttackResult) {
-                        player.isAttacking = false;
                         if ("damage" in nextAttackResult) {
                             socket.emit("world:system", `You hit ${nextAttackResult.targetName} for ${nextAttackResult.damage} damage.`);
                         }
+                        this.stopAttacking(socket.id);
                         socket.emit("world:system", nextAttackResult.warning);
-                        this._attackTimeouts.delete(socket.id);
                         return;
                     }
 
@@ -228,6 +230,19 @@ export class UserCommandHandler {
 
     public setSocketServer(socketServer: SocketServer): void {
         this._socketServer = socketServer;
+    }
+
+    private stopAttacking(playerId: string): void {
+        const attackTimeout = this._attackTimeouts.get(playerId);
+        if (attackTimeout) {
+            clearTimeout(attackTimeout);
+            this._attackTimeouts.delete(playerId);
+        }
+
+        const player = this._world.getPlayer(playerId);
+        if (player) {
+            player.isAttacking = false;
+        }
     }
 
 }
