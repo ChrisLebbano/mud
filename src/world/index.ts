@@ -53,6 +53,20 @@ export class World {
         };
     }
 
+    private clearTargetsOutsideRoom(): void {
+        this._players.forEach((player) => {
+            const target = player.primaryTarget;
+            if (!target) {
+                return;
+            }
+
+            if (player.roomId !== target.roomId) {
+                player.isAttacking = false;
+                player.primaryTarget = undefined;
+            }
+        });
+    }
+
     public static fromData(worldData: WorldData): World {
         const zones = worldData.zones.map((zoneData) => {
             const rooms = zoneData.rooms.map((roomData) => {
@@ -157,6 +171,7 @@ export class World {
         currentRoom.removePlayer(playerId);
         nextRoom.addPlayer(playerId);
         player.roomId = nextRoom.id;
+        this.clearTargetsOutsideRoom();
 
         return {
             direction,
@@ -176,6 +191,12 @@ export class World {
         const target = player.primaryTarget;
         if (!target) {
             return { error: "No primary target selected." };
+        }
+
+        if (target.roomId !== player.roomId) {
+            player.isAttacking = false;
+            player.primaryTarget = undefined;
+            return { error: `${target.name} is no longer here.` };
         }
 
         if (!target.secondaryAttributes.isAlive) {
