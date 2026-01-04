@@ -12,6 +12,7 @@ export class PlayerCharacter extends Character {
             attributes: this.attributes.toSnapshot(),
             id: this.id,
             name: this.name,
+            primaryTargetName: this.primaryTarget?.name,
             roomId: this.roomId
         };
     }

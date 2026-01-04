@@ -1,3 +1,4 @@
+import { Character } from "../character";
 import { NonPlayerCharacter } from "../non-player-character";
 import { PlayerCharacter } from "../player-character";
 import { Room } from "../room";
@@ -197,6 +198,39 @@ export class World {
                 playerName: player.name,
                 roomId: player.roomId
             }
+        };
+    }
+
+    public setPrimaryTarget(playerId: string, targetName: string) {
+        const player = this._players.get(playerId);
+        if (!player) {
+            return { error: "Player not found." };
+        }
+
+        const trimmedTargetName = targetName.trim();
+        if (!trimmedTargetName) {
+            return { error: "Target who?" };
+        }
+
+        const normalizedTargetName = trimmedTargetName.toLowerCase();
+        const room = this.getRoomById(player.roomId);
+        const matchingPlayer = room.playerIds
+            .filter((listedPlayerId) => listedPlayerId !== playerId)
+            .map((listedPlayerId) => this._players.get(listedPlayerId))
+            .find((listedPlayer) => listedPlayer && listedPlayer.name.toLowerCase() === normalizedTargetName);
+        const matchingNonPlayerCharacter = room.nonPlayerCharacters
+            .find((nonPlayerCharacter) => nonPlayerCharacter.name.toLowerCase() === normalizedTargetName);
+        const target: Character | undefined = matchingPlayer ?? matchingNonPlayerCharacter;
+
+        if (!target) {
+            return { error: `No target found named ${trimmedTargetName}.` };
+        }
+
+        player.primaryTarget = target;
+
+        return {
+            roomSnapshot: this.getRoomSnapshot(player.roomId, playerId),
+            targetName: target.name
         };
     }
 

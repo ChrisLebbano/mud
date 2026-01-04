@@ -34,6 +34,7 @@ export interface PlayerSnapshot {
     attributes: CharacterAttributesSnapshot;
     id: string;
     name: string;
+    primaryTargetName?: string;
     roomId: string;
 }
 

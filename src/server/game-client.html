@@ -114,6 +114,15 @@
             outline: none;
         }
 
+        .target-button {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font: inherit;
+            padding: 0;
+        }
+
         @keyframes blink-caret {
             0%,
             49% {
@@ -146,6 +155,8 @@
                     <h2>Character</h2>
                     <h3>Attributes</h3>
                     <ul id="player-attributes" class="room-list"></ul>
+                    <h3>Target</h3>
+                    <ul id="player-target" class="room-list"></ul>
                 </div>
             </div>
         </section>
@@ -164,6 +175,7 @@
         const roomName = document.getElementById("room-name");
         const roomNpcs = document.getElementById("room-npcs");
         const playerAttributes = document.getElementById("player-attributes");
+        const playerTarget = document.getElementById("player-target");
         const zoneName = document.getElementById("zone-name");
         const submitButton = document.getElementById("submit-button");
 
@@ -202,6 +214,35 @@
             });
         };
 
+        const renderTargetList = (listElement, targets) => {
+            listElement.innerHTML = "";
+            if (!targets.length) {
+                const emptyItem = document.createElement("li");
+                emptyItem.textContent = "None";
+                listElement.appendChild(emptyItem);
+                return;
+            }
+            targets.forEach((targetName) => {
+                const listItem = document.createElement("li");
+                const button = document.createElement("button");
+                button.classList.add("target-button");
+                button.textContent = targetName;
+                button.type = "button";
+                button.addEventListener("click", () => {
+                    socket.emit("submit", `target ${targetName}`);
+                });
+                listItem.appendChild(button);
+                listElement.appendChild(listItem);
+            });
+        };
+
+        const renderTargetSummary = (listElement, targetName) => {
+            listElement.innerHTML = "";
+            const targetItem = document.createElement("li");
+            targetItem.textContent = targetName ? targetName : "None";
+            listElement.appendChild(targetItem);
+        };
+
         const renderVitals = (listElement, snapshot) => {
             if (!snapshot) {
                 renderList(listElement, []);
@@ -233,8 +274,9 @@
             zoneName.textContent = `Zone: ${roomSnapshot.zone.name}`;
             roomDescription.textContent = roomSnapshot.description;
             renderList(roomExits, roomSnapshot.exits);
-            renderList(roomNpcs, roomSnapshot.nonPlayerCharacters.map((nonPlayerCharacter) => nonPlayerCharacter.name));
+            renderTargetList(roomNpcs, roomSnapshot.nonPlayerCharacters.map((nonPlayerCharacter) => nonPlayerCharacter.name));
             renderVitals(playerAttributes, roomSnapshot.player ? roomSnapshot.player.attributes : null);
+            renderTargetSummary(playerTarget, roomSnapshot.player ? roomSnapshot.player.primaryTargetName : null);
         });
 
         socket.on("world:system", (message) => {
@@ -257,4 +299,3 @@
     </script>
 </body>
 </html>
-

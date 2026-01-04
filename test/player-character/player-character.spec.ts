@@ -25,6 +25,7 @@ describe(`[Class] PlayerCharacter`, () => {
                 attributes: { health: 40, mana: 20 },
                 id: "player-2",
                 name: "Riley",
+                primaryTargetName: undefined,
                 roomId: "lounge"
             });
         });

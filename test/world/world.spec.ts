@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { NonPlayerCharacter } from "../../src/non-player-character";
 import { Room } from "../../src/room";
 import { type WorldData } from "../../src/types";
 import { World } from "../../src/world";
@@ -175,10 +176,36 @@ describe(`[Class] World`, () => {
                 attributes: { health: 40, mana: 20 },
                 id: "player-1",
                 name: "Alex",
+                primaryTargetName: undefined,
                 roomId: "atrium"
             });
             expect(snapshot.nonPlayerCharacters).to.deep.equal([]);
             expect(snapshot.zone).to.deep.equal({ id: "starter-zone", name: "Starter Zone" });
+        });
+
+    });
+
+    describe(`[Method] setPrimaryTarget`, () => {
+
+        it(`should set the target to a non-player character in the room`, () => {
+            const rooms = [
+                new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }, [
+                    new NonPlayerCharacter("npc-greeter", "Greeter", "atrium")
+                ])
+            ];
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], "starter-zone", "atrium");
+
+            world.addPlayer("player-1", "Alex");
+
+            const targetResult = world.setPrimaryTarget("player-1", "Greeter");
+
+            if ("error" in targetResult) {
+                throw new Error(targetResult.error);
+            }
+
+            expect(targetResult.targetName).to.equal("Greeter");
+            expect(targetResult.roomSnapshot.player?.primaryTargetName).to.equal("Greeter");
         });
 
     });

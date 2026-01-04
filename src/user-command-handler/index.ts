@@ -90,6 +90,19 @@ export class UserCommandHandler {
             return;
         }
 
+        if (lowerVerb === "target") {
+            const targetName = rest.join(" ");
+            const targetResult = this._world.setPrimaryTarget(socket.id, targetName);
+            if ("error" in targetResult) {
+                socket.emit("world:system", targetResult.error);
+                return;
+            }
+
+            socket.emit("world:room", targetResult.roomSnapshot);
+            socket.emit("world:system", `Primary target set to ${targetResult.targetName}.`);
+            return;
+        }
+
         const isMoveVerb = lowerVerb === "move" || lowerVerb === "go";
         const isDirectMove = this.allowedDirections.includes(lowerVerb);
         const direction = isMoveVerb ? rest[0] : (isDirectMove ? lowerVerb : "");
