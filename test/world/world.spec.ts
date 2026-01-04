@@ -197,6 +197,61 @@ describe(`[Class] World`, () => {
 
     });
 
+    describe(`[Method] performAttack`, () => {
+
+        it(`should apply damage to the target`, () => {
+            const rooms = [
+                new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }, [
+                    new NonPlayerCharacter("npc-guard", "Guard", "atrium")
+                ])
+            ];
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], "starter-zone", "atrium");
+
+            world.addPlayer("player-1", "Alex");
+            world.setPrimaryTarget("player-1", "Guard");
+
+            const attackResult = world.performAttack("player-1");
+
+            if ("error" in attackResult || "warning" in attackResult) {
+                throw new Error(attackResult.error ?? attackResult.warning);
+            }
+
+            expect(attackResult.damage).to.equal(10);
+            expect(attackResult.targetName).to.equal("Guard");
+            expect(attackResult.targetCurrentHealth).to.equal(30);
+        });
+
+        it(`should warn when attacking a dead target`, () => {
+            const rooms = [
+                new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }, [
+                    new NonPlayerCharacter("npc-guard", "Guard", "atrium")
+                ])
+            ];
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], "starter-zone", "atrium");
+
+            world.addPlayer("player-1", "Alex");
+            world.setPrimaryTarget("player-1", "Guard");
+
+            const room = world.getRoom("atrium");
+            const target = room?.nonPlayerCharacters[0];
+            if (!target) {
+                throw new Error("Target not found.");
+            }
+            target.secondaryAttributes.currentHealth = 0;
+
+            const attackResult = world.performAttack("player-1");
+
+            if ("error" in attackResult) {
+                throw new Error(attackResult.error);
+            }
+
+            expect(attackResult.warning).to.equal("Cannot attack Guard. Guard is already dead.");
+        });
+
+    });
+
     describe(`[Method] setPrimaryTarget`, () => {
 
         it(`should set the target to a non-player character in the room`, () => {
