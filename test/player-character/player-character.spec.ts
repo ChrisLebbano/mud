@@ -22,7 +22,19 @@ describe(`[Class] PlayerCharacter`, () => {
             const playerCharacter = new PlayerCharacter("player-2", "Riley", "lounge");
 
             expect(playerCharacter.toSnapshot()).to.deep.equal({
-                attributes: { health: 40, mana: 20 },
+                attributes: {
+                    agility: 10,
+                    charisma: 10,
+                    constitution: 10,
+                    dexterity: 10,
+                    health: 40,
+                    intelligence: 10,
+                    mana: 20,
+                    perception: 10,
+                    resolve: 10,
+                    strength: 10,
+                    wisdom: 10
+                },
                 id: "player-2",
                 name: "Riley",
                 primaryTargetName: undefined,
