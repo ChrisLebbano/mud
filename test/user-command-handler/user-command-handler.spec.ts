@@ -199,6 +199,28 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits[0].payload).to.equal("Tester\nThere are 1 players in Starter Zone");
         });
 
+        it(`should update targets when using the target command`, () => {
+            const world = new World([
+                new Zone("starter-zone", "Starter Zone", [
+                    new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium")
+                    ])
+                ], "atrium")
+            ], "starter-zone", "atrium");
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "target Greeter");
+
+            expect(fakeSocket.emits).to.have.lengthOf(2);
+            expect(fakeSocket.emits[0].event).to.equal("world:room");
+            expect(fakeSocket.emits[0].payload.player.primaryTargetName).to.equal("Greeter");
+            expect(fakeSocket.emits[1].event).to.equal("world:system");
+            expect(fakeSocket.emits[1].payload).to.equal("Primary target set to Greeter.");
+        });
+
         it(`should warn on unknown commands`, () => {
             const world = createWorld();
             const handler = new UserCommandHandler(world);
