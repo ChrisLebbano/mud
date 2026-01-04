@@ -185,11 +185,14 @@ export class World {
 
         const damage = player.secondaryAttributes.attackDamage;
         const remainingHealth = target.secondaryAttributes.applyDamage(damage);
+        const targetPlayerId = target instanceof PlayerCharacter ? target.id : undefined;
 
         if (remainingHealth <= 0) {
             player.isAttacking = false;
             return {
+                attackerName: player.name,
                 damage,
+                targetPlayerId,
                 targetCurrentHealth: remainingHealth,
                 targetName: target.name,
                 warning: `You have slain ${target.name}.`,
@@ -198,7 +201,9 @@ export class World {
         }
 
         return {
+            attackerName: player.name,
             damage,
+            targetPlayerId,
             targetCurrentHealth: remainingHealth,
             targetName: target.name
         };

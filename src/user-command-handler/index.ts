@@ -156,7 +156,13 @@ export class UserCommandHandler {
                     return;
                 }
 
-                socket.emit("world:system", { category: "System", message: `You hit ${attackResult.targetName} for ${attackResult.damage} damage.` });
+                socket.emit("world:system", { category: "SelfDealingAttackDamage", message: `You hit ${attackResult.targetName} for ${attackResult.damage} damage.` });
+                if (attackResult.targetPlayerId) {
+                    this._socketServer?.to(attackResult.targetPlayerId).emit("world:system", {
+                        category: "SelfRecieveAttackDamage",
+                        message: `You are hit by ${attackResult.attackerName} for ${attackResult.damage} damage.`
+                    });
+                }
                 this._nextAttackTimes.set(socket.id, now + attackDelayMs);
             }
 
@@ -180,7 +186,13 @@ export class UserCommandHandler {
                         return;
                     }
 
-                    socket.emit("world:system", { category: "System", message: `You hit ${nextAttackResult.targetName} for ${nextAttackResult.damage} damage.` });
+                    socket.emit("world:system", { category: "SelfDealingAttackDamage", message: `You hit ${nextAttackResult.targetName} for ${nextAttackResult.damage} damage.` });
+                    if (nextAttackResult.targetPlayerId) {
+                        this._socketServer?.to(nextAttackResult.targetPlayerId).emit("world:system", {
+                            category: "SelfRecieveAttackDamage",
+                            message: `You are hit by ${nextAttackResult.attackerName} for ${nextAttackResult.damage} damage.`
+                        });
+                    }
                     this._nextAttackTimes.set(socket.id, Date.now() + scheduledAttackDelayMs);
                     scheduleAttack();
                 }, remainingDelay);

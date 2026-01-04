@@ -15,7 +15,7 @@ export interface CharacterAttributesSnapshot {
     wisdom: number;
 }
 
-export type MessageCategory = "CharacterSpeech" | "System";
+export type MessageCategory = "CharacterSpeech" | "SelfDealingAttackDamage" | "SelfRecieveAttackDamage" | "System";
 
 export interface MessagePayload {
     category: MessageCategory;
