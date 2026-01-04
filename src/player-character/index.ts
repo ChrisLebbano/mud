@@ -8,11 +8,18 @@ export class PlayerCharacter extends Character {
     }
 
     public toSnapshot(): PlayerSnapshot {
+        const primaryTarget = this.primaryTarget;
+        const primaryTargetVitals = primaryTarget ? {
+            currentHealth: primaryTarget.secondaryAttributes.currentHealth,
+            maxHealth: primaryTarget.secondaryAttributes.maxHealth
+        } : undefined;
+
         return {
             attributes: this.attributes.toSnapshot(),
             id: this.id,
             name: this.name,
             primaryTargetName: this.primaryTarget?.name,
+            primaryTargetVitals,
             roomId: this.roomId
         };
     }

@@ -153,7 +153,7 @@ describe(`[Class] UserCommandHandler`, () => {
 
             expect(fakeSocket.emits).to.have.lengthOf(1);
             expect(fakeSocket.emits[0].event).to.equal("world:system");
-            expect(fakeSocket.emits[0].payload).to.equal([
+            expect(fakeSocket.emits[0].payload.message).to.equal([
                 "Name: Tester",
                 "Strength: 10",
                 "Agility: 10",
@@ -185,7 +185,7 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.joinedRooms).to.deep.equal(["lounge"]);
             expect(fakeSocket.emits[0].event).to.equal("world:room");
             expect(fakeSocket.emits[1].event).to.equal("world:system");
-            expect(fakeSocket.emits[1].payload).to.equal("You move north, you have entered Lounge");
+            expect(fakeSocket.emits[1].payload.message).to.equal("You move north, you have entered Lounge");
             expect(fakeSocket.emits[2].event).to.equal("room:atrium:world:system");
             expect(fakeSocket.emits[3].event).to.equal("room:lounge:world:system");
         });
@@ -203,7 +203,7 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.joinedRooms).to.deep.equal([]);
             expect(fakeSocket.emits).to.have.lengthOf(1);
             expect(fakeSocket.emits[0].event).to.equal("world:system");
-            expect(fakeSocket.emits[0].payload).to.equal("j is not a direction, please use 'north', 'south', 'east', or 'west'");
+            expect(fakeSocket.emits[0].payload.message).to.equal("j is not a direction, please use 'north', 'south', 'east', or 'west'");
         });
 
         it(`should list players when using who`, () => {
@@ -226,7 +226,7 @@ describe(`[Class] UserCommandHandler`, () => {
 
             expect(fakeSocket.emits).to.have.lengthOf(1);
             expect(fakeSocket.emits[0].event).to.equal("world:system");
-            expect(fakeSocket.emits[0].payload).to.equal("Tester\nThere are 1 players in Starter Zone");
+            expect(fakeSocket.emits[0].payload.message).to.equal("Tester\nThere are 1 players in Starter Zone");
         });
 
         it(`should update targets when using the target command`, () => {
@@ -247,8 +247,12 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits).to.have.lengthOf(2);
             expect(fakeSocket.emits[0].event).to.equal("world:room");
             expect(fakeSocket.emits[0].payload.player.primaryTargetName).to.equal("Greeter");
+            expect(fakeSocket.emits[0].payload.player.primaryTargetVitals).to.deep.equal({
+                currentHealth: 40,
+                maxHealth: 40
+            });
             expect(fakeSocket.emits[1].event).to.equal("world:system");
-            expect(fakeSocket.emits[1].payload).to.equal("Primary target set to Greeter.");
+            expect(fakeSocket.emits[1].payload.message).to.equal("Primary target set to Greeter.");
         });
 
         it(`should warn when attacking with no primary target`, () => {
@@ -262,7 +266,7 @@ describe(`[Class] UserCommandHandler`, () => {
 
             expect(fakeSocket.emits).to.have.lengthOf(1);
             expect(fakeSocket.emits[0].event).to.equal("world:system");
-            expect(fakeSocket.emits[0].payload).to.equal("No primary target selected.");
+            expect(fakeSocket.emits[0].payload.message).to.equal("No primary target selected.");
         });
 
         it(`should toggle attacking off when issuing attack again`, () => {
@@ -283,9 +287,9 @@ describe(`[Class] UserCommandHandler`, () => {
             handler.handleCommand(fakeSocket, "attack");
 
             expect(fakeSocket.emits[2].event).to.equal("world:system");
-            expect(fakeSocket.emits[2].payload).to.equal("You are now attacking Greeter.");
-            expect(fakeSocket.emits[4].event).to.equal("world:system");
-            expect(fakeSocket.emits[4].payload).to.equal("You stop attacking.");
+            expect(fakeSocket.emits[2].payload.message).to.equal("You are now attacking Greeter.");
+            expect(fakeSocket.emits[5].event).to.equal("world:system");
+            expect(fakeSocket.emits[5].payload.message).to.equal("You stop attacking.");
         });
 
         it(`should honor the attack delay when restarting attacks`, () => {
@@ -311,11 +315,11 @@ describe(`[Class] UserCommandHandler`, () => {
                 Date.now = () => 2000;
                 handler.handleCommand(fakeSocket, "attack");
 
-                expect(fakeSocket.emits[2].payload).to.equal("You are now attacking Greeter.");
-                expect(fakeSocket.emits[3].payload).to.equal("You hit Greeter for 10 damage.");
-                expect(fakeSocket.emits[4].payload).to.equal("You stop attacking.");
-                expect(fakeSocket.emits[5].payload).to.equal("You are now attacking Greeter.");
-                expect(fakeSocket.emits).to.have.lengthOf(6);
+                expect(fakeSocket.emits[2].payload.message).to.equal("You are now attacking Greeter.");
+                expect(fakeSocket.emits[3].payload.message).to.equal("You hit Greeter for 10 damage.");
+                expect(fakeSocket.emits[5].payload.message).to.equal("You stop attacking.");
+                expect(fakeSocket.emits[6].payload.message).to.equal("You are now attacking Greeter.");
+                expect(fakeSocket.emits).to.have.lengthOf(7);
             } finally {
                 Date.now = originalNow;
             }
@@ -330,7 +334,7 @@ describe(`[Class] UserCommandHandler`, () => {
 
             expect(fakeSocket.emits).to.have.lengthOf(1);
             expect(fakeSocket.emits[0].event).to.equal("world:system");
-            expect(fakeSocket.emits[0].payload).to.equal("Unknown command: dance");
+            expect(fakeSocket.emits[0].payload.message).to.equal("Unknown command: dance");
         });
 
     });

@@ -1,5 +1,6 @@
 import { expect } from "chai";
 
+import { NonPlayerCharacter } from "../../src/non-player-character";
 import { PlayerCharacter } from "../../src/player-character";
 
 describe(`[Class] PlayerCharacter`, () => {
@@ -38,7 +39,23 @@ describe(`[Class] PlayerCharacter`, () => {
                 id: "player-2",
                 name: "Riley",
                 primaryTargetName: undefined,
+                primaryTargetVitals: undefined,
                 roomId: "lounge"
+            });
+        });
+
+        it(`should include primary target vitals in snapshots`, () => {
+            const playerCharacter = new PlayerCharacter("player-3", "Jordan", "atrium");
+            const target = new NonPlayerCharacter("npc-1", "Guard", "atrium");
+
+            playerCharacter.primaryTarget = target;
+
+            const snapshot = playerCharacter.toSnapshot();
+
+            expect(snapshot.primaryTargetName).to.equal("Guard");
+            expect(snapshot.primaryTargetVitals).to.deep.equal({
+                currentHealth: 40,
+                maxHealth: 40
             });
         });
 

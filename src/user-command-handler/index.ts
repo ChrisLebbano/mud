@@ -153,6 +153,8 @@ export class UserCommandHandler {
                     if (attackResult.stopMessage) {
                         socket.emit("world:system", { category: "System", message: attackResult.stopMessage });
                     }
+                    const roomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
+                    socket.emit("world:room", roomSnapshot);
                     return;
                 }
 
@@ -163,6 +165,8 @@ export class UserCommandHandler {
                         message: `You are hit by ${attackResult.attackerName} for ${attackResult.damage} damage.`
                     });
                 }
+                const roomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
+                socket.emit("world:room", roomSnapshot);
                 this._nextAttackTimes.set(socket.id, now + attackDelayMs);
             }
 
@@ -183,6 +187,8 @@ export class UserCommandHandler {
                         if (nextAttackResult.stopMessage) {
                             socket.emit("world:system", { category: "System", message: nextAttackResult.stopMessage });
                         }
+                        const roomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
+                        socket.emit("world:room", roomSnapshot);
                         return;
                     }
 
@@ -193,6 +199,8 @@ export class UserCommandHandler {
                             message: `You are hit by ${nextAttackResult.attackerName} for ${nextAttackResult.damage} damage.`
                         });
                     }
+                    const roomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
+                    socket.emit("world:room", roomSnapshot);
                     this._nextAttackTimes.set(socket.id, Date.now() + scheduledAttackDelayMs);
                     scheduleAttack();
                 }, remainingDelay);

@@ -50,7 +50,13 @@ export interface PlayerSnapshot {
     id: string;
     name: string;
     primaryTargetName?: string;
+    primaryTargetVitals?: TargetVitalsSnapshot;
     roomId: string;
+}
+
+export interface TargetVitalsSnapshot {
+    currentHealth: number;
+    maxHealth: number;
 }
 
 export interface ZoneSnapshot {
