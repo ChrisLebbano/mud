@@ -17,7 +17,7 @@ describe(`[Class] Character`, () => {
             expect(character.roomId).to.equal("atrium");
             expect(character.secondaryAttributes.attackDelaySeconds).to.equal(5);
             expect(character.secondaryAttributes.currentHealth).to.equal(40);
-            expect(character.secondaryAttributes.damage).to.equal(10);
+            expect(character.secondaryAttributes.attackDamage).to.equal(10);
         });
 
     });

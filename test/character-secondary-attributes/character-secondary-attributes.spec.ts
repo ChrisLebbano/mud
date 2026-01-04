@@ -11,7 +11,7 @@ describe(`[Class] CharacterSecondaryAttributes`, () => {
 
             expect(attributes.attackDelaySeconds).to.equal(5);
             expect(attributes.currentHealth).to.equal(45);
-            expect(attributes.damage).to.equal(10);
+            expect(attributes.attackDamage).to.equal(10);
             expect(attributes.maxHealth).to.equal(45);
         });
 
@@ -54,14 +54,14 @@ describe(`[Class] CharacterSecondaryAttributes`, () => {
 
     });
 
-    describe(`[Method] damage`, () => {
+    describe(`[Method] attackDamage`, () => {
 
         it(`should update the damage value`, () => {
             const attributes = new CharacterSecondaryAttributes(30);
 
-            attributes.damage = 18;
+            attributes.attackDamage = 18;
 
-            expect(attributes.damage).to.equal(18);
+            expect(attributes.attackDamage).to.equal(18);
         });
 
     });
@@ -91,4 +91,3 @@ describe(`[Class] CharacterSecondaryAttributes`, () => {
     });
 
 });
-

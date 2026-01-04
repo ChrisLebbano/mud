@@ -98,7 +98,7 @@ export class UserCommandHandler {
                 `Resolve: ${attributes.resolve}`,
                 `Health: ${attributes.health}`,
                 `Current Health: ${secondaryAttributes.currentHealth}`,
-                `Damage: ${secondaryAttributes.damage}`,
+                `Damage: ${secondaryAttributes.attackDamage}`,
                 `Attack Delay: ${secondaryAttributes.attackDelaySeconds}s`,
                 `Mana: ${attributes.mana}`
             ];
@@ -147,11 +147,11 @@ export class UserCommandHandler {
                 }
 
                 if ("warning" in attackResult) {
-                    if ("damage" in attackResult) {
-                        socket.emit("world:system", `You hit ${attackResult.targetName} for ${attackResult.damage} damage.`);
-                    }
                     this.stopAttacking(socket.id);
                     socket.emit("world:system", attackResult.warning);
+                    if (attackResult.stopMessage) {
+                        socket.emit("world:system", attackResult.stopMessage);
+                    }
                     return;
                 }
 
@@ -171,11 +171,11 @@ export class UserCommandHandler {
                     }
 
                     if ("warning" in nextAttackResult) {
-                        if ("damage" in nextAttackResult) {
-                            socket.emit("world:system", `You hit ${nextAttackResult.targetName} for ${nextAttackResult.damage} damage.`);
-                        }
                         this.stopAttacking(socket.id);
                         socket.emit("world:system", nextAttackResult.warning);
+                        if (nextAttackResult.stopMessage) {
+                            socket.emit("world:system", nextAttackResult.stopMessage);
+                        }
                         return;
                     }
 

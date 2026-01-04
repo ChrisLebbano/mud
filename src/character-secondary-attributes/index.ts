@@ -2,12 +2,12 @@ export class CharacterSecondaryAttributes {
 
     private _attackDelaySeconds: number;
     private _currentHealth: number;
-    private _damage: number;
+    private _attackDamage: number;
     private _maxHealth: number;
 
-    constructor(maxHealth: number, attackDelaySeconds?: number, damage?: number) {
+    constructor(maxHealth: number, attackDelaySeconds?: number, attackDamage?: number) {
         this._attackDelaySeconds = attackDelaySeconds ?? 5;
-        this._damage = damage ?? 10;
+        this._attackDamage = attackDamage ?? 10;
         this._maxHealth = maxHealth;
         this._currentHealth = maxHealth;
     }
@@ -33,12 +33,12 @@ export class CharacterSecondaryAttributes {
         this._currentHealth = currentHealth;
     }
 
-    public get damage(): number {
-        return this._damage;
+    public get attackDamage(): number {
+        return this._attackDamage;
     }
 
-    public set damage(damage: number) {
-        this._damage = damage;
+    public set attackDamage(attackDamage: number) {
+        this._attackDamage = attackDamage;
     }
 
     public get isAlive(): boolean {

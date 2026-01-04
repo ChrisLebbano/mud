@@ -304,7 +304,7 @@
                 return;
             }
 
-            if (message === "You stop attacking." || message.includes("already dead.")) {
+            if (message === "You stop attacking." || message.startsWith("You have slain ")) {
                 setAttackIndicator(false);
             }
         });

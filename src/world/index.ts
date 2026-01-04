@@ -183,7 +183,7 @@ export class World {
             return { warning: `Cannot attack ${target.name}. ${target.name} is already dead.` };
         }
 
-        const damage = player.secondaryAttributes.damage;
+        const damage = player.secondaryAttributes.attackDamage;
         const remainingHealth = target.secondaryAttributes.applyDamage(damage);
 
         if (remainingHealth <= 0) {
@@ -192,7 +192,8 @@ export class World {
                 damage,
                 targetCurrentHealth: remainingHealth,
                 targetName: target.name,
-                warning: `Cannot attack ${target.name}. ${target.name} is already dead.`
+                warning: `You have slain ${target.name}.`,
+                stopMessage: "You stop attacking."
             };
         }
 
@@ -271,4 +272,3 @@ export class World {
     }
 
 }
-
