@@ -288,6 +288,39 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits[4].payload).to.equal("You stop attacking.");
         });
 
+        it(`should honor the attack delay when restarting attacks`, () => {
+            const world = new World([
+                new Zone("starter-zone", "Starter Zone", [
+                    new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium")
+                    ])
+                ], "atrium")
+            ], "starter-zone", "atrium");
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+            const originalNow = Date.now;
+
+            try {
+                Date.now = () => 1000;
+                world.addPlayer(fakeSocket.id, "Tester");
+
+                handler.handleCommand(fakeSocket, "target Greeter");
+                handler.handleCommand(fakeSocket, "attack");
+                handler.handleCommand(fakeSocket, "attack");
+
+                Date.now = () => 2000;
+                handler.handleCommand(fakeSocket, "attack");
+
+                expect(fakeSocket.emits[2].payload).to.equal("You are now attacking Greeter.");
+                expect(fakeSocket.emits[3].payload).to.equal("You hit Greeter for 10 damage.");
+                expect(fakeSocket.emits[4].payload).to.equal("You stop attacking.");
+                expect(fakeSocket.emits[5].payload).to.equal("You are now attacking Greeter.");
+                expect(fakeSocket.emits).to.have.lengthOf(6);
+            } finally {
+                Date.now = originalNow;
+            }
+        });
+
         it(`should warn on unknown commands`, () => {
             const world = createWorld();
             const handler = new UserCommandHandler(world);

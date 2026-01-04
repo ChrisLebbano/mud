@@ -5,12 +5,14 @@ export class UserCommandHandler {
 
     private _allowedDirections: string[];
     private _attackTimeouts: Map<string, NodeJS.Timeout>;
+    private _nextAttackTimes: Map<string, number>;
     private _socketServer?: SocketServer;
     private _world: World;
 
     constructor(world: World) {
         this._allowedDirections = ["north", "south", "east", "west"];
         this._attackTimeouts = new Map();
+        this._nextAttackTimes = new Map();
         this._world = world;
     }
 
@@ -118,27 +120,49 @@ export class UserCommandHandler {
                 return;
             }
 
-            const attackResult = this._world.performAttack(socket.id);
-            if ("error" in attackResult) {
-                socket.emit("world:system", attackResult.error);
+            const target = player.primaryTarget;
+            if (!target) {
+                socket.emit("world:system", "No primary target selected.");
                 return;
             }
 
-            if ("warning" in attackResult) {
-                player.isAttacking = false;
-                if ("damage" in attackResult) {
-                    socket.emit("world:system", `You hit ${attackResult.targetName} for ${attackResult.damage} damage.`);
-                }
-                socket.emit("world:system", attackResult.warning);
+            if (!target.secondaryAttributes.isAlive) {
+                socket.emit("world:system", `Cannot attack ${target.name}. ${target.name} is already dead.`);
                 return;
             }
 
             player.isAttacking = true;
-            socket.emit("world:system", `You are now attacking ${attackResult.targetName}.`);
-            socket.emit("world:system", `You hit ${attackResult.targetName} for ${attackResult.damage} damage.`);
+            socket.emit("world:system", `You are now attacking ${target.name}.`);
+
+            const now = Date.now();
+            const nextAttackTime = this._nextAttackTimes.get(socket.id);
+            const attackDelayMs = player.secondaryAttributes.attackDelaySeconds * 1000;
+            const isAttackReady = !nextAttackTime || now >= nextAttackTime;
+            if (isAttackReady) {
+                const attackResult = this._world.performAttack(socket.id);
+                if ("error" in attackResult) {
+                    this.stopAttacking(socket.id);
+                    socket.emit("world:system", attackResult.error);
+                    return;
+                }
+
+                if ("warning" in attackResult) {
+                    if ("damage" in attackResult) {
+                        socket.emit("world:system", `You hit ${attackResult.targetName} for ${attackResult.damage} damage.`);
+                    }
+                    this.stopAttacking(socket.id);
+                    socket.emit("world:system", attackResult.warning);
+                    return;
+                }
+
+                socket.emit("world:system", `You hit ${attackResult.targetName} for ${attackResult.damage} damage.`);
+                this._nextAttackTimes.set(socket.id, now + attackDelayMs);
+            }
 
             const scheduleAttack = (): void => {
+                const remainingDelay = this.getRemainingAttackDelay(socket.id);
                 const nextTimeout = setTimeout(() => {
+                    const scheduledAttackDelayMs = player.secondaryAttributes.attackDelaySeconds * 1000;
                     const nextAttackResult = this._world.performAttack(socket.id);
                     if ("error" in nextAttackResult) {
                         this.stopAttacking(socket.id);
@@ -156,8 +180,9 @@ export class UserCommandHandler {
                     }
 
                     socket.emit("world:system", `You hit ${nextAttackResult.targetName} for ${nextAttackResult.damage} damage.`);
+                    this._nextAttackTimes.set(socket.id, Date.now() + scheduledAttackDelayMs);
                     scheduleAttack();
-                }, player.secondaryAttributes.attackDelaySeconds * 1000);
+                }, remainingDelay);
 
                 this._attackTimeouts.set(socket.id, nextTimeout);
             };
@@ -243,6 +268,22 @@ export class UserCommandHandler {
         if (player) {
             player.isAttacking = false;
         }
+    }
+
+    private getRemainingAttackDelay(playerId: string): number {
+        const player = this._world.getPlayer(playerId);
+        if (!player) {
+            return 0;
+        }
+
+        const delayMs = player.secondaryAttributes.attackDelaySeconds * 1000;
+        const nextAttackTime = this._nextAttackTimes.get(playerId);
+        if (!nextAttackTime) {
+            return delayMs;
+        }
+
+        const remainingDelay = nextAttackTime - Date.now();
+        return remainingDelay > 0 ? remainingDelay : 0;
     }
 
 }
