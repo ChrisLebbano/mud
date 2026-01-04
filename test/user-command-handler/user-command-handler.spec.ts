@@ -127,6 +127,47 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocketServer.roomEmits[1].payload).to.include({ message: "Greeter says, \"Welcome aboard.\"", playerName: "Greeter" });
         });
 
+        it(`should let players hail their primary target`, () => {
+            const world = new World([
+                new Zone("starter-zone", "Starter Zone", [
+                    new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", "Welcome aboard.")
+                    ])
+                ], "atrium")
+            ], "starter-zone", "atrium");
+            const handler = new UserCommandHandler(world);
+            const fakeSocketServer = new FakeSocketServer();
+            const fakeSocket = new FakeSocket("player-1");
+
+            handler.setSocketServer(fakeSocketServer as unknown as SocketServer);
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "target Greeter");
+            handler.handleCommand(fakeSocket, "Hail");
+
+            expect(fakeSocketServer.roomEmits).to.have.lengthOf(2);
+            expect(fakeSocketServer.roomEmits[0].event).to.equal("world:chat");
+            expect(fakeSocketServer.roomEmits[0].payload).to.include({ message: "Tester says, \"Hail, Greeter\".", playerName: "Tester" });
+            expect(fakeSocketServer.roomEmits[1].event).to.equal("world:chat");
+            expect(fakeSocketServer.roomEmits[1].payload).to.include({ message: "Greeter says, \"Welcome aboard.\"", playerName: "Greeter" });
+        });
+
+        it(`should let players hail with no target`, () => {
+            const world = createWorld();
+            const handler = new UserCommandHandler(world);
+            const fakeSocketServer = new FakeSocketServer();
+            const fakeSocket = new FakeSocket("player-1");
+
+            handler.setSocketServer(fakeSocketServer as unknown as SocketServer);
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "Hail");
+
+            expect(fakeSocketServer.roomEmits).to.have.lengthOf(1);
+            expect(fakeSocketServer.roomEmits[0].event).to.equal("world:chat");
+            expect(fakeSocketServer.roomEmits[0].payload).to.include({ message: "Tester says, \"Hail\".", playerName: "Tester" });
+        });
+
         it(`should emit room snapshots when looking`, () => {
             const world = createWorld();
             const handler = new UserCommandHandler(world);
