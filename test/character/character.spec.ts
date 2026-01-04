@@ -12,8 +12,12 @@ describe(`[Class] Character`, () => {
             expect(character.attributes.health).to.equal(40);
             expect(character.attributes.mana).to.equal(20);
             expect(character.id).to.equal("character-1");
+            expect(character.isAttacking).to.equal(false);
             expect(character.name).to.equal("Alex");
             expect(character.roomId).to.equal("atrium");
+            expect(character.secondaryAttributes.attackDelaySeconds).to.equal(5);
+            expect(character.secondaryAttributes.currentHealth).to.equal(40);
+            expect(character.secondaryAttributes.attackDamage).to.equal(10);
         });
 
     });
@@ -39,6 +43,18 @@ describe(`[Class] Character`, () => {
             character.primaryTarget = target;
 
             expect(character.primaryTarget).to.equal(target);
+        });
+
+    });
+
+    describe(`[Method] isAttacking`, () => {
+
+        it(`should update the attacking state`, () => {
+            const character = new Character("character-5", "Casey", "atrium");
+
+            character.isAttacking = true;
+
+            expect(character.isAttacking).to.equal(true);
         });
 
     });

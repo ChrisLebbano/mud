@@ -4,11 +4,15 @@ import { World } from "../world";
 export class UserCommandHandler {
 
     private _allowedDirections: string[];
+    private _attackTimeouts: Map<string, NodeJS.Timeout>;
+    private _nextAttackTimes: Map<string, number>;
     private _socketServer?: SocketServer;
     private _world: World;
 
     constructor(world: World) {
         this._allowedDirections = ["north", "south", "east", "west"];
+        this._attackTimeouts = new Map();
+        this._nextAttackTimes = new Map();
         this._world = world;
     }
 
@@ -80,6 +84,7 @@ export class UserCommandHandler {
             }
 
             const attributes = player.attributes;
+            const secondaryAttributes = player.secondaryAttributes;
             const listItems = [
                 `Name: ${player.name}`,
                 `Strength: ${attributes.strength}`,
@@ -92,10 +97,97 @@ export class UserCommandHandler {
                 `Charisma: ${attributes.charisma}`,
                 `Resolve: ${attributes.resolve}`,
                 `Health: ${attributes.health}`,
+                `Current Health: ${secondaryAttributes.currentHealth}`,
+                `Damage: ${secondaryAttributes.attackDamage}`,
+                `Attack Delay: ${secondaryAttributes.attackDelaySeconds}s`,
                 `Mana: ${attributes.mana}`
             ];
             const listMessage = listItems.join("\n");
             socket.emit("world:system", listMessage);
+            return;
+        }
+
+        if (lowerVerb === "attack") {
+            const player = this._world.getPlayer(socket.id);
+            if (!player) {
+                socket.emit("world:system", "Player not found.");
+                return;
+            }
+
+            if (player.isAttacking) {
+                this.stopAttacking(socket.id);
+                socket.emit("world:system", "You stop attacking.");
+                return;
+            }
+
+            const target = player.primaryTarget;
+            if (!target) {
+                socket.emit("world:system", "No primary target selected.");
+                return;
+            }
+
+            if (!target.secondaryAttributes.isAlive) {
+                socket.emit("world:system", `Cannot attack ${target.name}. ${target.name} is already dead.`);
+                return;
+            }
+
+            player.isAttacking = true;
+            socket.emit("world:system", `You are now attacking ${target.name}.`);
+
+            const now = Date.now();
+            const nextAttackTime = this._nextAttackTimes.get(socket.id);
+            const attackDelayMs = player.secondaryAttributes.attackDelaySeconds * 1000;
+            const isAttackReady = !nextAttackTime || now >= nextAttackTime;
+            if (isAttackReady) {
+                const attackResult = this._world.performAttack(socket.id);
+                if ("error" in attackResult) {
+                    this.stopAttacking(socket.id);
+                    socket.emit("world:system", attackResult.error);
+                    return;
+                }
+
+                if ("warning" in attackResult) {
+                    this.stopAttacking(socket.id);
+                    socket.emit("world:system", attackResult.warning);
+                    if (attackResult.stopMessage) {
+                        socket.emit("world:system", attackResult.stopMessage);
+                    }
+                    return;
+                }
+
+                socket.emit("world:system", `You hit ${attackResult.targetName} for ${attackResult.damage} damage.`);
+                this._nextAttackTimes.set(socket.id, now + attackDelayMs);
+            }
+
+            const scheduleAttack = (): void => {
+                const remainingDelay = this.getRemainingAttackDelay(socket.id);
+                const nextTimeout = setTimeout(() => {
+                    const scheduledAttackDelayMs = player.secondaryAttributes.attackDelaySeconds * 1000;
+                    const nextAttackResult = this._world.performAttack(socket.id);
+                    if ("error" in nextAttackResult) {
+                        this.stopAttacking(socket.id);
+                        socket.emit("world:system", nextAttackResult.error);
+                        return;
+                    }
+
+                    if ("warning" in nextAttackResult) {
+                        this.stopAttacking(socket.id);
+                        socket.emit("world:system", nextAttackResult.warning);
+                        if (nextAttackResult.stopMessage) {
+                            socket.emit("world:system", nextAttackResult.stopMessage);
+                        }
+                        return;
+                    }
+
+                    socket.emit("world:system", `You hit ${nextAttackResult.targetName} for ${nextAttackResult.damage} damage.`);
+                    this._nextAttackTimes.set(socket.id, Date.now() + scheduledAttackDelayMs);
+                    scheduleAttack();
+                }, remainingDelay);
+
+                this._attackTimeouts.set(socket.id, nextTimeout);
+            };
+
+            scheduleAttack();
             return;
         }
 
@@ -163,6 +255,35 @@ export class UserCommandHandler {
 
     public setSocketServer(socketServer: SocketServer): void {
         this._socketServer = socketServer;
+    }
+
+    private stopAttacking(playerId: string): void {
+        const attackTimeout = this._attackTimeouts.get(playerId);
+        if (attackTimeout) {
+            clearTimeout(attackTimeout);
+            this._attackTimeouts.delete(playerId);
+        }
+
+        const player = this._world.getPlayer(playerId);
+        if (player) {
+            player.isAttacking = false;
+        }
+    }
+
+    private getRemainingAttackDelay(playerId: string): number {
+        const player = this._world.getPlayer(playerId);
+        if (!player) {
+            return 0;
+        }
+
+        const delayMs = player.secondaryAttributes.attackDelaySeconds * 1000;
+        const nextAttackTime = this._nextAttackTimes.get(playerId);
+        if (!nextAttackTime) {
+            return delayMs;
+        }
+
+        const remainingDelay = nextAttackTime - Date.now();
+        return remainingDelay > 0 ? remainingDelay : 0;
     }
 
 }

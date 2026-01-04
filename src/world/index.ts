@@ -167,6 +167,43 @@ export class World {
         };
     }
 
+    public performAttack(playerId: string) {
+        const player = this._players.get(playerId);
+        if (!player) {
+            return { error: "Player not found." };
+        }
+
+        const target = player.primaryTarget;
+        if (!target) {
+            return { error: "No primary target selected." };
+        }
+
+        if (!target.secondaryAttributes.isAlive) {
+            player.isAttacking = false;
+            return { warning: `Cannot attack ${target.name}. ${target.name} is already dead.` };
+        }
+
+        const damage = player.secondaryAttributes.attackDamage;
+        const remainingHealth = target.secondaryAttributes.applyDamage(damage);
+
+        if (remainingHealth <= 0) {
+            player.isAttacking = false;
+            return {
+                damage,
+                targetCurrentHealth: remainingHealth,
+                targetName: target.name,
+                warning: `You have slain ${target.name}.`,
+                stopMessage: "You stop attacking."
+            };
+        }
+
+        return {
+            damage,
+            targetCurrentHealth: remainingHealth,
+            targetName: target.name
+        };
+    }
+
     public removePlayer(playerId: string) {
         const player = this._players.get(playerId);
         if (!player) {
