@@ -189,6 +189,7 @@ describe(`[Class] World`, () => {
                 id: "player-1",
                 name: "Alex",
                 primaryTargetName: undefined,
+                primaryTargetVitals: undefined,
                 roomId: "atrium"
             });
             expect(snapshot.nonPlayerCharacters).to.deep.equal([]);
