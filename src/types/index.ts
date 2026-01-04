@@ -15,8 +15,14 @@ export interface CharacterAttributesSnapshot {
     wisdom: number;
 }
 
-export interface ChatMessage {
+export type MessageCategory = "CharacterSpeech" | "SelfDealingAttackDamage" | "SelfRecieveAttackDamage" | "System";
+
+export interface MessagePayload {
+    category: MessageCategory;
     message: string;
+}
+
+export interface ChatMessage extends MessagePayload {
     playerId: string;
     playerName: string;
     roomId: string;

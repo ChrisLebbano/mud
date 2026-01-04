@@ -185,11 +185,14 @@ export class World {
 
         const damage = player.secondaryAttributes.attackDamage;
         const remainingHealth = target.secondaryAttributes.applyDamage(damage);
+        const targetPlayerId = target instanceof PlayerCharacter ? target.id : undefined;
 
         if (remainingHealth <= 0) {
             player.isAttacking = false;
             return {
+                attackerName: player.name,
                 damage,
+                targetPlayerId,
                 targetCurrentHealth: remainingHealth,
                 targetName: target.name,
                 warning: `You have slain ${target.name}.`,
@@ -198,7 +201,9 @@ export class World {
         }
 
         return {
+            attackerName: player.name,
             damage,
+            targetPlayerId,
             targetCurrentHealth: remainingHealth,
             targetName: target.name
         };
@@ -217,7 +222,7 @@ export class World {
         return { playerName: player.name, roomId: room.id };
     }
 
-    public say(playerId: string, message: string) {
+    public say(playerId: string, message: string): { chatMessage: ChatMessage } | { error: string } {
         const player = this._players.get(playerId);
         if (!player) {
             return { error: "Player not found." };
@@ -230,6 +235,7 @@ export class World {
 
         return {
             chatMessage: {
+                category: "CharacterSpeech",
                 message: `${player.name} says, "${trimmedMessage}".`,
                 playerId: player.id,
                 playerName: player.name,

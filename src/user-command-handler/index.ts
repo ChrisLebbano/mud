@@ -33,7 +33,7 @@ export class UserCommandHandler {
             const message = rest.join(" ");
             const sayResult = this._world.say(socket.id, message);
             if ("error" in sayResult) {
-                socket.emit("world:system", sayResult.error);
+                socket.emit("world:system", { category: "System", message: sayResult.error });
                 return;
             }
 
@@ -52,6 +52,7 @@ export class UserCommandHandler {
                         const trimmedResponse = hailResponse.trim();
                         const punctuationSuffix = /[.!?]$/.test(trimmedResponse) ? "" : ".";
                         const nonPlayerChatMessage: ChatMessage = {
+                            category: "CharacterSpeech",
                             message: `${matchingNonPlayerCharacter.name} says, "${trimmedResponse}${punctuationSuffix}"`,
                             playerId: matchingNonPlayerCharacter.id,
                             playerName: matchingNonPlayerCharacter.name,
@@ -67,7 +68,7 @@ export class UserCommandHandler {
         if (lowerVerb === "look") {
             const player = this._world.getPlayer(socket.id);
             if (!player) {
-                socket.emit("world:system", "Player not found.");
+                socket.emit("world:system", { category: "System", message: "Player not found." });
                 return;
             }
 
@@ -79,7 +80,7 @@ export class UserCommandHandler {
         if (lowerVerb === "char") {
             const player = this._world.getPlayer(socket.id);
             if (!player) {
-                socket.emit("world:system", "Player not found.");
+                socket.emit("world:system", { category: "System", message: "Player not found." });
                 return;
             }
 
@@ -103,36 +104,36 @@ export class UserCommandHandler {
                 `Mana: ${attributes.mana}`
             ];
             const listMessage = listItems.join("\n");
-            socket.emit("world:system", listMessage);
+            socket.emit("world:system", { category: "System", message: listMessage });
             return;
         }
 
         if (lowerVerb === "attack") {
             const player = this._world.getPlayer(socket.id);
             if (!player) {
-                socket.emit("world:system", "Player not found.");
+                socket.emit("world:system", { category: "System", message: "Player not found." });
                 return;
             }
 
             if (player.isAttacking) {
                 this.stopAttacking(socket.id);
-                socket.emit("world:system", "You stop attacking.");
+                socket.emit("world:system", { category: "System", message: "You stop attacking." });
                 return;
             }
 
             const target = player.primaryTarget;
             if (!target) {
-                socket.emit("world:system", "No primary target selected.");
+                socket.emit("world:system", { category: "System", message: "No primary target selected." });
                 return;
             }
 
             if (!target.secondaryAttributes.isAlive) {
-                socket.emit("world:system", `Cannot attack ${target.name}. ${target.name} is already dead.`);
+                socket.emit("world:system", { category: "System", message: `Cannot attack ${target.name}. ${target.name} is already dead.` });
                 return;
             }
 
             player.isAttacking = true;
-            socket.emit("world:system", `You are now attacking ${target.name}.`);
+            socket.emit("world:system", { category: "System", message: `You are now attacking ${target.name}.` });
 
             const now = Date.now();
             const nextAttackTime = this._nextAttackTimes.get(socket.id);
@@ -142,20 +143,26 @@ export class UserCommandHandler {
                 const attackResult = this._world.performAttack(socket.id);
                 if ("error" in attackResult) {
                     this.stopAttacking(socket.id);
-                    socket.emit("world:system", attackResult.error);
+                    socket.emit("world:system", { category: "System", message: attackResult.error });
                     return;
                 }
 
                 if ("warning" in attackResult) {
                     this.stopAttacking(socket.id);
-                    socket.emit("world:system", attackResult.warning);
+                    socket.emit("world:system", { category: "System", message: attackResult.warning });
                     if (attackResult.stopMessage) {
-                        socket.emit("world:system", attackResult.stopMessage);
+                        socket.emit("world:system", { category: "System", message: attackResult.stopMessage });
                     }
                     return;
                 }
 
-                socket.emit("world:system", `You hit ${attackResult.targetName} for ${attackResult.damage} damage.`);
+                socket.emit("world:system", { category: "SelfDealingAttackDamage", message: `You hit ${attackResult.targetName} for ${attackResult.damage} damage.` });
+                if (attackResult.targetPlayerId) {
+                    this._socketServer?.to(attackResult.targetPlayerId).emit("world:system", {
+                        category: "SelfRecieveAttackDamage",
+                        message: `You are hit by ${attackResult.attackerName} for ${attackResult.damage} damage.`
+                    });
+                }
                 this._nextAttackTimes.set(socket.id, now + attackDelayMs);
             }
 
@@ -166,20 +173,26 @@ export class UserCommandHandler {
                     const nextAttackResult = this._world.performAttack(socket.id);
                     if ("error" in nextAttackResult) {
                         this.stopAttacking(socket.id);
-                        socket.emit("world:system", nextAttackResult.error);
+                        socket.emit("world:system", { category: "System", message: nextAttackResult.error });
                         return;
                     }
 
                     if ("warning" in nextAttackResult) {
                         this.stopAttacking(socket.id);
-                        socket.emit("world:system", nextAttackResult.warning);
+                        socket.emit("world:system", { category: "System", message: nextAttackResult.warning });
                         if (nextAttackResult.stopMessage) {
-                            socket.emit("world:system", nextAttackResult.stopMessage);
+                            socket.emit("world:system", { category: "System", message: nextAttackResult.stopMessage });
                         }
                         return;
                     }
 
-                    socket.emit("world:system", `You hit ${nextAttackResult.targetName} for ${nextAttackResult.damage} damage.`);
+                    socket.emit("world:system", { category: "SelfDealingAttackDamage", message: `You hit ${nextAttackResult.targetName} for ${nextAttackResult.damage} damage.` });
+                    if (nextAttackResult.targetPlayerId) {
+                        this._socketServer?.to(nextAttackResult.targetPlayerId).emit("world:system", {
+                            category: "SelfRecieveAttackDamage",
+                            message: `You are hit by ${nextAttackResult.attackerName} for ${nextAttackResult.damage} damage.`
+                        });
+                    }
                     this._nextAttackTimes.set(socket.id, Date.now() + scheduledAttackDelayMs);
                     scheduleAttack();
                 }, remainingDelay);
@@ -194,7 +207,7 @@ export class UserCommandHandler {
         if (lowerVerb === "who") {
             const player = this._world.getPlayer(socket.id);
             if (!player) {
-                socket.emit("world:system", "Player not found.");
+                socket.emit("world:system", { category: "System", message: "Player not found." });
                 return;
             }
 
@@ -205,7 +218,7 @@ export class UserCommandHandler {
                 `There are ${playerNames.length} players in ${zone.name}`
             ];
             const listMessage = listItems.join("\n");
-            socket.emit("world:system", listMessage);
+            socket.emit("world:system", { category: "System", message: listMessage });
             return;
         }
 
@@ -213,12 +226,12 @@ export class UserCommandHandler {
             const targetName = rest.join(" ");
             const targetResult = this._world.setPrimaryTarget(socket.id, targetName);
             if ("error" in targetResult) {
-                socket.emit("world:system", targetResult.error);
+                socket.emit("world:system", { category: "System", message: targetResult.error });
                 return;
             }
 
             socket.emit("world:room", targetResult.roomSnapshot);
-            socket.emit("world:system", `Primary target set to ${targetResult.targetName}.`);
+            socket.emit("world:system", { category: "System", message: `Primary target set to ${targetResult.targetName}.` });
             return;
         }
 
@@ -228,7 +241,7 @@ export class UserCommandHandler {
         const normalizedDirection = direction ? direction.toLowerCase() : "";
 
         if (isMoveVerb && direction && !this.allowedDirections.includes(normalizedDirection)) {
-            socket.emit("world:system", `${direction} is not a direction, please use 'north', 'south', 'east', or 'west'`);
+            socket.emit("world:system", { category: "System", message: `${direction} is not a direction, please use 'north', 'south', 'east', or 'west'` });
             return;
         }
 
@@ -236,7 +249,7 @@ export class UserCommandHandler {
             const moveCommand: MoveCommand = { direction: normalizedDirection };
             const moveResult = this._world.movePlayer(socket.id, moveCommand.direction);
             if ("error" in moveResult) {
-                socket.emit("world:system", moveResult.error);
+                socket.emit("world:system", { category: "System", message: moveResult.error });
                 return;
             }
 
@@ -244,13 +257,13 @@ export class UserCommandHandler {
             socket.join(moveResult.toRoomId);
 
             socket.emit("world:room", moveResult.roomSnapshot);
-            socket.emit("world:system", `You move ${moveResult.direction}, you have entered ${moveResult.roomSnapshot.name}`);
-            socket.to(moveResult.fromRoomId).emit("world:system", `${moveResult.playerName} leaves to the ${moveResult.direction}.`);
-            socket.to(moveResult.toRoomId).emit("world:system", `${moveResult.playerName} arrives from the ${moveResult.direction}.`);
+            socket.emit("world:system", { category: "System", message: `You move ${moveResult.direction}, you have entered ${moveResult.roomSnapshot.name}` });
+            socket.to(moveResult.fromRoomId).emit("world:system", { category: "System", message: `${moveResult.playerName} leaves to the ${moveResult.direction}.` });
+            socket.to(moveResult.toRoomId).emit("world:system", { category: "System", message: `${moveResult.playerName} arrives from the ${moveResult.direction}.` });
             return;
         }
 
-        socket.emit("world:system", `Unknown command: ${trimmedCommand}`);
+        socket.emit("world:system", { category: "System", message: `Unknown command: ${trimmedCommand}` });
     }
 
     public setSocketServer(socketServer: SocketServer): void {

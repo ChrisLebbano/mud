@@ -32,13 +32,13 @@ export class Server {
 
             socket.join(joinResult.roomId);
             socket.emit("world:room", joinResult.roomSnapshot);
-            socket.emit("world:system", `Welcome, ${playerName}.`);
-            socket.to(joinResult.roomId).emit("world:system", joinResult.systemMessage);
+            socket.emit("world:system", { category: "System", message: `Welcome, ${playerName}.` });
+            socket.to(joinResult.roomId).emit("world:system", { category: "System", message: joinResult.systemMessage });
 
             socket.on("disconnect", () => {
                 const removedPlayer = this._world.removePlayer(socket.id);
                 if (removedPlayer) {
-                    socket.to(removedPlayer.roomId).emit("world:system", `${removedPlayer.playerName} has left the room.`);
+                    socket.to(removedPlayer.roomId).emit("world:system", { category: "System", message: `${removedPlayer.playerName} has left the room.` });
                 }
             });
 
