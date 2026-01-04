@@ -92,6 +92,34 @@ describe(`[Class] World`, () => {
             expect(moveResult.roomSnapshot.id).to.equal("lounge");
         });
 
+        it(`should clear targets when players move rooms`, () => {
+            const rooms = [
+                new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }, [
+                    new NonPlayerCharacter("npc-guard", "Guard", "atrium")
+                ]),
+                new Room("lounge", "Lounge", "A quiet lounge.", { south: "atrium" })
+            ];
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], "starter-zone", "atrium");
+
+            world.addPlayer("player-1", "Alex");
+            world.addPlayer("player-2", "Riley");
+
+            world.setPrimaryTarget("player-1", "Riley");
+            world.setPrimaryTarget("player-2", "Guard");
+
+            const moveResult = world.movePlayer("player-2", "north");
+            if ("error" in moveResult) {
+                throw new Error(moveResult.error);
+            }
+
+            const playerOne = world.getPlayer("player-1");
+            const playerTwo = world.getPlayer("player-2");
+
+            expect(playerOne?.primaryTarget).to.equal(undefined);
+            expect(playerTwo?.primaryTarget).to.equal(undefined);
+        });
+
     });
 
     describe(`[Method] removePlayer`, () => {
