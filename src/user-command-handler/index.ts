@@ -136,6 +136,8 @@ export class UserCommandHandler {
                 `Resolve: ${attributes.resolve}`,
                 `Health: ${attributes.health}`,
                 `Current Health: ${secondaryAttributes.currentHealth}`,
+                `Current Experience: ${secondaryAttributes.currentExperience}`,
+                `Experience Until Next Level: ${secondaryAttributes.experienceUntilNextLevel}`,
                 `Damage: ${secondaryAttributes.attackDamage}`,
                 `Attack Delay: ${secondaryAttributes.attackDelaySeconds}s`,
                 `Mana: ${attributes.mana}`
@@ -441,4 +443,3 @@ export class UserCommandHandler {
     }
 
 }
-

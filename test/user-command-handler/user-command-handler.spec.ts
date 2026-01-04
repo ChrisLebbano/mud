@@ -207,6 +207,8 @@ describe(`[Class] UserCommandHandler`, () => {
                 "Resolve: 10",
                 "Health: 40",
                 "Current Health: 40",
+                "Current Experience: 0",
+                "Experience Until Next Level: 1000",
                 "Damage: 10",
                 "Attack Delay: 5s",
                 "Mana: 20"

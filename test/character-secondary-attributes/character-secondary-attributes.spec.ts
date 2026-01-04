@@ -11,7 +11,9 @@ describe(`[Class] CharacterSecondaryAttributes`, () => {
 
             expect(attributes.attackDelaySeconds).to.equal(5);
             expect(attributes.currentHealth).to.equal(45);
+            expect(attributes.currentExperience).to.equal(0);
             expect(attributes.attackDamage).to.equal(10);
+            expect(attributes.experienceUntilNextLevel).to.equal(1000);
             expect(attributes.maxHealth).to.equal(45);
         });
 
@@ -54,6 +56,18 @@ describe(`[Class] CharacterSecondaryAttributes`, () => {
 
     });
 
+    describe(`[Method] currentExperience`, () => {
+
+        it(`should update the current experience`, () => {
+            const attributes = new CharacterSecondaryAttributes(30);
+
+            attributes.currentExperience = 250;
+
+            expect(attributes.currentExperience).to.equal(250);
+        });
+
+    });
+
     describe(`[Method] attackDamage`, () => {
 
         it(`should update the damage value`, () => {
@@ -62,6 +76,18 @@ describe(`[Class] CharacterSecondaryAttributes`, () => {
             attributes.attackDamage = 18;
 
             expect(attributes.attackDamage).to.equal(18);
+        });
+
+    });
+
+    describe(`[Method] experienceUntilNextLevel`, () => {
+
+        it(`should update the experience requirement for the next level`, () => {
+            const attributes = new CharacterSecondaryAttributes(30);
+
+            attributes.experienceUntilNextLevel = 1200;
+
+            expect(attributes.experienceUntilNextLevel).to.equal(1200);
         });
 
     });
