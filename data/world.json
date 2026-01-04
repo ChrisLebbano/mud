@@ -84,6 +84,7 @@
         {
           "description": "An open courtyard with bioluminescent planters and soft mist.",
           "exits": {
+            "east": "training-grounds",
             "north": "workshop"
           },
           "id": "courtyard",
@@ -94,10 +95,29 @@
               "name": "Gardener Rue"
             }
           ]
+        },
+        {
+          "description": "A fenced training ground with scuffed earth and scattered practice dummies.",
+          "exits": {
+            "west": "courtyard"
+          },
+          "id": "training-grounds",
+          "name": "Training Grounds",
+          "nonPlayerCharacters": [
+            {
+              "id": "npc-rat",
+              "maxHealth": 20,
+              "name": "a rat"
+            },
+            {
+              "id": "npc-snake",
+              "maxHealth": 20,
+              "name": "a snake"
+            }
+          ]
         }
       ],
       "startingRoomId": "atrium"
     }
   ]
 }
-
