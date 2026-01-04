@@ -21,6 +21,13 @@ describe(`[Class] NonPlayerCharacter`, () => {
             expect(nonPlayerCharacter.secondaryAttributes.maxHealth).to.equal(20);
         });
 
+        it(`should set default attack damage and delay`, () => {
+            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Rat", "training-grounds");
+
+            expect(nonPlayerCharacter.secondaryAttributes.attackDamage).to.equal(5);
+            expect(nonPlayerCharacter.secondaryAttributes.attackDelaySeconds).to.equal(5);
+        });
+
     });
 
     describe(`[Method] hailResponse`, () => {

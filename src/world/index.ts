@@ -231,6 +231,66 @@ export class World {
         };
     }
 
+    public performNonPlayerCharacterAttack(nonPlayerCharacterId: string, targetPlayerId: string) {
+        const targetPlayer = this._players.get(targetPlayerId);
+        if (!targetPlayer) {
+            return { error: "Player not found." };
+        }
+
+        let attacker: NonPlayerCharacter | undefined;
+        this._rooms.forEach((room) => {
+            if (attacker) {
+                return;
+            }
+
+            const matchingNonPlayerCharacter = room.nonPlayerCharacters
+                .find((nonPlayerCharacter) => nonPlayerCharacter.id === nonPlayerCharacterId);
+            if (matchingNonPlayerCharacter) {
+                attacker = matchingNonPlayerCharacter;
+            }
+        });
+
+        if (!attacker) {
+            return { error: "Non-player character not found." };
+        }
+
+        if (attacker.roomId !== targetPlayer.roomId) {
+            attacker.isAttacking = false;
+            attacker.primaryTarget = undefined;
+            return { error: `${attacker.name} is no longer here.` };
+        }
+
+        if (!attacker.secondaryAttributes.isAlive) {
+            attacker.isAttacking = false;
+            return { warning: `${attacker.name} is already dead.` };
+        }
+
+        if (!targetPlayer.secondaryAttributes.isAlive) {
+            attacker.isAttacking = false;
+            return { warning: `${targetPlayer.name} is already dead.` };
+        }
+
+        const damage = attacker.secondaryAttributes.attackDamage;
+        const remainingHealth = targetPlayer.secondaryAttributes.applyDamage(damage);
+
+        if (remainingHealth <= 0) {
+            attacker.isAttacking = false;
+            return {
+                attackerName: attacker.name,
+                damage,
+                stopMessage: "You stop attacking.",
+                targetCurrentHealth: remainingHealth,
+                warning: `You have been slain by ${attacker.name}.`
+            };
+        }
+
+        return {
+            attackerName: attacker.name,
+            damage,
+            targetCurrentHealth: remainingHealth
+        };
+    }
+
     public removePlayer(playerId: string) {
         const player = this._players.get(playerId);
         if (!player) {
@@ -298,5 +358,6 @@ export class World {
             targetName: target.name
         };
 }
+
 
 }
