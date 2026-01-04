@@ -142,6 +142,33 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits[0].payload.zone).to.deep.equal({ id: "starter-zone", name: "Starter Zone" });
         });
 
+        it(`should list player details when using char`, () => {
+            const world = createWorld();
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "char");
+
+            expect(fakeSocket.emits).to.have.lengthOf(1);
+            expect(fakeSocket.emits[0].event).to.equal("world:system");
+            expect(fakeSocket.emits[0].payload).to.equal([
+                "Name: Tester",
+                "Strength: 10",
+                "Agility: 10",
+                "Dexterity: 10",
+                "Perception: 10",
+                "Constitution: 10",
+                "Wisdom: 10",
+                "Intelligence: 10",
+                "Charisma: 10",
+                "Resolve: 10",
+                "Health: 40",
+                "Mana: 20"
+            ].join("\n"));
+        });
+
         it(`should move players when using directions`, () => {
             const world = createWorld();
             const handler = new UserCommandHandler(world);
