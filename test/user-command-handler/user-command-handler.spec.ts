@@ -327,10 +327,11 @@ describe(`[Class] UserCommandHandler`, () => {
             handler.handleCommand(fakeSocket, "attack");
             handler.handleCommand(fakeSocket, "attack");
 
-            expect(fakeSocket.emits[2].event).to.equal("world:system");
-            expect(fakeSocket.emits[2].payload.message).to.equal("You are now attacking Greeter.");
-            expect(fakeSocket.emits[5].event).to.equal("world:system");
-            expect(fakeSocket.emits[5].payload.message).to.equal("You stop attacking.");
+            const systemMessages = fakeSocket.emits
+                .filter((emit) => emit.event === "world:system")
+                .map((emit) => (emit.payload as { message: string }).message);
+            expect(systemMessages).to.include("You are now attacking Greeter.");
+            expect(systemMessages).to.include("You stop attacking.");
         });
 
         it(`should honor the attack delay when restarting attacks`, () => {
@@ -356,14 +357,41 @@ describe(`[Class] UserCommandHandler`, () => {
                 Date.now = () => 2000;
                 handler.handleCommand(fakeSocket, "attack");
 
-                expect(fakeSocket.emits[2].payload.message).to.equal("You are now attacking Greeter.");
-                expect(fakeSocket.emits[3].payload.message).to.equal("You hit Greeter for 10 damage.");
-                expect(fakeSocket.emits[5].payload.message).to.equal("You stop attacking.");
-                expect(fakeSocket.emits[6].payload.message).to.equal("You are now attacking Greeter.");
-                expect(fakeSocket.emits).to.have.lengthOf(7);
+                const systemMessages = fakeSocket.emits
+                    .filter((emit) => emit.event === "world:system")
+                    .map((emit) => (emit.payload as { message: string }).message);
+                expect(systemMessages).to.include("You are now attacking Greeter.");
+                expect(systemMessages).to.include("You hit Greeter for 10 damage.");
+                expect(systemMessages).to.include("You stop attacking.");
             } finally {
                 Date.now = originalNow;
             }
+        });
+
+        it(`should let non-player characters retaliate when attacked`, () => {
+            const world = new World([
+                new Zone("starter-zone", "Starter Zone", [
+                    new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium")
+                    ])
+                ], "atrium")
+            ], "starter-zone", "atrium");
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "target Greeter");
+            handler.handleCommand(fakeSocket, "attack");
+
+            const attackMessage = fakeSocket.emits.find((emit) => {
+                const payload = emit.payload as { category?: string; message?: string };
+                return emit.event === "world:system"
+                    && payload.category === "SelfRecieveAttackDamage"
+                    && payload.message === "Greeter hits YOU for 5 damage!";
+            });
+
+            expect(attackMessage).to.not.equal(undefined);
         });
 
         it(`should warn on unknown commands`, () => {

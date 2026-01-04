@@ -21,7 +21,15 @@ describe(`[Class] World`, () => {
 
             expect(result.roomId).to.equal("atrium");
             expect(result.roomSnapshot.players).to.include("Alex");
-        });
+});
+
+
+
+
+
+
+
+
 
     });
 
@@ -214,7 +222,9 @@ describe(`[Class] World`, () => {
                     strength: 10,
                     wisdom: 10
                 },
+                currentHealth: 40,
                 id: "player-1",
+                maxHealth: 40,
                 name: "Alex",
                 primaryTargetName: undefined,
                 primaryTargetVitals: undefined,
@@ -281,6 +291,32 @@ describe(`[Class] World`, () => {
 
     });
 
+    describe(`[Method] performNonPlayerCharacterAttack`, () => {
+
+        it(`should apply damage from the non-player character to the player`, () => {
+            const rooms = [
+                new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }, [
+                    new NonPlayerCharacter("npc-guard", "Guard", "atrium")
+                ])
+            ];
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], "starter-zone", "atrium");
+
+            world.addPlayer("player-1", "Alex");
+
+            const attackResult = world.performNonPlayerCharacterAttack("npc-guard", "player-1");
+
+            if ("error" in attackResult || "warning" in attackResult) {
+                throw new Error(attackResult.error ?? attackResult.warning);
+            }
+
+            expect(attackResult.attackerName).to.equal("Guard");
+            expect(attackResult.damage).to.equal(5);
+            expect(attackResult.targetCurrentHealth).to.equal(35);
+        });
+
+    });
+
     describe(`[Method] setPrimaryTarget`, () => {
 
         it(`should set the target to a non-player character in the room`, () => {
@@ -328,3 +364,4 @@ describe(`[Class] World`, () => {
     });
 
 });
+

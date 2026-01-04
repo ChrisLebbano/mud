@@ -36,7 +36,9 @@ describe(`[Class] PlayerCharacter`, () => {
                     strength: 10,
                     wisdom: 10
                 },
+                currentHealth: 40,
                 id: "player-2",
+                maxHealth: 40,
                 name: "Riley",
                 primaryTargetName: undefined,
                 primaryTargetVitals: undefined,
@@ -62,3 +64,4 @@ describe(`[Class] PlayerCharacter`, () => {
     });
 
 });
+

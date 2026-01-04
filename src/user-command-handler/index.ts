@@ -1,3 +1,4 @@
+import { NonPlayerCharacter } from "../non-player-character";
 import { type ChatMessage, type GameSocket, type MoveCommand, type RoomSnapshot, type SocketServer } from "../types";
 import { World } from "../world";
 
@@ -5,6 +6,8 @@ export class UserCommandHandler {
 
     private _allowedDirections: string[];
     private _attackTimeouts: Map<string, NodeJS.Timeout>;
+    private _nonPlayerAttackTimeouts: Map<string, NodeJS.Timeout>;
+    private _nonPlayerNextAttackTimes: Map<string, number>;
     private _nextAttackTimes: Map<string, number>;
     private _socketServer?: SocketServer;
     private _world: World;
@@ -12,6 +15,8 @@ export class UserCommandHandler {
     constructor(world: World) {
         this._allowedDirections = ["north", "south", "east", "west"];
         this._attackTimeouts = new Map();
+        this._nonPlayerAttackTimeouts = new Map();
+        this._nonPlayerNextAttackTimes = new Map();
         this._nextAttackTimes = new Map();
         this._world = world;
     }
@@ -219,6 +224,17 @@ export class UserCommandHandler {
                         if (nextAttackResult.stopMessage) {
                             socket.emit("world:system", { category: "System", message: nextAttackResult.stopMessage });
                         }
+                        const nonPlayerTarget = player.primaryTarget instanceof NonPlayerCharacter ? player.primaryTarget : undefined;
+                        if (nonPlayerTarget) {
+                            const nonPlayerAttackTimeout = this._nonPlayerAttackTimeouts.get(nonPlayerTarget.id);
+                            if (nonPlayerAttackTimeout) {
+                                clearTimeout(nonPlayerAttackTimeout);
+                                this._nonPlayerAttackTimeouts.delete(nonPlayerTarget.id);
+                            }
+                            this._nonPlayerNextAttackTimes.delete(nonPlayerTarget.id);
+                            nonPlayerTarget.isAttacking = false;
+                            nonPlayerTarget.primaryTarget = undefined;
+                        }
                         const roomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
                         socket.emit("world:room", roomSnapshot);
                         return;
@@ -241,6 +257,107 @@ export class UserCommandHandler {
             };
 
             scheduleAttack();
+
+            const nonPlayerTarget = target instanceof NonPlayerCharacter ? target : undefined;
+            if (nonPlayerTarget) {
+                nonPlayerTarget.isAttacking = true;
+                nonPlayerTarget.primaryTarget = player;
+
+                const stopNonPlayerAttacking = (): void => {
+                    const attackTimeout = this._nonPlayerAttackTimeouts.get(nonPlayerTarget.id);
+                    if (attackTimeout) {
+                        clearTimeout(attackTimeout);
+                        this._nonPlayerAttackTimeouts.delete(nonPlayerTarget.id);
+                    }
+
+                    this._nonPlayerNextAttackTimes.delete(nonPlayerTarget.id);
+                    nonPlayerTarget.isAttacking = false;
+                    nonPlayerTarget.primaryTarget = undefined;
+                };
+
+                const getRemainingNonPlayerAttackDelay = (): number => {
+                    const delayMs = nonPlayerTarget.secondaryAttributes.attackDelaySeconds * 1000;
+                    const nextNonPlayerAttackTime = this._nonPlayerNextAttackTimes.get(nonPlayerTarget.id);
+                    if (!nextNonPlayerAttackTime) {
+                        return delayMs;
+                    }
+
+                    const remainingDelay = nextNonPlayerAttackTime - Date.now();
+                    return remainingDelay > 0 ? remainingDelay : 0;
+                };
+
+                const scheduleNonPlayerAttack = (): void => {
+                    const remainingDelay = getRemainingNonPlayerAttackDelay();
+                    const nextTimeout = setTimeout(() => {
+                        const attackDelayMs = nonPlayerTarget.secondaryAttributes.attackDelaySeconds * 1000;
+                        const attackResult = this._world.performNonPlayerCharacterAttack(nonPlayerTarget.id, player.id);
+                        if ("error" in attackResult) {
+                            stopNonPlayerAttacking();
+                            socket.emit("world:system", { category: "System", message: attackResult.error });
+                            return;
+                        }
+
+                        if ("warning" in attackResult) {
+                            stopNonPlayerAttacking();
+                            socket.emit("world:system", { category: "System", message: attackResult.warning });
+                            if (attackResult.stopMessage) {
+                                this.stopAttacking(socket.id);
+                                socket.emit("world:system", { category: "System", message: attackResult.stopMessage });
+                            }
+                            const roomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
+                            socket.emit("world:room", roomSnapshot);
+                            return;
+                        }
+
+                        socket.emit("world:system", {
+                            category: "SelfRecieveAttackDamage",
+                            message: `${attackResult.attackerName} hits YOU for ${attackResult.damage} damage!`
+                        });
+                        const roomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
+                        socket.emit("world:room", roomSnapshot);
+                        this._nonPlayerNextAttackTimes.set(nonPlayerTarget.id, Date.now() + attackDelayMs);
+                        scheduleNonPlayerAttack();
+                    }, remainingDelay);
+
+                    this._nonPlayerAttackTimeouts.set(nonPlayerTarget.id, nextTimeout);
+                };
+
+                if (!this._nonPlayerAttackTimeouts.has(nonPlayerTarget.id)) {
+                    const attackDelayMs = nonPlayerTarget.secondaryAttributes.attackDelaySeconds * 1000;
+                    const nextNonPlayerAttackTime = this._nonPlayerNextAttackTimes.get(nonPlayerTarget.id);
+                    const isAttackReady = !nextNonPlayerAttackTime || now >= nextNonPlayerAttackTime;
+                    if (isAttackReady) {
+                        const attackResult = this._world.performNonPlayerCharacterAttack(nonPlayerTarget.id, player.id);
+                        if ("error" in attackResult) {
+                            stopNonPlayerAttacking();
+                            socket.emit("world:system", { category: "System", message: attackResult.error });
+                            return;
+                        }
+
+                        if ("warning" in attackResult) {
+                            stopNonPlayerAttacking();
+                            socket.emit("world:system", { category: "System", message: attackResult.warning });
+                            if (attackResult.stopMessage) {
+                                this.stopAttacking(socket.id);
+                                socket.emit("world:system", { category: "System", message: attackResult.stopMessage });
+                            }
+                            const roomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
+                            socket.emit("world:room", roomSnapshot);
+                            return;
+                        }
+
+                        socket.emit("world:system", {
+                            category: "SelfRecieveAttackDamage",
+                            message: `${attackResult.attackerName} hits YOU for ${attackResult.damage} damage!`
+                        });
+                        const roomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
+                        socket.emit("world:room", roomSnapshot);
+                        this._nonPlayerNextAttackTimes.set(nonPlayerTarget.id, now + attackDelayMs);
+                    }
+
+                    scheduleNonPlayerAttack();
+                }
+            }
             return;
         }
 
@@ -324,3 +441,4 @@ export class UserCommandHandler {
     }
 
 }
+
