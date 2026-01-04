@@ -20,6 +20,22 @@ export class UserCommandHandler {
         return this._allowedDirections;
     }
 
+    private getRemainingAttackDelay(playerId: string): number {
+        const player = this._world.getPlayer(playerId);
+        if (!player) {
+            return 0;
+        }
+
+        const delayMs = player.secondaryAttributes.attackDelaySeconds * 1000;
+        const nextAttackTime = this._nextAttackTimes.get(playerId);
+        if (!nextAttackTime) {
+            return delayMs;
+        }
+
+        const remainingDelay = nextAttackTime - Date.now();
+        return remainingDelay > 0 ? remainingDelay : 0;
+    }
+
     public handleCommand(socket: GameSocket, command: string): void {
         const trimmedCommand = command.trim();
         if (!trimmedCommand) {
@@ -28,9 +44,7 @@ export class UserCommandHandler {
 
         const [verb, ...rest] = trimmedCommand.split(" ");
         const lowerVerb = verb.toLowerCase();
-
-        if (lowerVerb === "say") {
-            const message = rest.join(" ");
+        const handleSay = (message: string): void => {
             const sayResult = this._world.say(socket.id, message);
             if ("error" in sayResult) {
                 socket.emit("world:system", { category: "System", message: sayResult.error });
@@ -40,7 +54,7 @@ export class UserCommandHandler {
             const chatMessage: ChatMessage = sayResult.chatMessage;
             this._socketServer?.to(chatMessage.roomId).emit("world:chat", chatMessage);
             const trimmedMessage = message.trim();
-            const hailMatch = trimmedMessage.match(/^hail\s+(.+)/i);
+            const hailMatch = trimmedMessage.match(/^hail[, ]+(.+)/i);
             if (hailMatch) {
                 const targetName = hailMatch[1].trim().toLowerCase();
                 const room = this._world.getRoom(chatMessage.roomId);
@@ -62,6 +76,24 @@ export class UserCommandHandler {
                     }
                 }
             }
+        };
+
+        if (lowerVerb === "hail") {
+            const player = this._world.getPlayer(socket.id);
+            if (!player) {
+                socket.emit("world:system", { category: "System", message: "Player not found." });
+                return;
+            }
+
+            const targetName = player.primaryTarget?.name;
+            const hailMessage = targetName ? `Hail, ${targetName}` : "Hail";
+            handleSay(hailMessage);
+            return;
+        }
+
+        if (lowerVerb === "say") {
+            const message = rest.join(" ");
+            handleSay(message);
             return;
         }
 
@@ -289,22 +321,6 @@ export class UserCommandHandler {
         if (player) {
             player.isAttacking = false;
         }
-    }
-
-    private getRemainingAttackDelay(playerId: string): number {
-        const player = this._world.getPlayer(playerId);
-        if (!player) {
-            return 0;
-        }
-
-        const delayMs = player.secondaryAttributes.attackDelaySeconds * 1000;
-        const nextAttackTime = this._nextAttackTimes.get(playerId);
-        if (!nextAttackTime) {
-            return delayMs;
-        }
-
-        const remainingDelay = nextAttackTime - Date.now();
-        return remainingDelay > 0 ? remainingDelay : 0;
     }
 
 }
