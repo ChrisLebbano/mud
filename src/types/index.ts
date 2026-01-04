@@ -88,6 +88,7 @@ export interface WorldData {
 export interface WorldNonPlayerCharacterData {
     hailResponse?: string;
     id: string;
+    maxHealth?: number;
     name: string;
 }
 

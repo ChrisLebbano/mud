@@ -74,7 +74,8 @@ export class World {
                     nonPlayerCharacterData.id,
                     nonPlayerCharacterData.name,
                     roomData.id,
-                    nonPlayerCharacterData.hailResponse
+                    nonPlayerCharacterData.hailResponse,
+                    nonPlayerCharacterData.maxHealth
                 ));
 
                 return new Room(
@@ -296,6 +297,6 @@ export class World {
             roomSnapshot: this.getRoomSnapshot(player.roomId, playerId),
             targetName: target.name
         };
-    }
+}
 
 }

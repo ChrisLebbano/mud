@@ -14,6 +14,13 @@ describe(`[Class] NonPlayerCharacter`, () => {
             expect(nonPlayerCharacter.roomId).to.equal("atrium");
         });
 
+        it(`should initialize secondary attributes when max health is provided`, () => {
+            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Rat", "training-grounds", undefined, 20);
+
+            expect(nonPlayerCharacter.secondaryAttributes.currentHealth).to.equal(20);
+            expect(nonPlayerCharacter.secondaryAttributes.maxHealth).to.equal(20);
+        });
+
     });
 
     describe(`[Method] hailResponse`, () => {
