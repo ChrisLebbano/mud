@@ -6,6 +6,7 @@ export class Character {
     private _attributes: CharacterAttributes;
     private _id: string;
     private _isAttacking: boolean;
+    private _level: number;
     private _name: string;
     private _primaryTarget?: Character;
     private _roomId: string;
@@ -15,6 +16,7 @@ export class Character {
         this._attributes = new CharacterAttributes(40, 20);
         this._id = id;
         this._isAttacking = false;
+        this._level = 1;
         this._name = name;
         this._roomId = roomId;
         this._secondaryAttributes = secondaryAttributes ?? new CharacterSecondaryAttributes(this._attributes.health);
@@ -34,6 +36,14 @@ export class Character {
 
     public set isAttacking(isAttacking: boolean) {
         this._isAttacking = isAttacking;
+    }
+
+    public get level(): number {
+        return this._level;
+    }
+
+    public set level(level: number) {
+        this._level = level;
     }
 
     public get name(): string {
@@ -61,4 +71,3 @@ export class Character {
     }
 
 }
-
