@@ -30,4 +30,17 @@ describe(`[Class] Character`, () => {
 
     });
 
+    describe(`[Method] primaryTarget`, () => {
+
+        it(`should update the primary target`, () => {
+            const character = new Character("character-3", "Quinn", "atrium");
+            const target = new Character("character-4", "Morgan", "lounge");
+
+            character.primaryTarget = target;
+
+            expect(character.primaryTarget).to.equal(target);
+        });
+
+    });
+
 });
