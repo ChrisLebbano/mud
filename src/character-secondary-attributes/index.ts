@@ -2,12 +2,22 @@ export class CharacterSecondaryAttributes {
 
     private _attackDelaySeconds: number;
     private _currentHealth: number;
+    private _currentExperience: number;
     private _attackDamage: number;
+    private _experienceUntilNextLevel: number;
     private _maxHealth: number;
 
-    constructor(maxHealth: number, attackDelaySeconds?: number, attackDamage?: number) {
+    constructor(
+        maxHealth: number,
+        attackDelaySeconds?: number,
+        attackDamage?: number,
+        currentExperience?: number,
+        experienceUntilNextLevel?: number
+    ) {
         this._attackDelaySeconds = attackDelaySeconds ?? 5;
         this._attackDamage = attackDamage ?? 10;
+        this._currentExperience = currentExperience ?? 0;
+        this._experienceUntilNextLevel = experienceUntilNextLevel ?? 1000;
         this._maxHealth = maxHealth;
         this._currentHealth = maxHealth;
     }
@@ -15,6 +25,14 @@ export class CharacterSecondaryAttributes {
     public applyDamage(amount: number): number {
         this._currentHealth -= amount;
         return this._currentHealth;
+    }
+
+    public get attackDamage(): number {
+        return this._attackDamage;
+    }
+
+    public set attackDamage(attackDamage: number) {
+        this._attackDamage = attackDamage;
     }
 
     public get attackDelaySeconds(): number {
@@ -25,6 +43,14 @@ export class CharacterSecondaryAttributes {
         this._attackDelaySeconds = attackDelaySeconds;
     }
 
+    public get currentExperience(): number {
+        return this._currentExperience;
+    }
+
+    public set currentExperience(currentExperience: number) {
+        this._currentExperience = currentExperience;
+    }
+
     public get currentHealth(): number {
         return this._currentHealth;
     }
@@ -33,12 +59,12 @@ export class CharacterSecondaryAttributes {
         this._currentHealth = currentHealth;
     }
 
-    public get attackDamage(): number {
-        return this._attackDamage;
+    public get experienceUntilNextLevel(): number {
+        return this._experienceUntilNextLevel;
     }
 
-    public set attackDamage(attackDamage: number) {
-        this._attackDamage = attackDamage;
+    public set experienceUntilNextLevel(experienceUntilNextLevel: number) {
+        this._experienceUntilNextLevel = experienceUntilNextLevel;
     }
 
     public get isAlive(): boolean {

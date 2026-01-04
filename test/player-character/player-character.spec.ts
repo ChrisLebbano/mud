@@ -13,6 +13,8 @@ describe(`[Class] PlayerCharacter`, () => {
             expect(playerCharacter.id).to.equal("player-1");
             expect(playerCharacter.name).to.equal("Alex");
             expect(playerCharacter.roomId).to.equal("atrium");
+            expect(playerCharacter.secondaryAttributes.currentExperience).to.equal(0);
+            expect(playerCharacter.secondaryAttributes.experienceUntilNextLevel).to.equal(1000);
         });
 
     });
@@ -64,4 +66,3 @@ describe(`[Class] PlayerCharacter`, () => {
     });
 
 });
-
