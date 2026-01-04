@@ -217,7 +217,7 @@ export class World {
         return { playerName: player.name, roomId: room.id };
     }
 
-    public say(playerId: string, message: string) {
+    public say(playerId: string, message: string): { chatMessage: ChatMessage } | { error: string } {
         const player = this._players.get(playerId);
         if (!player) {
             return { error: "Player not found." };
@@ -230,6 +230,7 @@ export class World {
 
         return {
             chatMessage: {
+                category: "CharacterSpeech",
                 message: `${player.name} says, "${trimmedMessage}".`,
                 playerId: player.id,
                 playerName: player.name,

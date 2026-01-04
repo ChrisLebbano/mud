@@ -31,6 +31,7 @@
 
         .log {
             border: 1px solid #0f0;
+            color: #fff;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -78,6 +79,10 @@
             list-style: none;
             margin: 0;
             padding: 0;
+        }
+
+        .log-message {
+            color: #fff;
         }
 
         .input-bar {
@@ -193,10 +198,27 @@
         const zoneName = document.getElementById("zone-name");
         const submitButton = document.getElementById("submit-button");
 
-        const appendLog = (message) => {
+        const messageColors = {
+            CharacterSpeech: "#fff",
+            System: "#fff"
+        };
+
+        const resolveMessageColor = (category) => {
+            if (category && messageColors[category]) {
+                return messageColors[category];
+            }
+            return "#fff";
+        };
+
+        const appendLog = (payload) => {
+            const message = payload?.message ?? "";
+            const category = payload?.category ?? "System";
+            const messageColor = resolveMessageColor(category);
             if (message.includes("\n")) {
                 const list = document.createElement("ul");
                 list.classList.add("log-list");
+                list.classList.add("log-message");
+                list.style.color = messageColor;
                 message.split("\n").forEach((line) => {
                     const item = document.createElement("li");
                     item.textContent = line;
@@ -208,7 +230,9 @@
             }
 
             const line = document.createElement("div");
+            line.classList.add("log-message");
             line.textContent = message;
+            line.style.color = messageColor;
             logContainer.appendChild(line);
             logContainer.scrollTop = logContainer.scrollHeight;
         };
@@ -284,7 +308,7 @@
         };
 
         socket.on("world:chat", (chatMessage) => {
-            appendLog(chatMessage.message);
+            appendLog(chatMessage);
         });
 
         socket.on("world:room", (roomSnapshot) => {
@@ -297,8 +321,9 @@
             renderTargetSummary(playerTarget, roomSnapshot.player ? roomSnapshot.player.primaryTargetName : null);
         });
 
-        socket.on("world:system", (message) => {
-            appendLog(message);
+        socket.on("world:system", (messagePayload) => {
+            appendLog(messagePayload);
+            const message = messagePayload?.message ?? "";
             if (message.startsWith("You are now attacking ")) {
                 setAttackIndicator(true);
                 return;
