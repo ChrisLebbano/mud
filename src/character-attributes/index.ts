@@ -2,16 +2,19 @@ import { type CharacterAttributesSnapshot } from "../types";
 
 export class CharacterAttributes {
 
-    // Agility: "Modifies damage mitigation success for various skills (dodge, block, parry, etc)."
+    // Agility: "Modifies success for various skills (dodge, block, parry, etc)."
     private _agility: number;
+    // Charisma: Affects how much non player characters will like you, as well as how successful mind-altering spells are.
     private _charisma: number;
     // Constitution: "Modifies base health."
     private _constitution: number;
-    // Dexterity: "Modifies attack speed"
+    // Dexterity: "Modifies attack accuracy"
     private _dexterity: number;
+    // Health: Maximum base health
     private _health: number;
     // Intelligence: "Increases damage done and healing done by spells.  Increases duration for damage over time, and healing over time."
     private _intelligence: number;
+    // Mana: Maximum base Mana. Expend to cast spells.
     private _mana: number;
     // Perception: "Modifies the character's ability to interrupt a target during melee."
     private _perception: number;
