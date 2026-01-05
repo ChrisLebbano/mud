@@ -6,6 +6,7 @@ export class UserCommandHandler {
 
     private _allowedDirections: string[];
     private _attackTimeouts: Map<string, NodeJS.Timeout>;
+    private _directionAliases: Map<string, string>;
     private _nonPlayerAttackTimeouts: Map<string, NodeJS.Timeout>;
     private _nonPlayerNextAttackTimes: Map<string, number>;
     private _nextAttackTimes: Map<string, number>;
@@ -15,6 +16,12 @@ export class UserCommandHandler {
     constructor(world: World) {
         this._allowedDirections = ["north", "south", "east", "west"];
         this._attackTimeouts = new Map();
+        this._directionAliases = new Map([
+            ["e", "east"],
+            ["n", "north"],
+            ["s", "south"],
+            ["w", "west"]
+        ]);
         this._nonPlayerAttackTimeouts = new Map();
         this._nonPlayerNextAttackTimes = new Map();
         this._nextAttackTimes = new Map();
@@ -409,15 +416,8 @@ export class UserCommandHandler {
             return;
         }
 
-        const isMoveVerb = lowerVerb === "move" || lowerVerb === "go";
-        const isDirectMove = this.allowedDirections.includes(lowerVerb);
-        const direction = isMoveVerb ? rest[0] : (isDirectMove ? lowerVerb : "");
-        const normalizedDirection = direction ? direction.toLowerCase() : "";
-
-        if (isMoveVerb && direction && !this.allowedDirections.includes(normalizedDirection)) {
-            socket.emit("world:system", { category: "System", message: `${direction} is not a direction, please use 'north', 'south', 'east', or 'west'` });
-            return;
-        }
+        const normalizedDirection = this._directionAliases.get(lowerVerb)
+            ?? (this._allowedDirections.includes(lowerVerb) ? lowerVerb : "");
 
         if (normalizedDirection) {
             const moveCommand: MoveCommand = { direction: normalizedDirection };
