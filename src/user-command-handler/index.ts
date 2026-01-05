@@ -132,6 +132,10 @@ export class UserCommandHandler {
             const secondaryAttributes = player.secondaryAttributes;
             const listItems = [
                 `Name: ${player.name}`,
+                `Race: ${player.race.name}`,
+                `Race Description: ${player.race.description}`,
+                `Class: ${player.characterClass.name}`,
+                `Class Description: ${player.characterClass.description}`,
                 `Strength: ${attributes.strength}`,
                 `Agility: ${attributes.agility}`,
                 `Dexterity: ${attributes.dexterity}`,

@@ -1,5 +1,6 @@
 import { expect } from "chai";
 
+import { CharacterClass } from "../../src/character-class";
 import { NonPlayerCharacter } from "../../src/non-player-character";
 import { PlayerCharacter } from "../../src/player-character";
 import { Race } from "../../src/race";
@@ -9,8 +10,9 @@ describe(`[Class] PlayerCharacter`, () => {
     describe(`[Method] constructor`, () => {
 
         it(`should initialize a player character with id, name, and room`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("human", "Human", "Versatile adventurers.");
-            const playerCharacter = new PlayerCharacter("player-1", "Alex", "atrium", race);
+            const playerCharacter = new PlayerCharacter("player-1", "Alex", "atrium", race, characterClass);
 
             expect(playerCharacter.id).to.equal("player-1");
             expect(playerCharacter.name).to.equal("Alex");
@@ -24,8 +26,9 @@ describe(`[Class] PlayerCharacter`, () => {
     describe(`[Method] toSnapshot`, () => {
 
         it(`should return a snapshot with attributes`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("human", "Human", "Versatile adventurers.");
-            const playerCharacter = new PlayerCharacter("player-2", "Riley", "lounge", race);
+            const playerCharacter = new PlayerCharacter("player-2", "Riley", "lounge", race, characterClass);
 
             expect(playerCharacter.toSnapshot()).to.deep.equal({
                 attributes: {
@@ -40,6 +43,11 @@ describe(`[Class] PlayerCharacter`, () => {
                     resolve: 10,
                     strength: 10,
                     wisdom: 10
+                },
+                characterClass: {
+                    description: "Disciplined fighters.",
+                    id: "warrior",
+                    name: "Warrior"
                 },
                 currentHealth: 40,
                 id: "player-2",
@@ -57,10 +65,12 @@ describe(`[Class] PlayerCharacter`, () => {
         });
 
         it(`should include primary target vitals in snapshots`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
+            const targetClass = new CharacterClass("cleric", "Cleric", "Devout healers.");
             const race = new Race("human", "Human", "Versatile adventurers.");
             const creatureRace = new Race("creature", "Creature", "Wild denizens.");
-            const playerCharacter = new PlayerCharacter("player-3", "Jordan", "atrium", race);
-            const target = new NonPlayerCharacter("npc-1", "Guard", "atrium", creatureRace);
+            const playerCharacter = new PlayerCharacter("player-3", "Jordan", "atrium", race, characterClass);
+            const target = new NonPlayerCharacter("npc-1", "Guard", "atrium", creatureRace, targetClass);
 
             playerCharacter.primaryTarget = target;
 

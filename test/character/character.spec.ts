@@ -1,6 +1,7 @@
 import { expect } from "chai";
 
 import { Character } from "../../src/character";
+import { CharacterClass } from "../../src/character-class";
 import { Race } from "../../src/race";
 
 describe(`[Class] Character`, () => {
@@ -8,11 +9,13 @@ describe(`[Class] Character`, () => {
     describe(`[Method] constructor`, () => {
 
         it(`should initialize the character with id, name, and room`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("human", "Human", "Versatile adventurers.");
-            const character = new Character("character-1", "Alex", "atrium", race);
+            const character = new Character("character-1", "Alex", "atrium", race, characterClass);
 
             expect(character.attributes.health).to.equal(40);
             expect(character.attributes.mana).to.equal(20);
+            expect(character.characterClass).to.equal(characterClass);
             expect(character.id).to.equal("character-1");
             expect(character.isAttacking).to.equal(false);
             expect(character.level).to.equal(1);
@@ -29,8 +32,9 @@ describe(`[Class] Character`, () => {
     describe(`[Method] roomId`, () => {
 
         it(`should update the room id`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("human", "Human", "Versatile adventurers.");
-            const character = new Character("character-2", "Riley", "atrium", race);
+            const character = new Character("character-2", "Riley", "atrium", race, characterClass);
 
             character.roomId = "lounge";
 
@@ -42,10 +46,12 @@ describe(`[Class] Character`, () => {
     describe(`[Method] primaryTarget`, () => {
 
         it(`should update the primary target`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
+            const targetClass = new CharacterClass("cleric", "Cleric", "Devout healers.");
             const race = new Race("human", "Human", "Versatile adventurers.");
             const creatureRace = new Race("creature", "Creature", "Wild denizens.");
-            const character = new Character("character-3", "Quinn", "atrium", race);
-            const target = new Character("character-4", "Morgan", "lounge", creatureRace);
+            const character = new Character("character-3", "Quinn", "atrium", race, characterClass);
+            const target = new Character("character-4", "Morgan", "lounge", creatureRace, targetClass);
 
             character.primaryTarget = target;
 
@@ -57,8 +63,9 @@ describe(`[Class] Character`, () => {
     describe(`[Method] level`, () => {
 
         it(`should update the level`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("human", "Human", "Versatile adventurers.");
-            const character = new Character("character-6", "Jordan", "atrium", race);
+            const character = new Character("character-6", "Jordan", "atrium", race, characterClass);
 
             character.level = 2;
 
@@ -70,8 +77,9 @@ describe(`[Class] Character`, () => {
     describe(`[Method] isAttacking`, () => {
 
         it(`should update the attacking state`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("human", "Human", "Versatile adventurers.");
-            const character = new Character("character-5", "Casey", "atrium", race);
+            const character = new Character("character-5", "Casey", "atrium", race, characterClass);
 
             character.isAttacking = true;
 

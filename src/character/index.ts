@@ -1,10 +1,12 @@
 import { CharacterAttributes } from "../character-attributes";
+import { CharacterClass } from "../character-class";
 import { CharacterSecondaryAttributes } from "../character-secondary-attributes";
 import { Race } from "../race";
 
 export class Character {
 
     private _attributes: CharacterAttributes;
+    private _characterClass: CharacterClass;
     private _id: string;
     private _isAttacking: boolean;
     private _level: number;
@@ -14,8 +16,9 @@ export class Character {
     private _roomId: string;
     private _secondaryAttributes: CharacterSecondaryAttributes;
 
-    constructor(id: string, name: string, roomId: string, race: Race, secondaryAttributes?: CharacterSecondaryAttributes) {
+    constructor(id: string, name: string, roomId: string, race: Race, characterClass: CharacterClass, secondaryAttributes?: CharacterSecondaryAttributes) {
         this._attributes = new CharacterAttributes(40, 20);
+        this._characterClass = characterClass;
         this._id = id;
         this._isAttacking = false;
         this._level = 1;
@@ -27,6 +30,10 @@ export class Character {
 
     public get attributes(): CharacterAttributes {
         return this._attributes;
+    }
+
+    public get characterClass(): CharacterClass {
+        return this._characterClass;
     }
 
     public get id(): string {

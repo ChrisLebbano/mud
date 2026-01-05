@@ -1,4 +1,17 @@
 {
+  "classes": [
+    {
+      "description": "Disciplined fighters who excel with weapons and armor.",
+      "id": "warrior",
+      "name": "Warrior"
+    },
+    {
+      "description": "Devout healers and protectors who channel divine power.",
+      "id": "cleric",
+      "name": "Cleric"
+    }
+  ],
+  "playerClassId": "warrior",
   "playerRaceId": "human",
   "races": [
     {
@@ -29,6 +42,7 @@
           "nonPlayerCharacters": [
             {
               "hailResponse": "Move [north] to visit the training grounds and test your skills.",
+              "classId": "cleric",
               "id": "npc-guide",
               "name": "Terminal Guide",
               "raceId": "human"
@@ -44,12 +58,14 @@
           "name": "Training Grounds",
           "nonPlayerCharacters": [
             {
+              "classId": "warrior",
               "id": "npc-rat",
               "maxHealth": 20,
               "name": "a rat",
               "raceId": "creature"
             },
             {
+              "classId": "warrior",
               "id": "npc-snake",
               "maxHealth": 20,
               "name": "a snake",

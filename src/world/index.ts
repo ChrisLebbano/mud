@@ -1,4 +1,5 @@
 import { Character } from "../character";
+import { CharacterClass } from "../character-class";
 import { NonPlayerCharacter } from "../non-player-character";
 import { PlayerCharacter } from "../player-character";
 import { Race } from "../race";
@@ -9,7 +10,9 @@ import { Zone } from "../zone";
 export class World {
 
     private _players: Map<string, PlayerCharacter>;
+    private _playerClassId: string;
     private _playerRaceId: string;
+    private _classes: Map<string, CharacterClass>;
     private _races: Map<string, Race>;
     private _rooms: Map<string, Room>;
     private _startingRoomId: string;
@@ -17,9 +20,11 @@ export class World {
     private _zones: Map<string, Zone>;
     private _roomZones: Map<string, Zone>;
 
-    constructor(zones: Zone[], races: Race[], startingZoneId: string, startingRoomId: string, playerRaceId: string) {
+    constructor(zones: Zone[], races: Race[], classes: CharacterClass[], startingZoneId: string, startingRoomId: string, playerRaceId: string, playerClassId: string) {
         this._players = new Map();
+        this._playerClassId = playerClassId;
         this._playerRaceId = playerRaceId;
+        this._classes = new Map(classes.map((characterClass) => [characterClass.id, characterClass]));
         this._races = new Map(races.map((race) => [race.id, race]));
         this._rooms = new Map();
         this._startingRoomId = startingRoomId;
@@ -47,7 +52,8 @@ export class World {
     public addPlayer(playerId: string, playerName: string) {
         const room = this.getRoomById(this._startingRoomId);
         const playerRace = this.getRaceById(this._playerRaceId);
-        const player = new PlayerCharacter(playerId, playerName, room.id, playerRace);
+        const playerClass = this.getClassById(this._playerClassId);
+        const player = new PlayerCharacter(playerId, playerName, room.id, playerRace, playerClass);
 
         this._players.set(playerId, player);
         room.addPlayer(playerId);
@@ -74,6 +80,12 @@ export class World {
     }
 
     public static fromData(worldData: WorldData): World {
+        const classes = worldData.classes.map((classData) => new CharacterClass(
+            classData.id,
+            classData.name,
+            classData.description
+        ));
+        const classMap = new Map(classes.map((characterClass) => [characterClass.id, characterClass]));
         const races = worldData.races.map((raceData) => new Race(
             raceData.id,
             raceData.name,
@@ -87,6 +99,7 @@ export class World {
                     nonPlayerCharacterData.name,
                     roomData.id,
                     World.getRaceFromMap(raceMap, nonPlayerCharacterData.raceId),
+                    World.getClassFromMap(classMap, nonPlayerCharacterData.classId),
                     nonPlayerCharacterData.hailResponse,
                     nonPlayerCharacterData.maxHealth
                 ));
@@ -103,7 +116,7 @@ export class World {
             return new Zone(zoneData.id, zoneData.name, rooms, zoneData.startingRoomId);
         });
 
-        return new World(zones, races, worldData.startingZoneId, worldData.startingRoomId, worldData.playerRaceId);
+        return new World(zones, races, classes, worldData.startingZoneId, worldData.startingRoomId, worldData.playerRaceId, worldData.playerClassId);
     }
 
     public getPlayer(playerId: string): PlayerCharacter | undefined {
@@ -130,6 +143,10 @@ export class World {
 
     private getRaceById(raceId: string): Race {
         return World.getRaceFromMap(this._races, raceId);
+    }
+
+    private getClassById(classId: string): CharacterClass {
+        return World.getClassFromMap(this._classes, classId);
     }
 
     public getRoomSnapshot(roomId: string, playerId?: string): RoomSnapshot {
@@ -169,6 +186,14 @@ export class World {
             throw new Error(`Race not found: ${raceId}`);
         }
         return race;
+    }
+
+    private static getClassFromMap(classMap: Map<string, CharacterClass>, classId: string): CharacterClass {
+        const characterClass = classMap.get(classId);
+        if (!characterClass) {
+            throw new Error(`Class not found: ${classId}`);
+        }
+        return characterClass;
     }
 
     private getZoneForRoom(roomId: string): Zone {

@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { CharacterClass } from "../../src/character-class";
 import { NonPlayerCharacter } from "../../src/non-player-character";
 import { Race } from "../../src/race";
 import { Room } from "../../src/room";
@@ -76,7 +77,10 @@ class FakeSocket {
 }
 
 describe(`[Class] UserCommandHandler`, () => {
+    const clericClass = new CharacterClass("cleric", "Cleric", "Devout healers.");
     const humanRace = new Race("human", "Human", "Versatile adventurers.");
+    const warriorClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
+    const classes = [clericClass, warriorClass];
     const races = [humanRace];
 
     const createWorld = (): World => {
@@ -85,7 +89,7 @@ describe(`[Class] UserCommandHandler`, () => {
                 new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }),
                 new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
             ], "atrium")
-        ], races, "starter-zone", "atrium", "human");
+        ], races, classes, "starter-zone", "atrium", "human", "warrior");
     };
 
     describe(`[Method] handleCommand`, () => {
@@ -111,11 +115,11 @@ describe(`[Class] UserCommandHandler`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
                     new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
-                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, "Welcome aboard.")
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass, "Welcome aboard.")
                     ]),
                     new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
                 ], "atrium")
-            ], races, "starter-zone", "atrium", "human");
+            ], races, classes, "starter-zone", "atrium", "human", "warrior");
             const handler = new UserCommandHandler(world);
             const fakeSocketServer = new FakeSocketServer();
             const fakeSocket = new FakeSocket("player-1");
@@ -134,10 +138,10 @@ describe(`[Class] UserCommandHandler`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
                     new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
-                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, "Welcome aboard.")
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass, "Welcome aboard.")
                     ])
                 ], "atrium")
-            ], races, "starter-zone", "atrium", "human");
+            ], races, classes, "starter-zone", "atrium", "human", "warrior");
             const handler = new UserCommandHandler(world);
             const fakeSocketServer = new FakeSocketServer();
             const fakeSocket = new FakeSocket("player-1");
@@ -199,6 +203,10 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits[0].event).to.equal("world:system");
             expect(fakeSocket.emits[0].payload.message).to.equal([
                 "Name: Tester",
+                "Race: Human",
+                "Race Description: Versatile adventurers.",
+                "Class: Warrior",
+                "Class Description: Disciplined fighters.",
                 "Strength: 10",
                 "Agility: 10",
                 "Dexterity: 10",
@@ -274,7 +282,7 @@ describe(`[Class] UserCommandHandler`, () => {
                 new Zone("market-zone", "Market Zone", [
                     new Room("market", "Market", "A bustling market with vendors and neon signs.", { west: "atrium" })
                 ], "market")
-            ], races, "starter-zone", "atrium", "human");
+            ], races, classes, "starter-zone", "atrium", "human", "warrior");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
@@ -293,10 +301,10 @@ describe(`[Class] UserCommandHandler`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
                     new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
-                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace)
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass)
                     ])
                 ], "atrium")
-            ], races, "starter-zone", "atrium", "human");
+            ], races, classes, "starter-zone", "atrium", "human", "warrior");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
@@ -333,10 +341,10 @@ describe(`[Class] UserCommandHandler`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
                     new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
-                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace)
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass)
                     ])
                 ], "atrium")
-            ], races, "starter-zone", "atrium", "human");
+            ], races, classes, "starter-zone", "atrium", "human", "warrior");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
@@ -357,10 +365,10 @@ describe(`[Class] UserCommandHandler`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
                     new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
-                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace)
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass)
                     ])
                 ], "atrium")
-            ], races, "starter-zone", "atrium", "human");
+            ], races, classes, "starter-zone", "atrium", "human", "warrior");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
@@ -381,10 +389,10 @@ describe(`[Class] UserCommandHandler`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
                     new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
-                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace)
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass)
                     ])
                 ], "atrium")
-            ], races, "starter-zone", "atrium", "human");
+            ], races, classes, "starter-zone", "atrium", "human", "warrior");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
             const originalNow = Date.now;
@@ -415,10 +423,10 @@ describe(`[Class] UserCommandHandler`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
                     new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
-                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace)
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass)
                     ])
                 ], "atrium")
-            ], races, "starter-zone", "atrium", "human");
+            ], races, classes, "starter-zone", "atrium", "human", "warrior");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
