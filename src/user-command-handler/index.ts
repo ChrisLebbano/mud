@@ -147,17 +147,32 @@ export class UserCommandHandler {
             return;
         }
 
-        if (lowerVerb === "attack") {
+        if (lowerVerb === "kill") {
             const player = this._world.getPlayer(socket.id);
             if (!player) {
                 socket.emit("world:system", { category: "System", message: "Player not found." });
                 return;
             }
 
-            if (player.isAttacking) {
+            const targetName = rest.join(" ");
+            const trimmedTargetName = targetName.trim();
+            if (player.isAttacking && !trimmedTargetName) {
                 this.stopAttacking(socket.id);
                 socket.emit("world:system", { category: "System", message: "You stop attacking." });
                 return;
+            }
+
+            if (trimmedTargetName) {
+                const targetResult = this._world.setPrimaryTarget(socket.id, trimmedTargetName);
+                if ("error" in targetResult) {
+                    socket.emit("world:system", { category: "System", message: targetResult.error });
+                    return;
+                }
+                socket.emit("world:room", targetResult.roomSnapshot);
+            }
+
+            if (player.isAttacking) {
+                this.stopAttacking(socket.id);
             }
 
             const target = player.primaryTarget;

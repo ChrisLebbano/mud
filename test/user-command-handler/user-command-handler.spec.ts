@@ -298,21 +298,45 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits[1].payload.message).to.equal("Primary target set to Greeter.");
         });
 
-        it(`should warn when attacking with no primary target`, () => {
+        it(`should warn when killing with no primary target`, () => {
             const world = createWorld();
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
             world.addPlayer(fakeSocket.id, "Tester");
 
-            handler.handleCommand(fakeSocket, "attack");
+            handler.handleCommand(fakeSocket, "kill");
 
             expect(fakeSocket.emits).to.have.lengthOf(1);
             expect(fakeSocket.emits[0].event).to.equal("world:system");
             expect(fakeSocket.emits[0].payload.message).to.equal("No primary target selected.");
         });
 
-        it(`should toggle attacking off when issuing attack again`, () => {
+        it(`should set a primary target when killing by name`, () => {
+            const world = new World([
+                new Zone("starter-zone", "Starter Zone", [
+                    new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium")
+                    ])
+                ], "atrium")
+            ], "starter-zone", "atrium");
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "kill Greeter");
+
+            const targetRoomEmit = fakeSocket.emits.find((emit) => emit.event === "world:room"
+                && emit.payload.player.primaryTargetName === "Greeter");
+            expect(targetRoomEmit).to.not.equal(undefined);
+            const systemMessages = fakeSocket.emits
+                .filter((emit) => emit.event === "world:system")
+                .map((emit) => (emit.payload as { message: string }).message);
+            expect(systemMessages).to.include("You are now attacking Greeter.");
+        });
+
+        it(`should toggle attacking off when issuing kill again`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
                     new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
@@ -326,8 +350,8 @@ describe(`[Class] UserCommandHandler`, () => {
             world.addPlayer(fakeSocket.id, "Tester");
 
             handler.handleCommand(fakeSocket, "target Greeter");
-            handler.handleCommand(fakeSocket, "attack");
-            handler.handleCommand(fakeSocket, "attack");
+            handler.handleCommand(fakeSocket, "kill");
+            handler.handleCommand(fakeSocket, "kill");
 
             const systemMessages = fakeSocket.emits
                 .filter((emit) => emit.event === "world:system")
@@ -336,7 +360,7 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(systemMessages).to.include("You stop attacking.");
         });
 
-        it(`should honor the attack delay when restarting attacks`, () => {
+        it(`should honor the attack delay when restarting kills`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
                     new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
@@ -353,11 +377,11 @@ describe(`[Class] UserCommandHandler`, () => {
                 world.addPlayer(fakeSocket.id, "Tester");
 
                 handler.handleCommand(fakeSocket, "target Greeter");
-                handler.handleCommand(fakeSocket, "attack");
-                handler.handleCommand(fakeSocket, "attack");
+                handler.handleCommand(fakeSocket, "kill");
+                handler.handleCommand(fakeSocket, "kill");
 
                 Date.now = () => 2000;
-                handler.handleCommand(fakeSocket, "attack");
+                handler.handleCommand(fakeSocket, "kill");
 
                 const systemMessages = fakeSocket.emits
                     .filter((emit) => emit.event === "world:system")
@@ -384,7 +408,7 @@ describe(`[Class] UserCommandHandler`, () => {
             world.addPlayer(fakeSocket.id, "Tester");
 
             handler.handleCommand(fakeSocket, "target Greeter");
-            handler.handleCommand(fakeSocket, "attack");
+            handler.handleCommand(fakeSocket, "kill");
 
             const attackMessage = fakeSocket.emits.find((emit) => {
                 const payload = emit.payload as { category?: string; message?: string };
