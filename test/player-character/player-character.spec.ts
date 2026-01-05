@@ -2,13 +2,15 @@ import { expect } from "chai";
 
 import { NonPlayerCharacter } from "../../src/non-player-character";
 import { PlayerCharacter } from "../../src/player-character";
+import { Race } from "../../src/race";
 
 describe(`[Class] PlayerCharacter`, () => {
 
     describe(`[Method] constructor`, () => {
 
         it(`should initialize a player character with id, name, and room`, () => {
-            const playerCharacter = new PlayerCharacter("player-1", "Alex", "atrium");
+            const race = new Race("human", "Human", "Versatile adventurers.");
+            const playerCharacter = new PlayerCharacter("player-1", "Alex", "atrium", race);
 
             expect(playerCharacter.id).to.equal("player-1");
             expect(playerCharacter.name).to.equal("Alex");
@@ -22,7 +24,8 @@ describe(`[Class] PlayerCharacter`, () => {
     describe(`[Method] toSnapshot`, () => {
 
         it(`should return a snapshot with attributes`, () => {
-            const playerCharacter = new PlayerCharacter("player-2", "Riley", "lounge");
+            const race = new Race("human", "Human", "Versatile adventurers.");
+            const playerCharacter = new PlayerCharacter("player-2", "Riley", "lounge", race);
 
             expect(playerCharacter.toSnapshot()).to.deep.equal({
                 attributes: {
@@ -44,13 +47,20 @@ describe(`[Class] PlayerCharacter`, () => {
                 name: "Riley",
                 primaryTargetName: undefined,
                 primaryTargetVitals: undefined,
+                race: {
+                    description: "Versatile adventurers.",
+                    id: "human",
+                    name: "Human"
+                },
                 roomId: "lounge"
             });
         });
 
         it(`should include primary target vitals in snapshots`, () => {
-            const playerCharacter = new PlayerCharacter("player-3", "Jordan", "atrium");
-            const target = new NonPlayerCharacter("npc-1", "Guard", "atrium");
+            const race = new Race("human", "Human", "Versatile adventurers.");
+            const creatureRace = new Race("creature", "Creature", "Wild denizens.");
+            const playerCharacter = new PlayerCharacter("player-3", "Jordan", "atrium", race);
+            const target = new NonPlayerCharacter("npc-1", "Guard", "atrium", creatureRace);
 
             playerCharacter.primaryTarget = target;
 

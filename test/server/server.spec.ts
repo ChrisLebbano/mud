@@ -1,5 +1,8 @@
+import { expect } from "chai";
+import { type IncomingMessage, type ServerResponse } from "node:http";
 import { GameClientRoute } from "../../src/game-client-route";
 import { NodeHttpServerFactory } from "../../src/node-http-server-factory";
+import { Race } from "../../src/race";
 import { Room } from "../../src/room";
 import { Server } from "../../src/server";
 import { ServerRouter } from "../../src/server-router";
@@ -7,8 +10,6 @@ import { SocketServerFactory } from "../../src/socket-server-factory";
 import { type HttpRequestHandler, type NodeHttpServer, type SocketServer } from "../../src/types";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
-import { expect } from "chai";
-import { type IncomingMessage, type ServerResponse } from "node:http";
 
 class FakeHttpServer {
 
@@ -185,9 +186,10 @@ class FakeSocket {
 }
 
 const createWorld = (): World => {
+    const race = new Race("human", "Human", "Versatile adventurers.");
     return new World([new Zone("test-zone", "Test Zone", [
         new Room("test-room", "Test Room", "A test room.", {})
-    ], "test-room")], "test-zone", "test-room");
+    ], "test-room")], [race], "test-zone", "test-room", "human");
 };
 
 describe(`[Class] Server`, () => {

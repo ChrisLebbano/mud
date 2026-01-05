@@ -1,11 +1,15 @@
 import { expect } from "chai";
 import { NonPlayerCharacter } from "../../src/non-player-character";
+import { Race } from "../../src/race";
 import { Room } from "../../src/room";
 import { type WorldData } from "../../src/types";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
 
 describe(`[Class] World`, () => {
+    const creatureRace = new Race("creature", "Creature", "Wild denizens.");
+    const humanRace = new Race("human", "Human", "Versatile adventurers.");
+    const races = [creatureRace, humanRace];
 
     describe(`[Method] addPlayer`, () => {
 
@@ -15,7 +19,7 @@ describe(`[Class] World`, () => {
                 new Room("lounge", "Lounge", "A quiet lounge.", { south: "atrium" })
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const world = new World([zone], races, "starter-zone", "atrium", "human");
 
             const result = world.addPlayer("player-1", "Alex");
 
@@ -37,6 +41,14 @@ describe(`[Class] World`, () => {
 
         it(`should build a world from data`, () => {
             const worldData: WorldData = {
+                playerRaceId: "human",
+                races: [
+                    {
+                        description: "Versatile adventurers.",
+                        id: "human",
+                        name: "Human"
+                    }
+                ],
                 startingRoomId: "atrium",
                 startingZoneId: "starter-zone",
                 zones: [
@@ -53,7 +65,8 @@ describe(`[Class] World`, () => {
                                     {
                                         hailResponse: "Hello there.",
                                         id: "npc-1",
-                                        name: "Greeter"
+                                        name: "Greeter",
+                                        raceId: "human"
                                     }
                                 ]
                             },
@@ -86,7 +99,7 @@ describe(`[Class] World`, () => {
                 new Room("lounge", "Lounge", "A quiet lounge.", { south: "atrium" })
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const world = new World([zone], races, "starter-zone", "atrium", "human");
 
             world.addPlayer("player-1", "Alex");
             const moveResult = world.movePlayer("player-1", "north");
@@ -103,12 +116,12 @@ describe(`[Class] World`, () => {
         it(`should clear targets when players move rooms`, () => {
             const rooms = [
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }, [
-                    new NonPlayerCharacter("npc-guard", "Guard", "atrium")
+                    new NonPlayerCharacter("npc-guard", "Guard", "atrium", humanRace)
                 ]),
                 new Room("lounge", "Lounge", "A quiet lounge.", { south: "atrium" })
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const world = new World([zone], races, "starter-zone", "atrium", "human");
 
             world.addPlayer("player-1", "Alex");
             world.addPlayer("player-2", "Riley");
@@ -138,7 +151,7 @@ describe(`[Class] World`, () => {
                 new Room("lounge", "Lounge", "A quiet lounge.", { south: "atrium" })
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const world = new World([zone], races, "starter-zone", "atrium", "human");
 
             world.addPlayer("player-1", "Alex");
             const removed = world.removePlayer("player-1");
@@ -157,7 +170,7 @@ describe(`[Class] World`, () => {
                 new Room("lounge", "Lounge", "A quiet lounge.", { south: "atrium" })
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const world = new World([zone], races, "starter-zone", "atrium", "human");
 
             world.addPlayer("player-1", "Alex");
             world.addPlayer("player-2", "Riley");
@@ -186,7 +199,7 @@ describe(`[Class] World`, () => {
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" })
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const world = new World([zone], races, "starter-zone", "atrium", "human");
 
             const room = world.getRoom("atrium");
 
@@ -202,7 +215,7 @@ describe(`[Class] World`, () => {
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" })
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const world = new World([zone], races, "starter-zone", "atrium", "human");
 
             world.addPlayer("player-1", "Alex");
             const snapshot = world.getRoomSnapshot("atrium", "player-1");
@@ -228,6 +241,11 @@ describe(`[Class] World`, () => {
                 name: "Alex",
                 primaryTargetName: undefined,
                 primaryTargetVitals: undefined,
+                race: {
+                    description: "Versatile adventurers.",
+                    id: "human",
+                    name: "Human"
+                },
                 roomId: "atrium"
             });
             expect(snapshot.nonPlayerCharacters).to.deep.equal([]);
@@ -241,11 +259,11 @@ describe(`[Class] World`, () => {
         it(`should apply damage to the target`, () => {
             const rooms = [
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }, [
-                    new NonPlayerCharacter("npc-guard", "Guard", "atrium")
+                    new NonPlayerCharacter("npc-guard", "Guard", "atrium", humanRace)
                 ])
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const world = new World([zone], races, "starter-zone", "atrium", "human");
 
             world.addPlayer("player-1", "Alex");
             world.setPrimaryTarget("player-1", "Guard");
@@ -264,11 +282,11 @@ describe(`[Class] World`, () => {
         it(`should warn when attacking a dead target`, () => {
             const rooms = [
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }, [
-                    new NonPlayerCharacter("npc-guard", "Guard", "atrium")
+                    new NonPlayerCharacter("npc-guard", "Guard", "atrium", humanRace)
                 ])
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const world = new World([zone], races, "starter-zone", "atrium", "human");
 
             world.addPlayer("player-1", "Alex");
             world.setPrimaryTarget("player-1", "Guard");
@@ -296,11 +314,11 @@ describe(`[Class] World`, () => {
         it(`should apply damage from the non-player character to the player`, () => {
             const rooms = [
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }, [
-                    new NonPlayerCharacter("npc-guard", "Guard", "atrium")
+                    new NonPlayerCharacter("npc-guard", "Guard", "atrium", humanRace)
                 ])
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const world = new World([zone], races, "starter-zone", "atrium", "human");
 
             world.addPlayer("player-1", "Alex");
 
@@ -322,11 +340,11 @@ describe(`[Class] World`, () => {
         it(`should set the target to a non-player character in the room`, () => {
             const rooms = [
                 new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }, [
-                    new NonPlayerCharacter("npc-greeter", "Greeter", "atrium")
+                    new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace)
                 ])
             ];
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
-            const world = new World([zone], "starter-zone", "atrium");
+            const world = new World([zone], races, "starter-zone", "atrium", "human");
 
             world.addPlayer("player-1", "Alex");
 
@@ -352,7 +370,7 @@ describe(`[Class] World`, () => {
             const marketZone = new Zone("market-zone", "Market Zone", [
                 new Room("market", "Market", "A bustling market.", { west: "atrium" })
             ], "market");
-            const world = new World([zone, marketZone], "starter-zone", "atrium");
+            const world = new World([zone, marketZone], races, "starter-zone", "atrium", "human");
 
             world.addPlayer("player-1", "Alex");
             world.addPlayer("player-2", "Riley");
@@ -364,4 +382,3 @@ describe(`[Class] World`, () => {
     });
 
 });
-

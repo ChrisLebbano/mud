@@ -53,7 +53,14 @@ export interface PlayerSnapshot {
     name: string;
     primaryTargetName?: string;
     primaryTargetVitals?: TargetVitalsSnapshot;
+    race: RaceSnapshot;
     roomId: string;
+}
+
+export interface RaceSnapshot {
+    description: string;
+    id: string;
+    name: string;
 }
 
 export interface TargetVitalsSnapshot {
@@ -82,6 +89,8 @@ export interface ServerConfig {
 }
 
 export interface WorldData {
+    playerRaceId: string;
+    races: WorldRaceData[];
     startingRoomId: string;
     startingZoneId: string;
     zones: WorldZoneData[];
@@ -92,6 +101,7 @@ export interface WorldNonPlayerCharacterData {
     id: string;
     maxHealth?: number;
     name: string;
+    raceId: string;
 }
 
 export interface WorldRoomData {
@@ -109,7 +119,12 @@ export interface WorldZoneData {
     startingRoomId: string;
 }
 
+export interface WorldRaceData {
+    description: string;
+    id: string;
+    name: string;
+}
+
 export type HttpRequestHandler = (request: IncomingMessage, response: ServerResponse) => void;
 export type NodeHttpServer = Server;
 export type SocketServer = SocketIOServer;
-
