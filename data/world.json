@@ -15,7 +15,7 @@
           "name": "Atrium",
           "nonPlayerCharacters": [
             {
-              "hailResponse": "Move [direction] to visit the training grounds and test your skills.",
+              "hailResponse": "Move [north] to visit the training grounds and test your skills.",
               "id": "npc-guide",
               "name": "Terminal Guide"
             }
