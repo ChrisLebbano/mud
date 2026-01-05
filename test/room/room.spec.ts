@@ -1,18 +1,20 @@
 import { expect } from "chai";
 
+import { CharacterClass } from "../../src/character-class";
 import { NonPlayerCharacter } from "../../src/non-player-character";
 import { Race } from "../../src/race";
 import { Room } from "../../src/room";
 
 describe(`[Class] Room`, () => {
+    const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
     const humanRace = new Race("human", "Human", "Versatile adventurers.");
 
     describe(`[Method] addNonPlayerCharacter`, () => {
 
         it(`should track non-player characters in the room`, () => {
             const room = new Room("atrium", "Atrium", "A bright room.", { north: "lounge" });
-            const guide = new NonPlayerCharacter("npc-guide", "Guide", "atrium", humanRace);
-            const mechanic = new NonPlayerCharacter("npc-mechanic", "Mechanic", "atrium", humanRace);
+            const guide = new NonPlayerCharacter("npc-guide", "Guide", "atrium", humanRace, characterClass);
+            const mechanic = new NonPlayerCharacter("npc-mechanic", "Mechanic", "atrium", humanRace, characterClass);
 
             room.addNonPlayerCharacter(guide);
             room.addNonPlayerCharacter(mechanic);
@@ -61,8 +63,8 @@ describe(`[Class] Room`, () => {
 
         it(`should return a snapshot of the room`, () => {
             const room = new Room("atrium", "Atrium", "A bright room.", { north: "lounge", south: "garden" }, [
-                new NonPlayerCharacter("npc-guide", "Guide", "atrium", humanRace),
-                new NonPlayerCharacter("npc-scribe", "Scribe", "atrium", humanRace)
+                new NonPlayerCharacter("npc-guide", "Guide", "atrium", humanRace, characterClass),
+                new NonPlayerCharacter("npc-scribe", "Scribe", "atrium", humanRace, characterClass)
             ]);
             const snapshot = room.toSnapshot(["Zoe", "Alex"], { id: "starter-zone", name: "Starter Zone" });
 

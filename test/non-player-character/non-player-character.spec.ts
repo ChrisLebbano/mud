@@ -1,5 +1,6 @@
 import { expect } from "chai";
 
+import { CharacterClass } from "../../src/character-class";
 import { NonPlayerCharacter } from "../../src/non-player-character";
 import { Race } from "../../src/race";
 
@@ -8,8 +9,9 @@ describe(`[Class] NonPlayerCharacter`, () => {
     describe(`[Method] constructor`, () => {
 
         it(`should initialize a non-player character with id, name, and room`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("human", "Human", "Versatile adventurers.");
-            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Guide", "atrium", race);
+            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Guide", "atrium", race, characterClass);
 
             expect(nonPlayerCharacter.id).to.equal("npc-1");
             expect(nonPlayerCharacter.name).to.equal("Guide");
@@ -17,16 +19,18 @@ describe(`[Class] NonPlayerCharacter`, () => {
         });
 
         it(`should initialize secondary attributes when max health is provided`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("creature", "Creature", "Wild denizens.");
-            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Rat", "training-grounds", race, undefined, 20);
+            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Rat", "training-grounds", race, characterClass, undefined, 20);
 
             expect(nonPlayerCharacter.secondaryAttributes.currentHealth).to.equal(20);
             expect(nonPlayerCharacter.secondaryAttributes.maxHealth).to.equal(20);
         });
 
         it(`should set default attack damage and delay`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("creature", "Creature", "Wild denizens.");
-            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Rat", "training-grounds", race);
+            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Rat", "training-grounds", race, characterClass);
 
             expect(nonPlayerCharacter.secondaryAttributes.attackDamage).to.equal(5);
             expect(nonPlayerCharacter.secondaryAttributes.attackDelaySeconds).to.equal(5);
@@ -37,8 +41,9 @@ describe(`[Class] NonPlayerCharacter`, () => {
     describe(`[Method] hailResponse`, () => {
 
         it(`should return the hail response when set`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("human", "Human", "Versatile adventurers.");
-            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Guide", "atrium", race, "Greetings traveler.");
+            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Guide", "atrium", race, characterClass, "Greetings traveler.");
 
             expect(nonPlayerCharacter.hailResponse).to.equal("Greetings traveler.");
         });
@@ -48,15 +53,17 @@ describe(`[Class] NonPlayerCharacter`, () => {
     describe(`[Method] respondToHail`, () => {
 
         it(`should return the hail response when available`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("human", "Human", "Versatile adventurers.");
-            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Guide", "atrium", race, "Hello there.");
+            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Guide", "atrium", race, characterClass, "Hello there.");
 
             expect(nonPlayerCharacter.respondToHail()).to.equal("Hello there.");
         });
 
         it(`should return undefined when no hail response is configured`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
             const race = new Race("human", "Human", "Versatile adventurers.");
-            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Guide", "atrium", race);
+            const nonPlayerCharacter = new NonPlayerCharacter("npc-1", "Guide", "atrium", race, characterClass);
 
             expect(nonPlayerCharacter.respondToHail()).to.equal(undefined);
         });

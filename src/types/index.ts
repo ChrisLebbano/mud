@@ -15,6 +15,12 @@ export interface CharacterAttributesSnapshot {
     wisdom: number;
 }
 
+export interface CharacterClassSnapshot {
+    description: string;
+    id: string;
+    name: string;
+}
+
 export type MessageCategory = "CharacterSpeech" | "SelfDealingAttackDamage" | "SelfRecieveAttackDamage" | "System";
 
 export interface MessagePayload {
@@ -47,6 +53,7 @@ export interface NonPlayerCharacterSnapshot {
 
 export interface PlayerSnapshot {
     attributes: CharacterAttributesSnapshot;
+    characterClass: CharacterClassSnapshot;
     currentHealth: number;
     id: string;
     maxHealth: number;
@@ -89,6 +96,8 @@ export interface ServerConfig {
 }
 
 export interface WorldData {
+    classes: WorldClassData[];
+    playerClassId: string;
     playerRaceId: string;
     races: WorldRaceData[];
     startingRoomId: string;
@@ -97,11 +106,18 @@ export interface WorldData {
 }
 
 export interface WorldNonPlayerCharacterData {
+    classId: string;
     hailResponse?: string;
     id: string;
     maxHealth?: number;
     name: string;
     raceId: string;
+}
+
+export interface WorldClassData {
+    description: string;
+    id: string;
+    name: string;
 }
 
 export interface WorldRoomData {

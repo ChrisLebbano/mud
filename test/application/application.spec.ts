@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { Application } from "../../src/application";
+import { CharacterClass } from "../../src/character-class";
 import { Race } from "../../src/race";
 import { Room } from "../../src/room";
 import { Server } from "../../src/server";
@@ -10,10 +11,11 @@ import { Zone } from "../../src/zone";
 describe(`[Class] Application`, () => {
 
     const createWorld = (): World => {
+        const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
         const race = new Race("human", "Human", "Versatile adventurers.");
         return new World([new Zone("test-zone", "Test Zone", [
             new Room("test-room", "Test Room", "A test room.", {})
-        ], "test-room")], [race], "test-zone", "test-room", "human");
+        ], "test-room")], [race], [characterClass], "test-zone", "test-room", "human", "warrior");
     };
 
     describe(`[Method] init`, () => {

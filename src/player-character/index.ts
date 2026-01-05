@@ -1,11 +1,12 @@
 import { Character } from "../character";
+import { CharacterClass } from "../character-class";
 import { Race } from "../race";
 import { type PlayerSnapshot } from "../types";
 
 export class PlayerCharacter extends Character {
 
-    constructor(id: string, name: string, roomId: string, race: Race) {
-        super(id, name, roomId, race);
+    constructor(id: string, name: string, roomId: string, race: Race, characterClass: CharacterClass) {
+        super(id, name, roomId, race, characterClass);
     }
 
     public toSnapshot(): PlayerSnapshot {
@@ -17,6 +18,7 @@ export class PlayerCharacter extends Character {
 
         return {
             attributes: this.attributes.toSnapshot(),
+            characterClass: this.characterClass.toSnapshot(),
             currentHealth: this.secondaryAttributes.currentHealth,
             id: this.id,
             maxHealth: this.secondaryAttributes.maxHealth,
@@ -29,4 +31,3 @@ export class PlayerCharacter extends Character {
     }
 
 }
-
