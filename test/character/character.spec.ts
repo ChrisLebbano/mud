@@ -1,13 +1,15 @@
 import { expect } from "chai";
 
 import { Character } from "../../src/character";
+import { Race } from "../../src/race";
 
 describe(`[Class] Character`, () => {
 
     describe(`[Method] constructor`, () => {
 
         it(`should initialize the character with id, name, and room`, () => {
-            const character = new Character("character-1", "Alex", "atrium");
+            const race = new Race("human", "Human", "Versatile adventurers.");
+            const character = new Character("character-1", "Alex", "atrium", race);
 
             expect(character.attributes.health).to.equal(40);
             expect(character.attributes.mana).to.equal(20);
@@ -15,6 +17,7 @@ describe(`[Class] Character`, () => {
             expect(character.isAttacking).to.equal(false);
             expect(character.level).to.equal(1);
             expect(character.name).to.equal("Alex");
+            expect(character.race).to.equal(race);
             expect(character.roomId).to.equal("atrium");
             expect(character.secondaryAttributes.attackDelaySeconds).to.equal(5);
             expect(character.secondaryAttributes.currentHealth).to.equal(40);
@@ -26,7 +29,8 @@ describe(`[Class] Character`, () => {
     describe(`[Method] roomId`, () => {
 
         it(`should update the room id`, () => {
-            const character = new Character("character-2", "Riley", "atrium");
+            const race = new Race("human", "Human", "Versatile adventurers.");
+            const character = new Character("character-2", "Riley", "atrium", race);
 
             character.roomId = "lounge";
 
@@ -38,8 +42,10 @@ describe(`[Class] Character`, () => {
     describe(`[Method] primaryTarget`, () => {
 
         it(`should update the primary target`, () => {
-            const character = new Character("character-3", "Quinn", "atrium");
-            const target = new Character("character-4", "Morgan", "lounge");
+            const race = new Race("human", "Human", "Versatile adventurers.");
+            const creatureRace = new Race("creature", "Creature", "Wild denizens.");
+            const character = new Character("character-3", "Quinn", "atrium", race);
+            const target = new Character("character-4", "Morgan", "lounge", creatureRace);
 
             character.primaryTarget = target;
 
@@ -51,7 +57,8 @@ describe(`[Class] Character`, () => {
     describe(`[Method] level`, () => {
 
         it(`should update the level`, () => {
-            const character = new Character("character-6", "Jordan", "atrium");
+            const race = new Race("human", "Human", "Versatile adventurers.");
+            const character = new Character("character-6", "Jordan", "atrium", race);
 
             character.level = 2;
 
@@ -63,7 +70,8 @@ describe(`[Class] Character`, () => {
     describe(`[Method] isAttacking`, () => {
 
         it(`should update the attacking state`, () => {
-            const character = new Character("character-5", "Casey", "atrium");
+            const race = new Race("human", "Human", "Versatile adventurers.");
+            const character = new Character("character-5", "Casey", "atrium", race);
 
             character.isAttacking = true;
 

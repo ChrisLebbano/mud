@@ -1,4 +1,17 @@
 {
+  "playerRaceId": "human",
+  "races": [
+    {
+      "description": "Adaptable and ambitious inhabitants of the cities.",
+      "id": "human",
+      "name": "Human"
+    },
+    {
+      "description": "Wild denizens that stalk the edges of civilization.",
+      "id": "creature",
+      "name": "Creature"
+    }
+  ],
   "startingRoomId": "atrium",
   "startingZoneId": "starter-zone",
   "zones": [
@@ -17,7 +30,8 @@
             {
               "hailResponse": "Move [direction] to visit the training grounds and test your skills.",
               "id": "npc-guide",
-              "name": "Terminal Guide"
+              "name": "Terminal Guide",
+              "raceId": "human"
             }
           ]
         },
@@ -32,12 +46,14 @@
             {
               "id": "npc-rat",
               "maxHealth": 20,
-              "name": "a rat"
+              "name": "a rat",
+              "raceId": "creature"
             },
             {
               "id": "npc-snake",
               "maxHealth": 20,
-              "name": "a snake"
+              "name": "a snake",
+              "raceId": "creature"
             }
           ]
         }

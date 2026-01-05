@@ -1,17 +1,19 @@
+import { expect } from "chai";
 import { Application } from "../../src/application";
+import { Race } from "../../src/race";
 import { Room } from "../../src/room";
 import { Server } from "../../src/server";
 import { type NodeHttpServer } from "../../src/types";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
-import { expect } from "chai";
 
 describe(`[Class] Application`, () => {
 
     const createWorld = (): World => {
+        const race = new Race("human", "Human", "Versatile adventurers.");
         return new World([new Zone("test-zone", "Test Zone", [
             new Room("test-room", "Test Room", "A test room.", {})
-        ], "test-room")], "test-zone", "test-room");
+        ], "test-room")], [race], "test-zone", "test-room", "human");
     };
 
     describe(`[Method] init`, () => {
