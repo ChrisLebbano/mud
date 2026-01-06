@@ -7,10 +7,10 @@ services:
       dockerfile: dockerfile
     container_name: mud-mysql
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mud}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mud_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_USER: ${MYSQL_USER:-mud_user}
     image: mud-mysql:dev
     ports:
       - "${MYSQL_PORT}:3306"
