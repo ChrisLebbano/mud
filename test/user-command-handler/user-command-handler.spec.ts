@@ -1,9 +1,10 @@
 import { expect } from "chai";
 import { CharacterClass } from "../../src/character-class";
+import { Item } from "../../src/item";
 import { NonPlayerCharacter } from "../../src/non-player-character";
 import { Race } from "../../src/race";
 import { Room } from "../../src/room";
-import { type SocketServer } from "../../src/types";
+import { ITEM_TYPE, type SocketServer } from "../../src/types";
 import { UserCommandHandler } from "../../src/user-command-handler";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
@@ -90,6 +91,15 @@ describe(`[Class] UserCommandHandler`, () => {
                 new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
             ], "atrium")
         ], races, classes, "starter-zone", "atrium", "human", "warrior");
+    };
+
+    const createWorldWithItems = (items: Item[]): World => {
+        return new World([
+            new Zone("starter-zone", "Starter Zone", [
+                new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }),
+                new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
+            ], "atrium")
+        ], races, classes, "starter-zone", "atrium", "human", "warrior", items);
     };
 
     describe(`[Method] handleCommand`, () => {
@@ -262,6 +272,33 @@ describe(`[Class] UserCommandHandler`, () => {
                 "Damage: 10",
                 "Attack Delay: 5s",
                 "Mana: 20"
+            ].join("\n"));
+        });
+
+        it(`should list inventory items when using inventory`, () => {
+            const bread = new Item("bread", "A crusty loaf.", ITEM_TYPE.FOOD, 20);
+            const waterFlask = new Item("water flask", "A leather-bound flask.", ITEM_TYPE.DRINK, 20);
+            const amulet = new Item("amulet", "A small charm.", ITEM_TYPE.POTION);
+            const world = createWorldWithItems([bread, waterFlask, amulet]);
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+            const player = world.getPlayer(fakeSocket.id);
+            if (!player) {
+                throw new Error("Player not found.");
+            }
+
+            player.inventory.addItem(amulet, 1);
+
+            handler.handleCommand(fakeSocket, "inventory");
+
+            expect(fakeSocket.emits).to.have.lengthOf(1);
+            expect(fakeSocket.emits[0].event).to.equal("world:system");
+            expect(fakeSocket.emits[0].payload.message).to.equal([
+                "5 bread",
+                "5 water flask",
+                "amulet"
             ].join("\n"));
         });
 
