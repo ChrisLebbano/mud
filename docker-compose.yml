@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  mysql:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: mud-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mud}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mud_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_USER: ${MYSQL_USER:-mud_user}
+    image: mud-mysql:dev
+    ports:
+      - "${MYSQL_PORT}:3306"
+    restart: unless-stopped
+    volumes:
+      - mud-mysql-data:/var/lib/mysql
+  mysql-admin:
+    container_name: mud-mysql-admin
+    environment:
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mud_password}
+      MYSQL_USER: ${MYSQL_USER:-mud_user}
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    image: phpmyadmin/phpmyadmin:5.2.1
+    ports:
+      - "${MYSQL_ADMIN_PORT:-8081}:80"
+    restart: unless-stopped
+
+volumes:
+  mud-mysql-data:
