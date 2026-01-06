@@ -1,6 +1,7 @@
 import { CharacterAttributes } from "../character-attributes";
 import { CharacterClass } from "../character-class";
 import { CharacterSecondaryAttributes } from "../character-secondary-attributes";
+import { Inventory } from "../inventory";
 import { Race } from "../race";
 
 export class Character {
@@ -8,6 +9,7 @@ export class Character {
     private _attributes: CharacterAttributes;
     private _characterClass: CharacterClass;
     private _id: string;
+    private _inventory: Inventory;
     private _isAttacking: boolean;
     private _level: number;
     private _name: string;
@@ -20,6 +22,7 @@ export class Character {
         this._attributes = new CharacterAttributes(40, 20);
         this._characterClass = characterClass;
         this._id = id;
+        this._inventory = new Inventory();
         this._isAttacking = false;
         this._level = 1;
         this._name = name;
@@ -38,6 +41,10 @@ export class Character {
 
     public get id(): string {
         return this._id;
+    }
+
+    public get inventory(): Inventory {
+        return this._inventory;
     }
 
     public get isAttacking(): boolean {

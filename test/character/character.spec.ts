@@ -17,6 +17,8 @@ describe(`[Class] Character`, () => {
             expect(character.attributes.mana).to.equal(20);
             expect(character.characterClass).to.equal(characterClass);
             expect(character.id).to.equal("character-1");
+            expect(character.inventory.maxSlots).to.equal(8);
+            expect(character.inventory.slots).to.have.lengthOf(8);
             expect(character.isAttacking).to.equal(false);
             expect(character.level).to.equal(1);
             expect(character.name).to.equal("Alex");
