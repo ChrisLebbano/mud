@@ -399,6 +399,37 @@ export class World {
         };
     }
 
+    public shout(playerId: string, message: string): { chatMessage: ChatMessage; roomIds: string[]; selfMessage: ChatMessage } | { error: string } {
+        const player = this._players.get(playerId);
+        if (!player) {
+            return { error: "Player not found." };
+        }
+
+        const trimmedMessage = message.trim();
+        if (!trimmedMessage) {
+            return { error: "What would you like to shout? (shout [message here])" };
+        }
+
+        const zone = this.getZoneForRoom(player.roomId);
+        return {
+            chatMessage: {
+                category: "Shout",
+                message: `${player.name} shouts "${trimmedMessage}".`,
+                playerId: player.id,
+                playerName: player.name,
+                roomId: player.roomId
+            },
+            roomIds: zone.rooms.map((room) => room.id),
+            selfMessage: {
+                category: "Shout",
+                message: `You shout "${trimmedMessage}".`,
+                playerId: player.id,
+                playerName: player.name,
+                roomId: player.roomId
+            }
+        };
+    }
+
     public setPrimaryTarget(playerId: string, targetName: string) {
         const player = this._players.get(playerId);
         if (!player) {

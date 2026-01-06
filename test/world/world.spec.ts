@@ -39,6 +39,7 @@ describe(`[Class] World`, () => {
 
 
 
+
     });
 
     describe(`[Method] fromData`, () => {
@@ -201,6 +202,30 @@ describe(`[Class] World`, () => {
             expect(chatResult.chatMessage.message).to.equal("Riley says, \"Hello from the lounge\".");
             expect(chatResult.chatMessage.roomId).to.equal("lounge");
             expect(chatResult.chatMessage.playerName).to.equal("Riley");
+        });
+
+    });
+
+    describe(`[Method] shout`, () => {
+
+        it(`should return zone room ids with shout messages`, () => {
+            const rooms = [
+                new Room("atrium", "Atrium", "A bright room.", { north: "lounge" }),
+                new Room("lounge", "Lounge", "A quiet lounge.", { south: "atrium" })
+            ];
+            const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
+            const world = new World([zone], races, classes, "starter-zone", "atrium", "human", "warrior");
+
+            world.addPlayer("player-1", "Alex");
+
+            const shoutResult = world.shout("player-1", "Hello everyone");
+            if ("error" in shoutResult) {
+                throw new Error(shoutResult.error);
+            }
+
+            expect(shoutResult.chatMessage.message).to.equal("Alex shouts \"Hello everyone\".");
+            expect(shoutResult.selfMessage.message).to.equal("You shout \"Hello everyone\".");
+            expect(shoutResult.roomIds).to.have.members(["atrium", "lounge"]);
         });
 
     });
