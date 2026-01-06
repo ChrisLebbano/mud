@@ -3,7 +3,7 @@ import { CharacterClass } from "../../src/character-class";
 import { NonPlayerCharacter } from "../../src/non-player-character";
 import { Race } from "../../src/race";
 import { Room } from "../../src/room";
-import { type WorldData } from "../../src/types";
+import { ITEM_TYPE, type WorldData } from "../../src/types";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
 
@@ -395,6 +395,47 @@ describe(`[Class] World`, () => {
             world.movePlayer("player-2", "east");
 
             expect(world.getPlayerNamesForZone("starter-zone")).to.deep.equal(["Alex"]);
+        });
+
+    });
+
+    describe(`[Method] items`, () => {
+
+        it(`should return items built from data`, () => {
+            const worldData: WorldData = {
+                classes,
+                items: [
+                    {
+                        description: "A vial of red liquid.",
+                        name: "small health potion",
+                        type: ITEM_TYPE.POTION
+                    }
+                ],
+                playerClassId: "warrior",
+                playerRaceId: "human",
+                races,
+                startingRoomId: "atrium",
+                startingZoneId: "starter-zone",
+                zones: [
+                    {
+                        id: "starter-zone",
+                        name: "Starter Zone",
+                        rooms: [
+                            {
+                                description: "A bright room.",
+                                exits: {},
+                                id: "atrium",
+                                name: "Atrium"
+                            }
+                        ],
+                        startingRoomId: "atrium"
+                    }
+                ]
+            };
+
+            const world = World.fromData(worldData);
+
+            expect(world.items.map((item) => item.name)).to.deep.equal(["small health potion"]);
         });
 
     });
