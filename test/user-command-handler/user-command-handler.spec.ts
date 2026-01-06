@@ -191,7 +191,7 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits[1].event).to.equal("world:system");
             expect(fakeSocket.emits[1].payload).to.deep.equal({
                 category: "RoomDescription",
-                message: "A neon-lit atrium with flickering signage and a humming terminal."
+                message: "[Atrium] A neon-lit atrium with flickering signage and a humming terminal."
             });
         });
 
@@ -208,7 +208,7 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits[0].event).to.equal("world:system");
             expect(fakeSocket.emits[0].payload).to.deep.equal({
                 category: "RoomDescription",
-                message: "A quiet lounge with battered sofas and a wall of monitors."
+                message: "[Lounge] A quiet lounge with battered sofas and a wall of monitors."
             });
         });
 

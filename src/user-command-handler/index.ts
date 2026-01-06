@@ -120,7 +120,10 @@ export class UserCommandHandler {
             if (!directionInput) {
                 const roomSnapshot: RoomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
                 socket.emit("world:room", roomSnapshot);
-                socket.emit("world:system", { category: "RoomDescription", message: roomSnapshot.description });
+                socket.emit("world:system", {
+                    category: "RoomDescription",
+                    message: `[${roomSnapshot.name}] ${roomSnapshot.description}`
+                });
                 return;
             }
 
@@ -148,7 +151,10 @@ export class UserCommandHandler {
                 return;
             }
 
-            socket.emit("world:system", { category: "RoomDescription", message: targetRoom.description });
+            socket.emit("world:system", {
+                category: "RoomDescription",
+                message: `[${targetRoom.name}] ${targetRoom.description}`
+            });
             return;
         }
 
