@@ -1,15 +1,21 @@
-import { type RaceSnapshot } from "../types";
+import { type CharacterAttributeValues, type RaceSnapshot } from "../types";
 
 export class Race {
 
+    private _baseAttributes: CharacterAttributeValues;
     private _description: string;
     private _id: string;
     private _name: string;
 
-    constructor(id: string, name: string, description: string) {
+    constructor(id: string, name: string, description: string, baseAttributes: CharacterAttributeValues) {
+        this._baseAttributes = baseAttributes;
         this._description = description;
         this._id = id;
         this._name = name;
+    }
+
+    public get baseAttributes(): CharacterAttributeValues {
+        return this._baseAttributes;
     }
 
     public get description(): string {
@@ -33,4 +39,3 @@ export class Race {
     }
 
 }
-

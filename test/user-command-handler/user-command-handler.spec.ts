@@ -78,9 +78,51 @@ class FakeSocket {
 }
 
 describe(`[Class] UserCommandHandler`, () => {
-    const clericClass = new CharacterClass("cleric", "Cleric", "Devout healers.");
-    const humanRace = new Race("human", "Human", "Versatile adventurers.");
-    const warriorClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.");
+    const clericModifiers = {
+        agility: 0,
+        charisma: 1,
+        constitution: 1,
+        dexterity: 0,
+        health: 4,
+        intelligence: 2,
+        mana: 6,
+        perception: 1,
+        resolve: 2,
+        strength: -1,
+        wisdom: 2
+    };
+
+    const humanBaseAttributes = {
+        agility: 10,
+        charisma: 12,
+        constitution: 10,
+        dexterity: 10,
+        health: 42,
+        intelligence: 10,
+        mana: 22,
+        perception: 10,
+        resolve: 10,
+        strength: 10,
+        wisdom: 10
+    };
+
+    const warriorModifiers = {
+        agility: 1,
+        charisma: -1,
+        constitution: 2,
+        dexterity: 1,
+        health: 6,
+        intelligence: -1,
+        mana: -2,
+        perception: 0,
+        resolve: 1,
+        strength: 2,
+        wisdom: -1
+    };
+
+    const clericClass = new CharacterClass("cleric", "Cleric", "Devout healers.", clericModifiers);
+    const humanRace = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
+    const warriorClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
     const classes = [clericClass, warriorClass];
     const races = [humanRace];
 
@@ -280,17 +322,17 @@ describe(`[Class] UserCommandHandler`, () => {
                 "Race Description: Versatile adventurers.",
                 "Class: Warrior",
                 "Class Description: Disciplined fighters.",
-                "Strength: 10",
-                "Agility: 10",
-                "Dexterity: 10",
+                "Strength: 12",
+                "Agility: 11",
+                "Dexterity: 11",
                 "Perception: 10",
-                "Constitution: 10",
-                "Wisdom: 10",
-                "Intelligence: 10",
-                "Charisma: 10",
-                "Resolve: 10",
-                "Health: 40",
-                "Current Health: 40",
+                "Constitution: 12",
+                "Wisdom: 9",
+                "Intelligence: 9",
+                "Charisma: 11",
+                "Resolve: 11",
+                "Health: 48",
+                "Current Health: 48",
                 "Current Experience: 0",
                 "Experience Until Next Level: 1000",
                 "Damage: 10",

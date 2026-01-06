@@ -19,7 +19,7 @@ export class Character {
     private _secondaryAttributes: CharacterSecondaryAttributes;
 
     constructor(id: string, name: string, roomId: string, race: Race, characterClass: CharacterClass, secondaryAttributes?: CharacterSecondaryAttributes) {
-        this._attributes = new CharacterAttributes(40, 20);
+        this._attributes = new CharacterAttributes(race.baseAttributes, characterClass.attributeModifiers);
         this._characterClass = characterClass;
         this._id = id;
         this._inventory = new Inventory();
