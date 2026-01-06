@@ -90,6 +90,18 @@ export class UserCommandHandler {
                 }
             }
         };
+        const handleShout = (message: string): void => {
+            const shoutResult = this._world.shout(socket.id, message);
+            if ("error" in shoutResult) {
+                socket.emit("world:system", { category: "System", message: shoutResult.error });
+                return;
+            }
+
+            shoutResult.roomIds.forEach((roomId) => {
+                socket.to(roomId).emit("world:chat", { ...shoutResult.chatMessage, roomId });
+            });
+            socket.emit("world:chat", shoutResult.selfMessage);
+        };
 
         if (lowerVerb === "hail") {
             const player = this._world.getPlayer(socket.id);
@@ -107,6 +119,12 @@ export class UserCommandHandler {
         if (lowerVerb === "say") {
             const message = rest.join(" ");
             handleSay(message);
+            return;
+        }
+
+        if (lowerVerb === "shout") {
+            const message = rest.join(" ");
+            handleShout(message);
             return;
         }
 

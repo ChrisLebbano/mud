@@ -22,7 +22,7 @@ export interface CharacterClassSnapshot {
     name: string;
 }
 
-export type MessageCategory = "CharacterSpeech" | "RoomDescription" | "SelfDealingAttackDamage" | "SelfRecieveAttackDamage" | "System";
+export type MessageCategory = "CharacterSpeech" | "RoomDescription" | "SelfDealingAttackDamage" | "SelfRecieveAttackDamage" | "Shout" | "System";
 
 export interface MessagePayload {
     category: MessageCategory;

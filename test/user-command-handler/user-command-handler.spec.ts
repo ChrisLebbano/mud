@@ -121,6 +121,30 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocketServer.roomEmits[0].payload).to.include({ message: "Tester says, \"hello there\".", playerName: "Tester" });
         });
 
+        it(`should broadcast shouts to every room in the zone and echo the sender`, () => {
+            const world = createWorld();
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "shout hello there");
+
+            const roomEmits = fakeSocket.emits.filter((emit) => typeof emit.event === "string" && emit.event.startsWith("room:"));
+            const selfEmits = fakeSocket.emits.filter((emit) => emit.event === "world:chat");
+
+            expect(roomEmits).to.have.lengthOf(2);
+            expect(roomEmits.map((emit) => emit.event)).to.have.members([
+                "room:atrium:world:chat",
+                "room:lounge:world:chat"
+            ]);
+            roomEmits.forEach((emit) => {
+                expect(emit.payload).to.include({ category: "Shout", message: "Tester shouts \"hello there\".", playerName: "Tester" });
+            });
+            expect(selfEmits).to.have.lengthOf(1);
+            expect(selfEmits[0].payload).to.include({ category: "Shout", message: "You shout \"hello there\"." });
+        });
+
         it(`should let non-player characters respond to hails`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
