@@ -15,17 +15,20 @@
     {
       "description": "A small vial that restores a bit of health.",
       "name": "small health potion",
-      "type": "POTION"
+      "type": "POTION",
+      "maxCount": 20
     },
     {
       "description": "A crusty loaf of bread.",
       "name": "bread loaf",
-      "type": "FOOD"
+      "type": "FOOD",
+      "maxCount": 20
     },
     {
       "description": "A leather-bound flask filled with water.",
       "name": "water flask",
-      "type": "DRINK"
+      "type": "DRINK",
+      "maxCount": 20
     }
   ],
   "playerClassId": "warrior",
