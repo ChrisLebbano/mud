@@ -21,7 +21,7 @@ export interface CharacterClassSnapshot {
     name: string;
 }
 
-export type MessageCategory = "CharacterSpeech" | "SelfDealingAttackDamage" | "SelfRecieveAttackDamage" | "System";
+export type MessageCategory = "CharacterSpeech" | "RoomDescription" | "SelfDealingAttackDamage" | "SelfRecieveAttackDamage" | "System";
 
 export interface MessagePayload {
     category: MessageCategory;

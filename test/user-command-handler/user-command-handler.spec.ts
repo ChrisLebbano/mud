@@ -184,10 +184,49 @@ describe(`[Class] UserCommandHandler`, () => {
 
             handler.handleCommand(fakeSocket, "look");
 
-            expect(fakeSocket.emits).to.have.lengthOf(1);
+            expect(fakeSocket.emits).to.have.lengthOf(2);
             expect(fakeSocket.emits[0].event).to.equal("world:room");
             expect(fakeSocket.emits[0].payload).to.include({ id: "atrium", name: "Atrium" });
             expect(fakeSocket.emits[0].payload.zone).to.deep.equal({ id: "starter-zone", name: "Starter Zone" });
+            expect(fakeSocket.emits[1].event).to.equal("world:system");
+            expect(fakeSocket.emits[1].payload).to.deep.equal({
+                category: "RoomDescription",
+                message: "[Atrium] A neon-lit atrium with flickering signage and a humming terminal."
+            });
+        });
+
+        it(`should emit the next room description when looking in a direction`, () => {
+            const world = createWorld();
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "look north");
+
+            expect(fakeSocket.emits).to.have.lengthOf(1);
+            expect(fakeSocket.emits[0].event).to.equal("world:system");
+            expect(fakeSocket.emits[0].payload).to.deep.equal({
+                category: "RoomDescription",
+                message: "[Lounge] A quiet lounge with battered sofas and a wall of monitors."
+            });
+        });
+
+        it(`should warn when looking in a direction without a room`, () => {
+            const world = createWorld();
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "look east");
+
+            expect(fakeSocket.emits).to.have.lengthOf(1);
+            expect(fakeSocket.emits[0].event).to.equal("world:system");
+            expect(fakeSocket.emits[0].payload).to.deep.equal({
+                category: "RoomDescription",
+                message: "There is nothing in that direction"
+            });
         });
 
         it(`should list player details when using char`, () => {

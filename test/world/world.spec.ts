@@ -248,6 +248,11 @@ describe(`[Class] World`, () => {
                     strength: 10,
                     wisdom: 10
                 },
+                characterClass: {
+                    description: "Disciplined fighters.",
+                    id: "warrior",
+                    name: "Warrior"
+                },
                 currentHealth: 40,
                 id: "player-1",
                 maxHealth: 40,
