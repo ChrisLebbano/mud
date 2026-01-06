@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  mysql:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: mud-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+    image: mud-mysql:dev
+    ports:
+      - "${MYSQL_PORT}:3306"
+    restart: unless-stopped
+    volumes:
+      - mud-mysql-data:/var/lib/mysql
+
+volumes:
+  mud-mysql-data:
