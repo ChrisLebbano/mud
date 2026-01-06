@@ -1,3 +1,4 @@
+import { ITEM_TYPE } from "./item-type";
 import { type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { Server as SocketIOServer } from "socket.io";
 
@@ -97,12 +98,20 @@ export interface ServerConfig {
 
 export interface WorldData {
     classes: WorldClassData[];
+    items?: WorldItemData[];
     playerClassId: string;
     playerRaceId: string;
     races: WorldRaceData[];
     startingRoomId: string;
     startingZoneId: string;
     zones: WorldZoneData[];
+}
+
+export interface WorldItemData {
+    description: string;
+    maxCount?: number;
+    name: string;
+    type: ITEM_TYPE;
 }
 
 export interface WorldNonPlayerCharacterData {
@@ -144,3 +153,5 @@ export interface WorldRaceData {
 export type HttpRequestHandler = (request: IncomingMessage, response: ServerResponse) => void;
 export type NodeHttpServer = Server;
 export type SocketServer = SocketIOServer;
+
+export { ITEM_TYPE };

@@ -1,5 +1,6 @@
 import { Character } from "../character";
 import { CharacterClass } from "../character-class";
+import { Item } from "../item";
 import { NonPlayerCharacter } from "../non-player-character";
 import { PlayerCharacter } from "../player-character";
 import { Race } from "../race";
@@ -13,6 +14,7 @@ export class World {
     private _playerClassId: string;
     private _playerRaceId: string;
     private _classes: Map<string, CharacterClass>;
+    private _items: Item[];
     private _races: Map<string, Race>;
     private _rooms: Map<string, Room>;
     private _startingRoomId: string;
@@ -20,11 +22,12 @@ export class World {
     private _zones: Map<string, Zone>;
     private _roomZones: Map<string, Zone>;
 
-    constructor(zones: Zone[], races: Race[], classes: CharacterClass[], startingZoneId: string, startingRoomId: string, playerRaceId: string, playerClassId: string) {
+    constructor(zones: Zone[], races: Race[], classes: CharacterClass[], startingZoneId: string, startingRoomId: string, playerRaceId: string, playerClassId: string, items?: Item[]) {
         this._players = new Map();
         this._playerClassId = playerClassId;
         this._playerRaceId = playerRaceId;
         this._classes = new Map(classes.map((characterClass) => [characterClass.id, characterClass]));
+        this._items = items ?? [];
         this._races = new Map(races.map((race) => [race.id, race]));
         this._rooms = new Map();
         this._startingRoomId = startingRoomId;
@@ -92,6 +95,12 @@ export class World {
             raceData.description
         ));
         const raceMap = new Map(races.map((race) => [race.id, race]));
+        const items = (worldData.items ?? []).map((itemData) => new Item(
+            itemData.name,
+            itemData.description,
+            itemData.type,
+            itemData.maxCount
+        ));
         const zones = worldData.zones.map((zoneData) => {
             const rooms = zoneData.rooms.map((roomData) => {
                 const nonPlayerCharacters = (roomData.nonPlayerCharacters ?? []).map((nonPlayerCharacterData) => new NonPlayerCharacter(
@@ -116,11 +125,15 @@ export class World {
             return new Zone(zoneData.id, zoneData.name, rooms, zoneData.startingRoomId);
         });
 
-        return new World(zones, races, classes, worldData.startingZoneId, worldData.startingRoomId, worldData.playerRaceId, worldData.playerClassId);
+        return new World(zones, races, classes, worldData.startingZoneId, worldData.startingRoomId, worldData.playerRaceId, worldData.playerClassId, items);
     }
 
     public getPlayer(playerId: string): PlayerCharacter | undefined {
         return this._players.get(playerId);
+    }
+
+    public get items(): Item[] {
+        return this._items;
     }
 
     public getPlayerNamesForZone(zoneId: string): string[] {

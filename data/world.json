@@ -11,6 +11,23 @@
       "name": "Cleric"
     }
   ],
+  "items": [
+    {
+      "description": "A small vial that restores a bit of health.",
+      "name": "small health potion",
+      "type": "POTION"
+    },
+    {
+      "description": "A crusty loaf of bread.",
+      "name": "bread loaf",
+      "type": "FOOD"
+    },
+    {
+      "description": "A leather-bound flask filled with water.",
+      "name": "water flask",
+      "type": "DRINK"
+    }
+  ],
   "playerClassId": "warrior",
   "playerRaceId": "human",
   "races": [
