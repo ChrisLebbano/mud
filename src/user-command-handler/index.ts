@@ -1,5 +1,5 @@
 import { NonPlayerCharacter } from "../non-player-character";
-import { type ChatMessage, type GameSocket, type MoveCommand, type RoomSnapshot, type SocketServer } from "../types";
+import { ITEM_TYPE, type ChatMessage, type GameSocket, type MoveCommand, type RoomSnapshot, type SocketServer } from "../types";
 import { type InventoryStack } from "../types/inventory-slot";
 import { World } from "../world";
 
@@ -216,6 +216,60 @@ export class UserCommandHandler {
             });
             const listMessage = listItems.join("\n");
             socket.emit("world:system", { category: "System", message: listMessage });
+            return;
+        }
+
+        if (lowerVerb === "eat" || lowerVerb === "drink") {
+            const player = this._world.getPlayer(socket.id);
+            if (!player) {
+                socket.emit("world:system", { category: "System", message: "Player not found." });
+                return;
+            }
+
+            const targetName = rest.join(" ").trim();
+            const minimumLength = 3;
+            const invalidMessage = lowerVerb === "eat"
+                ? "what would you like you eat?"
+                : "what would you like to drink?";
+            const missingItemMessage = lowerVerb === "eat"
+                ? "You can't find anything like that to eat"
+                : "You can't find anything like that to drink";
+            if (targetName.length < minimumLength) {
+                socket.emit("world:system", { category: "System", message: invalidMessage });
+                return;
+            }
+
+            const normalizedTarget = targetName.toLowerCase();
+            const inventorySlots = player.inventory.slots
+                .filter((slot): slot is InventoryStack => slot !== null);
+            const matchingSlot = inventorySlots.find((slot) => slot.item.name.toLowerCase().startsWith(normalizedTarget));
+            if (!matchingSlot) {
+                socket.emit("world:system", { category: "System", message: missingItemMessage });
+                return;
+            }
+
+            const isAllowedType = lowerVerb === "eat"
+                ? matchingSlot.item.type === ITEM_TYPE.FOOD
+                : matchingSlot.item.type === ITEM_TYPE.DRINK || matchingSlot.item.type === ITEM_TYPE.POTION;
+            if (!isAllowedType) {
+                socket.emit("world:system", { category: "System", message: missingItemMessage });
+                return;
+            }
+
+            const didConsume = player.inventory.consumeItem(matchingSlot.item);
+            if (!didConsume) {
+                socket.emit("world:system", { category: "System", message: invalidMessage });
+                return;
+            }
+
+            const selfMessage = lowerVerb === "eat"
+                ? `You eat the ${matchingSlot.item.name}`
+                : `You drink the ${matchingSlot.item.name}.`;
+            socket.emit("world:system", { category: "System", message: selfMessage });
+            const roomMessage = lowerVerb === "eat"
+                ? `${player.name} ate a ${matchingSlot.item.name}`
+                : `${player.name} drank a ${matchingSlot.item.name}`;
+            socket.to(player.roomId).emit("world:system", { category: "System", message: roomMessage });
             return;
         }
 
