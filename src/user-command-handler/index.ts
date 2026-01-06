@@ -231,6 +231,9 @@ export class UserCommandHandler {
             const invalidMessage = lowerVerb === "eat"
                 ? "what would you like you eat?"
                 : "what would you like to drink?";
+            const missingItemMessage = lowerVerb === "eat"
+                ? "You can't find anything like that to eat"
+                : "You can't find anything like that to drink";
             if (targetName.length < minimumLength) {
                 socket.emit("world:system", { category: "System", message: invalidMessage });
                 return;
@@ -241,7 +244,7 @@ export class UserCommandHandler {
                 .filter((slot): slot is InventoryStack => slot !== null);
             const matchingSlot = inventorySlots.find((slot) => slot.item.name.toLowerCase().startsWith(normalizedTarget));
             if (!matchingSlot) {
-                socket.emit("world:system", { category: "System", message: invalidMessage });
+                socket.emit("world:system", { category: "System", message: missingItemMessage });
                 return;
             }
 
@@ -249,7 +252,7 @@ export class UserCommandHandler {
                 ? matchingSlot.item.type === ITEM_TYPE.FOOD
                 : matchingSlot.item.type === ITEM_TYPE.DRINK || matchingSlot.item.type === ITEM_TYPE.POTION;
             if (!isAllowedType) {
-                socket.emit("world:system", { category: "System", message: invalidMessage });
+                socket.emit("world:system", { category: "System", message: missingItemMessage });
                 return;
             }
 

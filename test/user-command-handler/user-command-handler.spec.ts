@@ -354,7 +354,7 @@ describe(`[Class] UserCommandHandler`, () => {
             handler.handleCommand(fakeSocket, "drink bre");
 
             expect(fakeSocket.emits).to.have.lengthOf(1);
-            expect(fakeSocket.emits[0].payload.message).to.equal("what would you like to drink?");
+            expect(fakeSocket.emits[0].payload.message).to.equal("You can't find anything like that to drink");
         });
 
         it(`should consume drinks when drinking inventory items`, () => {
