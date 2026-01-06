@@ -302,6 +302,88 @@ describe(`[Class] UserCommandHandler`, () => {
             ].join("\n"));
         });
 
+        it(`should prompt when eat commands are missing valid targets`, () => {
+            const bread = new Item("bread", "A crusty loaf.", ITEM_TYPE.FOOD, 20);
+            const world = createWorldWithItems([bread]);
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "eat br");
+
+            expect(fakeSocket.emits).to.have.lengthOf(1);
+            expect(fakeSocket.emits[0].event).to.equal("world:system");
+            expect(fakeSocket.emits[0].payload.message).to.equal("what would you like you eat?");
+        });
+
+        it(`should consume food when eating inventory items`, () => {
+            const bread = new Item("bread", "A crusty loaf.", ITEM_TYPE.FOOD, 20);
+            const world = createWorldWithItems([bread]);
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+            const player = world.getPlayer(fakeSocket.id);
+            if (!player) {
+                throw new Error("Player not found.");
+            }
+
+            handler.handleCommand(fakeSocket, "eat bre");
+
+            const slot = player.inventory.slots[0];
+            if (!slot) {
+                throw new Error("Inventory slot missing.");
+            }
+
+            expect(slot.count).to.equal(4);
+            expect(fakeSocket.emits).to.have.lengthOf(2);
+            expect(fakeSocket.emits[0].payload.message).to.equal("You eat the bread");
+            expect(fakeSocket.emits[1].event).to.equal("room:atrium:world:system");
+            expect(fakeSocket.emits[1].payload.message).to.equal("Tester ate a bread");
+        });
+
+        it(`should reject drink commands for non-drink items`, () => {
+            const bread = new Item("bread", "A crusty loaf.", ITEM_TYPE.FOOD, 20);
+            const world = createWorldWithItems([bread]);
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+
+            handler.handleCommand(fakeSocket, "drink bre");
+
+            expect(fakeSocket.emits).to.have.lengthOf(1);
+            expect(fakeSocket.emits[0].payload.message).to.equal("what would you like to drink?");
+        });
+
+        it(`should consume drinks when drinking inventory items`, () => {
+            const bread = new Item("bread", "A crusty loaf.", ITEM_TYPE.FOOD, 20);
+            const waterFlask = new Item("water flask", "A leather-bound flask.", ITEM_TYPE.DRINK, 20);
+            const world = createWorldWithItems([bread, waterFlask]);
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester");
+            const player = world.getPlayer(fakeSocket.id);
+            if (!player) {
+                throw new Error("Player not found.");
+            }
+
+            handler.handleCommand(fakeSocket, "drink wat");
+
+            const slot = player.inventory.slots[1];
+            if (!slot) {
+                throw new Error("Inventory slot missing.");
+            }
+
+            expect(slot.count).to.equal(4);
+            expect(fakeSocket.emits).to.have.lengthOf(2);
+            expect(fakeSocket.emits[0].payload.message).to.equal("You drink the water flask.");
+            expect(fakeSocket.emits[1].event).to.equal("room:atrium:world:system");
+            expect(fakeSocket.emits[1].payload.message).to.equal("Tester drank a water flask");
+        });
+
         it(`should move players when using directions`, () => {
             const world = createWorld();
             const handler = new UserCommandHandler(world);

@@ -43,6 +43,25 @@ export class Inventory {
         return remainingCount;
     }
 
+    public consumeItem(item: Item): boolean {
+        for (let slotIndex = 0; slotIndex < this._slots.length; slotIndex += 1) {
+            const slot = this._slots[slotIndex];
+            if (!slot || slot.item !== item) {
+                continue;
+            }
+
+            if (slot.count <= 1) {
+                this._slots[slotIndex] = null;
+                return true;
+            }
+
+            slot.count -= 1;
+            return true;
+        }
+
+        return false;
+    }
+
     public get maxSlots(): number {
         return this._maxSlots;
     }

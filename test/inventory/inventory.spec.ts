@@ -42,6 +42,24 @@ describe(`[Class] Inventory`, () => {
 
     });
 
+    describe(`[Method] consumeItem`, () => {
+
+        it(`should decrement stacks and clear empty slots`, () => {
+            const inventory = new Inventory();
+            const item = new Item("bread", "A crusty loaf.", ITEM_TYPE.FOOD, 20);
+
+            inventory.addItem(item, 2);
+
+            const firstConsume = inventory.consumeItem(item);
+            const secondConsume = inventory.consumeItem(item);
+
+            expect(firstConsume).to.equal(true);
+            expect(secondConsume).to.equal(true);
+            expect(inventory.slots[0]).to.equal(null);
+        });
+
+    });
+
     describe(`[Method] slots`, () => {
 
         it(`should return the slots`, () => {
