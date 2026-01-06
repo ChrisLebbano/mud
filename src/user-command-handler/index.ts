@@ -116,8 +116,39 @@ export class UserCommandHandler {
                 return;
             }
 
-            const roomSnapshot: RoomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
-            socket.emit("world:room", roomSnapshot);
+            const directionInput = rest.join(" ").trim().toLowerCase();
+            if (!directionInput) {
+                const roomSnapshot: RoomSnapshot = this._world.getRoomSnapshot(player.roomId, player.id);
+                socket.emit("world:room", roomSnapshot);
+                socket.emit("world:system", { category: "RoomDescription", message: roomSnapshot.description });
+                return;
+            }
+
+            const normalizedDirection = this._directionAliases.get(directionInput) ?? directionInput;
+            if (!this._allowedDirections.includes(normalizedDirection)) {
+                socket.emit("world:system", { category: "RoomDescription", message: "There is nothing in that direction" });
+                return;
+            }
+
+            const currentRoom = this._world.getRoom(player.roomId);
+            if (!currentRoom) {
+                socket.emit("world:system", { category: "System", message: "Room not found." });
+                return;
+            }
+
+            const exitRoomId = currentRoom.exitMap[normalizedDirection];
+            if (!exitRoomId) {
+                socket.emit("world:system", { category: "RoomDescription", message: "There is nothing in that direction" });
+                return;
+            }
+
+            const targetRoom = this._world.getRoom(exitRoomId);
+            if (!targetRoom) {
+                socket.emit("world:system", { category: "RoomDescription", message: "There is nothing in that direction" });
+                return;
+            }
+
+            socket.emit("world:system", { category: "RoomDescription", message: targetRoom.description });
             return;
         }
 
