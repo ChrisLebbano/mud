@@ -96,13 +96,15 @@ export class World {
         const classes = worldData.classes.map((classData) => new CharacterClass(
             classData.id,
             classData.name,
-            classData.description
+            classData.description,
+            classData.attributeModifiers
         ));
         const classMap = new Map(classes.map((characterClass) => [characterClass.id, characterClass]));
         const races = worldData.races.map((raceData) => new Race(
             raceData.id,
             raceData.name,
-            raceData.description
+            raceData.description,
+            raceData.baseAttributes
         ));
         const raceMap = new Map(races.map((race) => [race.id, race]));
         const items = (worldData.items ?? []).map((itemData) => new Item(

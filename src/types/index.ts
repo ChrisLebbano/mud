@@ -2,6 +2,20 @@ import { ITEM_TYPE } from "./item-type";
 import { type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { Server as SocketIOServer } from "socket.io";
 
+export interface CharacterAttributeValues {
+    agility: number;
+    charisma: number;
+    constitution: number;
+    dexterity: number;
+    health: number;
+    intelligence: number;
+    mana: number;
+    perception: number;
+    resolve: number;
+    strength: number;
+    wisdom: number;
+}
+
 export interface CharacterAttributesSnapshot {
     agility: number;
     charisma: number;
@@ -124,6 +138,7 @@ export interface WorldNonPlayerCharacterData {
 }
 
 export interface WorldClassData {
+    attributeModifiers: CharacterAttributeValues;
     description: string;
     id: string;
     name: string;
@@ -145,6 +160,7 @@ export interface WorldZoneData {
 }
 
 export interface WorldRaceData {
+    baseAttributes: CharacterAttributeValues;
     description: string;
     id: string;
     name: string;

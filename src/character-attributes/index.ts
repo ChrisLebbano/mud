@@ -1,4 +1,4 @@
-import { type CharacterAttributesSnapshot } from "../types";
+import { type CharacterAttributesSnapshot, type CharacterAttributeValues } from "../types";
 
 export class CharacterAttributes {
 
@@ -25,18 +25,18 @@ export class CharacterAttributes {
     // Wisdom: "Modifies total Mana."
     private _wisdom: number;
 
-    constructor(health: number, mana: number) {
-        this._agility = 10;
-        this._charisma = 10;
-        this._constitution = 10;
-        this._dexterity = 10;
-        this._health = health;
-        this._intelligence = 10;
-        this._mana = mana;
-        this._perception = 10;
-        this._resolve = 10;
-        this._strength = 10;
-        this._wisdom = 10;
+    constructor(baseAttributes: CharacterAttributeValues, attributeModifiers: CharacterAttributeValues) {
+        this._agility = baseAttributes.agility + attributeModifiers.agility;
+        this._charisma = baseAttributes.charisma + attributeModifiers.charisma;
+        this._constitution = baseAttributes.constitution + attributeModifiers.constitution;
+        this._dexterity = baseAttributes.dexterity + attributeModifiers.dexterity;
+        this._health = baseAttributes.health + attributeModifiers.health;
+        this._intelligence = baseAttributes.intelligence + attributeModifiers.intelligence;
+        this._mana = baseAttributes.mana + attributeModifiers.mana;
+        this._perception = baseAttributes.perception + attributeModifiers.perception;
+        this._resolve = baseAttributes.resolve + attributeModifiers.resolve;
+        this._strength = baseAttributes.strength + attributeModifiers.strength;
+        this._wisdom = baseAttributes.wisdom + attributeModifiers.wisdom;
     }
 
     public get agility(): number {

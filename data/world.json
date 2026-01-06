@@ -3,12 +3,38 @@
     {
       "description": "Disciplined fighters who excel with weapons and armor.",
       "id": "warrior",
-      "name": "Warrior"
+      "name": "Warrior",
+      "attributeModifiers": {
+        "strength": 2,
+        "agility": 1,
+        "dexterity": 1,
+        "perception": 0,
+        "constitution": 2,
+        "wisdom": -1,
+        "intelligence": -1,
+        "charisma": -1,
+        "resolve": 1,
+        "health": 6,
+        "mana": -2
+      }
     },
     {
       "description": "Devout healers and protectors who channel divine power.",
       "id": "cleric",
-      "name": "Cleric"
+      "name": "Cleric",
+      "attributeModifiers": {
+        "strength": -1,
+        "agility": 0,
+        "dexterity": 0,
+        "perception": 1,
+        "constitution": 1,
+        "wisdom": 2,
+        "intelligence": 2,
+        "charisma": 1,
+        "resolve": 2,
+        "health": 4,
+        "mana": 6
+      }
     }
   ],
   "items": [
@@ -37,12 +63,38 @@
     {
       "description": "Adaptable and ambitious inhabitants of the cities.",
       "id": "human",
-      "name": "Human"
+      "name": "Human",
+      "baseAttributes": {
+        "strength": 10,
+        "agility": 10,
+        "dexterity": 10,
+        "perception": 10,
+        "constitution": 10,
+        "wisdom": 10,
+        "intelligence": 10,
+        "charisma": 12,
+        "resolve": 10,
+        "health": 42,
+        "mana": 22
+      }
     },
     {
       "description": "Wild denizens that stalk the edges of civilization.",
       "id": "creature",
-      "name": "Creature"
+      "name": "Creature",
+      "baseAttributes": {
+        "strength": 12,
+        "agility": 11,
+        "dexterity": 9,
+        "perception": 11,
+        "constitution": 12,
+        "wisdom": 8,
+        "intelligence": 8,
+        "charisma": 6,
+        "resolve": 9,
+        "health": 46,
+        "mana": 16
+      }
     }
   ],
   "startingRoomId": "atrium",
