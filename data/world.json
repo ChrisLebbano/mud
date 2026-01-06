@@ -20,7 +20,7 @@
     },
     {
       "description": "A crusty loaf of bread.",
-      "name": "bread loaf",
+      "name": "bread",
       "type": "FOOD",
       "maxCount": 20
     },

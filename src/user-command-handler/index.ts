@@ -1,5 +1,6 @@
 import { NonPlayerCharacter } from "../non-player-character";
 import { type ChatMessage, type GameSocket, type MoveCommand, type RoomSnapshot, type SocketServer } from "../types";
+import { type InventoryStack } from "../types/inventory-slot";
 import { World } from "../world";
 
 export class UserCommandHandler {
@@ -190,6 +191,29 @@ export class UserCommandHandler {
                 `Attack Delay: ${secondaryAttributes.attackDelaySeconds}s`,
                 `Mana: ${attributes.mana}`
             ];
+            const listMessage = listItems.join("\n");
+            socket.emit("world:system", { category: "System", message: listMessage });
+            return;
+        }
+
+        if (lowerVerb === "inventory" || lowerVerb === "inv") {
+            const player = this._world.getPlayer(socket.id);
+            if (!player) {
+                socket.emit("world:system", { category: "System", message: "Player not found." });
+                return;
+            }
+
+            const inventorySlots = player.inventory.slots
+                .filter((slot): slot is InventoryStack => slot !== null);
+            if (inventorySlots.length === 0) {
+                socket.emit("world:system", { category: "System", message: "Inventory is empty." });
+                return;
+            }
+
+            const listItems = inventorySlots.map((slot) => {
+                const countPrefix = slot.item.maxCount > 1 ? `${slot.count} ` : "";
+                return `${countPrefix}${slot.item.name}`;
+            });
             const listMessage = listItems.join("\n");
             socket.emit("world:system", { category: "System", message: listMessage });
             return;

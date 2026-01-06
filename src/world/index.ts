@@ -57,6 +57,16 @@ export class World {
         const playerRace = this.getRaceById(this._playerRaceId);
         const playerClass = this.getClassById(this._playerClassId);
         const player = new PlayerCharacter(playerId, playerName, room.id, playerRace, playerClass);
+        const breadItem = this._items.find((item) => item.name === "bread");
+        const waterFlaskItem = this._items.find((item) => item.name === "water flask");
+
+        if (breadItem) {
+            player.inventory.addItem(breadItem, 5);
+        }
+
+        if (waterFlaskItem) {
+            player.inventory.addItem(waterFlaskItem, 5);
+        }
 
         this._players.set(playerId, player);
         room.addPlayer(playerId);

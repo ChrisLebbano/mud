@@ -1,6 +1,8 @@
 import { expect } from "chai";
 
 import { Inventory } from "../../src/inventory";
+import { Item } from "../../src/item";
+import { ITEM_TYPE } from "../../src/types";
 
 describe(`[Class] Inventory`, () => {
 
@@ -26,6 +28,20 @@ describe(`[Class] Inventory`, () => {
 
     });
 
+    describe(`[Method] addItem`, () => {
+
+        it(`should stack items into empty slots`, () => {
+            const inventory = new Inventory();
+            const item = new Item("bread", "A crusty loaf.", ITEM_TYPE.FOOD, 20);
+
+            const remainingCount = inventory.addItem(item, 5);
+
+            expect(remainingCount).to.equal(0);
+            expect(inventory.slots[0]).to.deep.equal({ count: 5, item });
+        });
+
+    });
+
     describe(`[Method] slots`, () => {
 
         it(`should return the slots`, () => {
@@ -37,4 +53,3 @@ describe(`[Class] Inventory`, () => {
     });
 
 });
-
