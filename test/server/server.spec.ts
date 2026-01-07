@@ -8,7 +8,7 @@ import { Room } from "../../src/room";
 import { Server } from "../../src/server";
 import { ServerRouter } from "../../src/server-router";
 import { SocketServerFactory } from "../../src/socket-server-factory";
-import { type HttpRequestHandler, type NodeHttpServer, type SocketServer } from "../../src/types";
+import { type DatabaseConnectionClient, type DatabasePoolFactory, type HttpRequestHandler, type NodeHttpServer, type SocketServer } from "../../src/types";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
 
@@ -186,6 +186,25 @@ class FakeSocket {
 
 }
 
+class FakeDatabaseConnection implements DatabaseConnectionClient {
+
+    private _testConnectionStages: string[] = [];
+
+    public connect(): ReturnType<DatabasePoolFactory> {
+        return {} as ReturnType<DatabasePoolFactory>;
+    }
+
+    public get testConnectionStages(): string[] {
+        return this._testConnectionStages;
+    }
+
+    public testConnection(stage: string): Promise<void> {
+        this._testConnectionStages.push(stage);
+        return Promise.resolve();
+    }
+
+}
+
 const humanBaseAttributes = {
     agility: 10,
     charisma: 12,
@@ -229,6 +248,7 @@ describe(`[Class] Server`, () => {
         it(`should start the server on the configured port`, () => {
             const originalHttpServerFactory = NodeHttpServerFactory.createServer;
             const originalSocketServerFactory = SocketServerFactory.createSocketIOServer;
+            const databaseConnection = new FakeDatabaseConnection();
             const fakeServer = new FakeHttpServer();
             let createdSocketServer: FakeSocketServer | undefined;
 
@@ -243,7 +263,7 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld());
+            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection);
 
             const startedServer = server.start();
 
@@ -251,6 +271,7 @@ describe(`[Class] Server`, () => {
             expect(createdSocketServer).to.be.ok;
             expect(fakeServer.listenPort).to.equal(4321);
             expect(fakeServer.handler).to.be.a("function");
+            expect(databaseConnection.testConnectionStages).to.deep.equal(["server listening"]);
 
             NodeHttpServerFactory.createServer = originalHttpServerFactory;
             SocketServerFactory.createSocketIOServer = originalSocketServerFactory;
@@ -259,6 +280,7 @@ describe(`[Class] Server`, () => {
         it(`should serve the game client html`, () => {
             const originalHttpServerFactory = NodeHttpServerFactory.createServer;
             const originalSocketServerFactory = SocketServerFactory.createSocketIOServer;
+            const databaseConnection = new FakeDatabaseConnection();
             const fakeServer = new FakeHttpServer();
 
             NodeHttpServerFactory.createServer = (handler: HttpRequestHandler): NodeHttpServer => {
@@ -271,7 +293,7 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([new GameClientRoute()]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld());
+            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection);
 
             server.start();
 
@@ -292,6 +314,7 @@ describe(`[Class] Server`, () => {
             const originalHttpServerFactory = NodeHttpServerFactory.createServer;
             const originalSocketServerFactory = SocketServerFactory.createSocketIOServer;
             const originalConsoleLog = console.log;
+            const databaseConnection = new FakeDatabaseConnection();
             const fakeServer = new FakeHttpServer();
             const logMessages: string[] = [];
             let createdSocketServer: FakeSocketServer | undefined;
@@ -313,7 +336,7 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld());
+            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection);
 
             server.start();
 
