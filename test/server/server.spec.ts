@@ -1,16 +1,16 @@
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
-import { CharacterClass } from "../../src/character-class";
-import { GameClientRoute } from "../../src/game-client-route";
-import { NodeHttpServerFactory } from "../../src/node-http-server-factory";
-import { Race } from "../../src/race";
-import { Room } from "../../src/room";
+import { CharacterClass } from "../../src/game/character-class";
+import { GameClientRoute } from "../../src/server/game-client-route";
+import { NodeHttpServerFactory } from "../../src/server/node-http-server-factory";
+import { Race } from "../../src/game/race";
+import { Room } from "../../src/game/room";
 import { Server } from "../../src/server";
-import { ServerRouter } from "../../src/server-router";
-import { SocketServerFactory } from "../../src/socket-server-factory";
+import { ServerRouter } from "../../src/server/server-router";
+import { SocketServerFactory } from "../../src/server/socket-server-factory";
 import { type DatabaseConnectionClient, type DatabasePoolFactory, type HttpRequestHandler, type NodeHttpServer, type SocketServer } from "../../src/types";
-import { World } from "../../src/world";
-import { Zone } from "../../src/zone";
+import { World } from "../../src/game/world";
+import { Zone } from "../../src/game/zone";
 
 class FakeHttpServer {
 

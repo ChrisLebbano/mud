@@ -1,4 +1,4 @@
-import { Item } from "../item";
+import { Item } from "../game/item";
 
 export interface InventoryStack {
     count: number;
@@ -6,4 +6,3 @@ export interface InventoryStack {
 }
 
 export type InventorySlot = InventoryStack | null;
-

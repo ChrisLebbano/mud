@@ -1,7 +1,7 @@
-import { Application } from "./application";
-import { DatabaseConnection } from "./database-connection";
+import { Application } from "./server/application";
+import { DatabaseConnection } from "./server/database-connection";
+import { World } from "./game/world";
 import { type DatabaseConfig, type ServerConfig, type WorldData } from "./types";
-import { World } from "./world";
 import { createPool } from "mysql2/promise";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
