@@ -16,5 +16,26 @@ describe(`[Class] PasswordHasher`, () => {
 
     });
 
-});
+    describe(`[Method] verifyPassword`, () => {
 
+        it(`should return true for matching passwords`, async () => {
+            const hasher = new PasswordHasher();
+            const hash = await hasher.hashPassword("super-secret");
+
+            const matches = await hasher.verifyPassword("super-secret", hash);
+
+            expect(matches).to.equal(true);
+        });
+
+        it(`should return false for invalid passwords`, async () => {
+            const hasher = new PasswordHasher();
+            const hash = await hasher.hashPassword("super-secret");
+
+            const matches = await hasher.verifyPassword("incorrect", hash);
+
+            expect(matches).to.equal(false);
+        });
+
+    });
+
+});

@@ -6,6 +6,11 @@ export interface UserCreateData {
     username: string;
 }
 
+export interface UserLoginPayload {
+    password: string;
+    username: string;
+}
+
 export interface UserRecord {
     email: string;
     id: number;
@@ -25,4 +30,3 @@ export interface UserSignupPayload {
     password: string;
     username: string;
 }
-
