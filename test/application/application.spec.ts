@@ -4,20 +4,25 @@ import { CharacterClass } from "../../src/character-class";
 import { Race } from "../../src/race";
 import { Room } from "../../src/room";
 import { Server } from "../../src/server";
-import { type NodeHttpServer } from "../../src/types";
+import { type DatabaseConnectionClient, type DatabasePoolFactory, type NodeHttpServer } from "../../src/types";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
 
-class FakeDatabaseConnection {
+class FakeDatabaseConnection implements DatabaseConnectionClient {
 
     private _connectCalled = false;
 
-    public connect(): void {
+    public connect(): ReturnType<DatabasePoolFactory> {
         this._connectCalled = true;
+        return {} as ReturnType<DatabasePoolFactory>;
     }
 
     public get connectCalled(): boolean {
         return this._connectCalled;
+    }
+
+    public testConnection(_stage: string): Promise<void> {
+        return Promise.resolve();
     }
 
 }

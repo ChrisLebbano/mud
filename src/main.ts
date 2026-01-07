@@ -25,12 +25,15 @@ const databaseConfig: DatabaseConfig = {
     port: parseInt(process.env.MYSQL_PORT || "3306"),
     user: process.env.MYSQL_USER || "mud_user"
 };
+const databaseTestTableName = "users";
 
 const worldDataPath = resolve(process.cwd(), "data", "world.json");
 const worldData = JSON.parse(readFileSync(worldDataPath, "utf8")) as WorldData;
 const world = World.fromData(worldData);
 
-const databaseConnection = new DatabaseConnection(databaseConfig, createPool);
+const databaseConnection = new DatabaseConnection(databaseConfig, createPool, databaseTestTableName);
 const application = new Application(serverConfig, world, databaseConnection);
+
+void databaseConnection.testConnection("process start");
 
 application.init();

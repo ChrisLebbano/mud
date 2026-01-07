@@ -1,12 +1,13 @@
 import { NodeHttpServerFactory } from "../node-http-server-factory";
 import { ServerRouter } from "../server-router";
 import { SocketServerFactory } from "../socket-server-factory";
-import { type NodeHttpServer, type ServerConfig, type SocketServer } from "../types";
+import { type DatabaseConnectionClient, type NodeHttpServer, type ServerConfig, type SocketServer } from "../types";
 import { UserCommandHandler } from "../user-command-handler";
 import { World } from "../world";
 
 export class Server {
 
+    private _databaseConnection: DatabaseConnectionClient;
     private _httpServer?: NodeHttpServer;
     private _serverConfig: ServerConfig;
     private _serverRouter: ServerRouter;
@@ -14,7 +15,8 @@ export class Server {
     private _userCommandHandler: UserCommandHandler;
     private _world: World;
 
-    constructor(serverConfig: ServerConfig, serverRouter: ServerRouter, world: World, userCommandHandler?: UserCommandHandler) {
+    constructor(serverConfig: ServerConfig, serverRouter: ServerRouter, world: World, databaseConnection: DatabaseConnectionClient, userCommandHandler?: UserCommandHandler) {
+        this._databaseConnection = databaseConnection;
         this._serverConfig = serverConfig;
         this._serverRouter = serverRouter;
         this._world = world;
@@ -63,6 +65,7 @@ export class Server {
 
         this._httpServer.listen(this._serverConfig.port, () => {
             console.log(`[INFO] Server started on port ${this._serverConfig.port}`);
+            void this._databaseConnection.testConnection("server listening");
         });
 
         return this._httpServer;

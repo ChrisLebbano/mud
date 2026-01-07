@@ -47,6 +47,11 @@ export interface DatabaseConfig {
 
 export type DatabasePoolFactory = (config: DatabaseConfig) => Pool;
 
+export interface DatabaseConnectionClient {
+    connect: () => ReturnType<DatabasePoolFactory>;
+    testConnection: (stage: string) => Promise<void>;
+}
+
 export type MessageCategory = "CharacterSpeech" | "RoomDescription" | "SelfDealingAttackDamage" | "SelfRecieveAttackDamage" | "Shout" | "System";
 
 export interface MessagePayload {
