@@ -1,4 +1,5 @@
 import { ITEM_TYPE } from "./item-type";
+import { type Pool } from "mysql2/promise";
 import { type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { Server as SocketIOServer } from "socket.io";
 
@@ -35,6 +36,16 @@ export interface CharacterClassSnapshot {
     id: string;
     name: string;
 }
+
+export interface DatabaseConfig {
+    database: string;
+    host: string;
+    password: string;
+    port: number;
+    user: string;
+}
+
+export type DatabasePoolFactory = (config: DatabaseConfig) => Pool;
 
 export type MessageCategory = "CharacterSpeech" | "RoomDescription" | "SelfDealingAttackDamage" | "SelfRecieveAttackDamage" | "Shout" | "System";
 

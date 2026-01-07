@@ -8,6 +8,20 @@ import { type NodeHttpServer } from "../../src/types";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
 
+class FakeDatabaseConnection {
+
+    private _connectCalled = false;
+
+    public connect(): void {
+        this._connectCalled = true;
+    }
+
+    public get connectCalled(): boolean {
+        return this._connectCalled;
+    }
+
+}
+
 describe(`[Class] Application`, () => {
     const humanBaseAttributes = {
         agility: 10,
@@ -49,6 +63,7 @@ describe(`[Class] Application`, () => {
 
         it(`should create an instance of a server`, () => {
             const originalStart = Server.prototype.start;
+            const databaseConnection = new FakeDatabaseConnection();
             let startCalled = false;
 
             Server.prototype.start = function (): NodeHttpServer {
@@ -56,13 +71,14 @@ describe(`[Class] Application`, () => {
                 return {} as NodeHttpServer;
             };
 
-            const app = new Application({ port: 8000 }, createWorld());
+            const app = new Application({ port: 8000 }, createWorld(), databaseConnection);
 
             expect(app.server).to.be.undefined;
 
             app.init();
 
             expect(app.server).to.be.ok;
+            expect(databaseConnection.connectCalled).to.equal(true);
             expect(startCalled).to.equal(true);
 
             Server.prototype.start = originalStart;
