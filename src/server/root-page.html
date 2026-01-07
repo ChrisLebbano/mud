@@ -41,7 +41,7 @@
             margin: 0 0 24px;
         }
 
-        .signup-button {
+        .action-button {
             background-color: #38bdf8;
             border: none;
             border-radius: 999px;
@@ -55,9 +55,20 @@
             text-transform: uppercase;
         }
 
-        .signup-button:focus {
+        .action-button:focus {
             outline: 2px solid #f8fafc;
             outline-offset: 2px;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .login-button {
+            background-color: #facc15;
         }
     </style>
 </head>
@@ -65,7 +76,10 @@
     <main class="card">
         <h1>Welcome to the MUD</h1>
         <p>Create an account to start your adventure.</p>
-        <a class="signup-button" href="/signup">SIGN UP</a>
+        <div class="actions">
+            <a class="action-button signup-button" href="/signup">SIGN UP</a>
+            <a class="action-button login-button" href="/login">LOG IN</a>
+        </div>
     </main>
 </body>
 </html>
