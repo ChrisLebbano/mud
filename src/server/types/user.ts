@@ -1,3 +1,5 @@
+import { RowDataPacket } from "mysql2";
+
 export interface UserCreateData {
     email: string;
     passwordHash: string;
@@ -11,7 +13,7 @@ export interface UserRecord {
     username: string;
 }
 
-export interface UserRow {
+export interface UserRow extends RowDataPacket {
     email: string;
     id: number;
     password_hash: string;
