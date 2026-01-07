@@ -1,4 +1,4 @@
-import { Item } from "../../game/item";
+import { Item } from "../item";
 
 export interface InventoryStack {
     count: number;

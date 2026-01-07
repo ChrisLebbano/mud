@@ -1,4 +1,4 @@
-import { type HttpRequestHandler, type NodeHttpServer } from "../../types";
+import { type HttpRequestHandler, type NodeHttpServer } from "../types/http";
 import { createServer } from "node:http";
 
 export class NodeHttpServerFactory {

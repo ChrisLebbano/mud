@@ -1,7 +1,7 @@
 import { Character } from "../character";
 import { CharacterClass } from "../character-class";
 import { Race } from "../race";
-import { type PlayerSnapshot } from "../../types";
+import { type PlayerSnapshot } from "../types/room";
 
 export class PlayerCharacter extends Character {
 

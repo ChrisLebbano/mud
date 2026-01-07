@@ -1,6 +1,6 @@
-import { expect } from "chai";
 import { DatabaseConnection } from "../../../src/server/database-connection";
-import { type DatabaseConfig, type DatabasePoolFactory } from "../../../src/types";
+import { type DatabaseConfig, type DatabasePoolFactory } from "../../../src/server/types/database";
+import { expect } from "chai";
 
 class FakePool {
 

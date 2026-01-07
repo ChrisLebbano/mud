@@ -1,12 +1,13 @@
-import { expect } from "chai";
-import { Application } from "../../../src/server/application";
 import { CharacterClass } from "../../../src/game/character-class";
 import { Race } from "../../../src/game/race";
 import { Room } from "../../../src/game/room";
-import { Server } from "../../../src/server";
-import { type DatabaseConnectionClient, type DatabasePoolFactory, type NodeHttpServer } from "../../../src/types";
 import { World } from "../../../src/game/world";
 import { Zone } from "../../../src/game/zone";
+import { Server } from "../../../src/server";
+import { Application } from "../../../src/server/application";
+import { type DatabaseConnectionClient, type DatabasePoolFactory } from "../../../src/server/types/database";
+import { type NodeHttpServer } from "../../../src/server/types/http";
+import { expect } from "chai";
 
 class FakeDatabaseConnection implements DatabaseConnectionClient {
 

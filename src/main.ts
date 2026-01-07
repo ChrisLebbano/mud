@@ -1,7 +1,9 @@
+import { type WorldData } from "./game/types/world-data";
+import { World } from "./game/world";
 import { Application } from "./server/application";
 import { DatabaseConnection } from "./server/database-connection";
-import { World } from "./game/world";
-import { type DatabaseConfig, type ServerConfig, type WorldData } from "./types";
+import { type DatabaseConfig } from "./server/types/database";
+import { type ServerConfig } from "./server/types/server-config";
 import { createPool } from "mysql2/promise";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";

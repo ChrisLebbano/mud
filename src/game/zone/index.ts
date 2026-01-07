@@ -1,5 +1,5 @@
-import { type ZoneSnapshot } from "../../types";
 import { Room } from "../room";
+import { type ZoneSnapshot } from "../types/room";
 
 export class Zone {
 

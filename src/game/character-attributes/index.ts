@@ -1,4 +1,4 @@
-import { type CharacterAttributesSnapshot, type CharacterAttributeValues } from "../../types";
+import { type CharacterAttributesSnapshot, type CharacterAttributeValues } from "../types/character-attributes";
 
 export class CharacterAttributes {
 

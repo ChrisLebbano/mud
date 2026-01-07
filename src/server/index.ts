@@ -1,9 +1,11 @@
 import { World } from "../game/world";
-import { type DatabaseConnectionClient, type NodeHttpServer, type ServerConfig, type SocketServer } from "../types";
 import { NodeHttpServerFactory } from "./node-http-server-factory";
 import { ServerRouter } from "./server-router";
 import { SocketServerFactory } from "./socket-server-factory";
 import { UserCommandHandler } from "./user-command-handler";
+import { type DatabaseConnectionClient } from "./types/database";
+import { type NodeHttpServer, type SocketServer } from "./types/http";
+import { type ServerConfig } from "./types/server-config";
 
 export class Server {
 

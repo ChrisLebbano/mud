@@ -1,8 +1,7 @@
-import { expect } from "chai";
-
 import { Inventory } from "../../../src/game/inventory";
 import { Item } from "../../../src/game/item";
-import { ITEM_TYPE } from "../../../src/types";
+import { ITEM_TYPE } from "../../../src/game/types/item-type";
+import { expect } from "chai";
 
 describe(`[Class] Inventory`, () => {
 

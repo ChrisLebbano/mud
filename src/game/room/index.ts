@@ -1,5 +1,5 @@
-import { type NonPlayerCharacterSnapshot, type RoomSnapshot, type ZoneSnapshot } from "../../types";
 import { NonPlayerCharacter } from "../non-player-character";
+import { type NonPlayerCharacterSnapshot, type RoomSnapshot, type ZoneSnapshot } from "../types/room";
 
 export class Room {
 

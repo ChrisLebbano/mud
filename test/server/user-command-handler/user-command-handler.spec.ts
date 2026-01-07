@@ -1,13 +1,14 @@
-import { expect } from "chai";
 import { CharacterClass } from "../../../src/game/character-class";
 import { Item } from "../../../src/game/item";
 import { NonPlayerCharacter } from "../../../src/game/non-player-character";
 import { Race } from "../../../src/game/race";
 import { Room } from "../../../src/game/room";
-import { ITEM_TYPE, type SocketServer } from "../../../src/types";
-import { UserCommandHandler } from "../../../src/server/user-command-handler";
 import { World } from "../../../src/game/world";
 import { Zone } from "../../../src/game/zone";
+import { ITEM_TYPE } from "../../../src/game/types/item-type";
+import { type SocketServer } from "../../../src/server/types/http";
+import { UserCommandHandler } from "../../../src/server/user-command-handler";
+import { expect } from "chai";
 
 class FakeSocketServer {
 

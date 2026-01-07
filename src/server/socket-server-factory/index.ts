@@ -1,4 +1,4 @@
-import { type NodeHttpServer, type SocketServer } from "../../types";
+import { type NodeHttpServer, type SocketServer } from "../types/http";
 import { Server as SocketIOServer } from "socket.io";
 
 export class SocketServerFactory {

@@ -1,4 +1,3 @@
-import { type ChatMessage, type RoomSnapshot, type WorldData } from "../../types";
 import { Character } from "../character";
 import { CharacterClass } from "../character-class";
 import { Item } from "../item";
@@ -6,6 +5,9 @@ import { NonPlayerCharacter } from "../non-player-character";
 import { PlayerCharacter } from "../player-character";
 import { Race } from "../race";
 import { Room } from "../room";
+import { type ChatMessage } from "../types/message";
+import { type RoomSnapshot } from "../types/room";
+import { type WorldData } from "../types/world-data";
 import { Zone } from "../zone";
 
 export class World {

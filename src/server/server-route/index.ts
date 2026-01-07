@@ -1,4 +1,4 @@
-import { type HttpRequestHandler } from "../../types";
+import { type HttpRequestHandler } from "../types/http";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 
 export class ServerRoute {

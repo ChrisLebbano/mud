@@ -1,4 +1,4 @@
-import { ITEM_TYPE } from "../../types";
+import { ITEM_TYPE } from "../types/item-type";
 
 export class Item {
 

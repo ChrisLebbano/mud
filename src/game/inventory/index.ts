@@ -1,5 +1,5 @@
 import { Item } from "../item";
-import { type InventorySlot, type InventoryStack } from "../../types/game/inventory-slot";
+import { type InventorySlot, type InventoryStack } from "../types/inventory-slot";
 
 export class Inventory {
 

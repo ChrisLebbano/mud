@@ -1,4 +1,4 @@
-import { type DatabaseConfig, type DatabasePoolFactory } from "../../types";
+import { type DatabaseConfig, type DatabasePoolFactory } from "../types/database";
 
 export class DatabaseConnection {
 

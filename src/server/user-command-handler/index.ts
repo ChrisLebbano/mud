@@ -1,7 +1,11 @@
 import { NonPlayerCharacter } from "../../game/non-player-character";
 import { World } from "../../game/world";
-import { ITEM_TYPE, type ChatMessage, type GameSocket, type MoveCommand, type RoomSnapshot, type SocketServer } from "../../types";
-import { type InventoryStack } from "../../types/game/inventory-slot";
+import { type GameSocket, type MoveCommand } from "../../game/types/game-socket";
+import { type InventoryStack } from "../../game/types/inventory-slot";
+import { ITEM_TYPE } from "../../game/types/item-type";
+import { type ChatMessage } from "../../game/types/message";
+import { type RoomSnapshot } from "../../game/types/room";
+import { type SocketServer } from "../types/http";
 
 export class UserCommandHandler {
 

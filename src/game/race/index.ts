@@ -1,4 +1,5 @@
-import { type CharacterAttributeValues, type RaceSnapshot } from "../../types";
+import { type CharacterAttributeValues } from "../types/character-attributes";
+import { type RaceSnapshot } from "../types/race";
 
 export class Race {
 

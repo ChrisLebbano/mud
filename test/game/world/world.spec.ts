@@ -1,11 +1,11 @@
-import { expect } from "chai";
 import { CharacterClass } from "../../../src/game/character-class";
 import { NonPlayerCharacter } from "../../../src/game/non-player-character";
 import { Race } from "../../../src/game/race";
 import { Room } from "../../../src/game/room";
-import { ITEM_TYPE, type WorldData } from "../../../src/types";
 import { World } from "../../../src/game/world";
 import { Zone } from "../../../src/game/zone";
+import { ITEM_TYPE, type WorldData } from "../../../src/game/types/world-data";
+import { expect } from "chai";
 
 describe(`[Class] World`, () => {
     const clericModifiers = {

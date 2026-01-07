@@ -1,8 +1,9 @@
 import { Server } from "..";
 import { World } from "../../game/world";
-import { type DatabaseConnectionClient, type ServerConfig } from "../../types";
 import { GameClientRoute } from "../game-client-route";
 import { ServerRouter } from "../server-router";
+import { type DatabaseConnectionClient } from "../types/database";
+import { type ServerConfig } from "../types/server-config";
 
 export class Application {
 
