@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign Up</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            align-items: center;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            justify-content: center;
+            margin: 0;
+            min-height: 100vh;
+            padding: 32px;
+        }
+
+        .card {
+            background-color: #1e293b;
+            border-radius: 16px;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+            max-width: 480px;
+            padding: 32px;
+            width: 100%;
+        }
+
+        .card h1 {
+            margin: 0 0 16px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+            gap: 8px;
+        }
+
+        input {
+            border: 1px solid #334155;
+            border-radius: 8px;
+            font-size: 16px;
+            padding: 10px 12px;
+        }
+
+        button {
+            background-color: #38bdf8;
+            border: none;
+            border-radius: 999px;
+            color: #0f172a;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 24px;
+            text-transform: uppercase;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .status {
+            font-size: 14px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <h1>Create your account</h1>
+        <form id="signup-form">
+            <label>
+                Username
+                <input id="username" name="username" type="text" autocomplete="username" required>
+            </label>
+            <label>
+                Email
+                <input id="email" name="email" type="email" autocomplete="email" required>
+            </label>
+            <label>
+                Password
+                <input id="password" name="password" type="password" autocomplete="new-password" required>
+            </label>
+            <label>
+                Confirm password
+                <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required>
+            </label>
+            <button id="submit" type="submit">Submit</button>
+            <p class="status" id="status" aria-live="polite"></p>
+        </form>
+    </main>
+    <script>
+        const form = document.getElementById("signup-form");
+        const status = document.getElementById("status");
+        const submitButton = document.getElementById("submit");
+        const confirmPassword = document.getElementById("confirm-password");
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+        const username = document.getElementById("username");
+
+        const setStatus = (message, isError) => {
+            status.textContent = message;
+            status.style.color = isError ? "#fca5a5" : "#bbf7d0";
+        };
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            setStatus("", false);
+
+            if (password.value !== confirmPassword.value) {
+                setStatus("Passwords do not match.", true);
+                return;
+            }
+
+            submitButton.disabled = true;
+
+            try {
+                const response = await fetch("/signup", {
+                    body: JSON.stringify({
+                        email: email.value,
+                        password: password.value,
+                        username: username.value
+                    }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST"
+                });
+
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    setStatus(payload.error ?? payload.warning ?? "Signup failed.", true);
+                    return;
+                }
+
+                setStatus(payload.message ?? "Signup successful.", false);
+                form.reset();
+            } catch (error) {
+                setStatus("Signup failed. Please try again.", true);
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
+
