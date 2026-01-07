@@ -1,7 +1,7 @@
 import { NonPlayerCharacter } from "../../game/non-player-character";
 import { World } from "../../game/world";
 import { ITEM_TYPE, type ChatMessage, type GameSocket, type MoveCommand, type RoomSnapshot, type SocketServer } from "../../types";
-import { type InventoryStack } from "../../types/inventory-slot";
+import { type InventoryStack } from "../../types/game/inventory-slot";
 
 export class UserCommandHandler {
 
