@@ -346,6 +346,18 @@
             appendLog(chatMessage);
         });
 
+        socket.on("auth:token", (payload) => {
+            if (payload?.token) {
+                localStorage.setItem("authToken", payload.token);
+            }
+            if (payload?.username) {
+                localStorage.setItem("authUsername", payload.username);
+            }
+            if (Array.isArray(payload?.playerCharacterNames)) {
+                localStorage.setItem("authPlayerCharacterNames", JSON.stringify(payload.playerCharacterNames));
+            }
+        });
+
         socket.on("world:room", (roomSnapshot) => {
             roomName.textContent = roomSnapshot.name;
             zoneName.textContent = `Zone: ${roomSnapshot.zone.name}`;

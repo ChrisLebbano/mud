@@ -8,7 +8,7 @@ import { Room } from "../../src/room";
 import { Server } from "../../src/server";
 import { ServerRouter } from "../../src/server-router";
 import { SocketServerFactory } from "../../src/socket-server-factory";
-import { type HttpRequestHandler, type NodeHttpServer, type SocketServer } from "../../src/types";
+import { type HttpRequestHandler, type NodeHttpServer, type SocketServer, type UserAuthenticationResult } from "../../src/types";
 import { World } from "../../src/world";
 import { Zone } from "../../src/zone";
 
@@ -186,6 +186,26 @@ class FakeSocket {
 
 }
 
+class FakeUserAuthenticationService {
+
+    private _loginResult: UserAuthenticationResult | null;
+    private _signupResult: UserAuthenticationResult | null;
+
+    constructor(loginResult: UserAuthenticationResult | null, signupResult: UserAuthenticationResult | null) {
+        this._loginResult = loginResult;
+        this._signupResult = signupResult;
+    }
+
+    public async loginUser(): Promise<UserAuthenticationResult | null> {
+        return this._loginResult;
+    }
+
+    public async signupUser(): Promise<UserAuthenticationResult | null> {
+        return this._signupResult;
+    }
+
+}
+
 const humanBaseAttributes = {
     agility: 10,
     charisma: 12,
@@ -213,6 +233,19 @@ const warriorModifiers = {
     strength: 2,
     wisdom: -1
 };
+
+const createServerConfig = () => ({
+    authSecret: "test-auth-secret",
+    databaseConfig: {
+        database: "mud",
+        host: "127.0.0.1",
+        password: "mud_password",
+        port: 3306,
+        user: "mud_user"
+    },
+    port: 4321,
+    tokenSecret: "test-token-secret"
+});
 
 const createWorld = (): World => {
     const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
@@ -243,7 +276,8 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld());
+            const userAuthenticationService = new FakeUserAuthenticationService(null, null);
+            const server = new Server(createServerConfig(), serverRouter, createWorld(), userAuthenticationService);
 
             const startedServer = server.start();
 
@@ -271,7 +305,8 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([new GameClientRoute()]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld());
+            const userAuthenticationService = new FakeUserAuthenticationService(null, null);
+            const server = new Server(createServerConfig(), serverRouter, createWorld(), userAuthenticationService);
 
             server.start();
 
@@ -313,7 +348,8 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld());
+            const userAuthenticationService = new FakeUserAuthenticationService(null, null);
+            const server = new Server(createServerConfig(), serverRouter, createWorld(), userAuthenticationService);
 
             server.start();
 
@@ -330,6 +366,56 @@ describe(`[Class] Server`, () => {
             ]);
 
             console.log = originalConsoleLog;
+            NodeHttpServerFactory.createServer = originalHttpServerFactory;
+            SocketServerFactory.createSocketIOServer = originalSocketServerFactory;
+        });
+
+        it(`should require authentication before entering the world`, () => {
+            const originalHttpServerFactory = NodeHttpServerFactory.createServer;
+            const originalSocketServerFactory = SocketServerFactory.createSocketIOServer;
+            const fakeServer = new FakeHttpServer();
+            let createdSocketServer: FakeSocketServer | undefined;
+
+            NodeHttpServerFactory.createServer = (handler: HttpRequestHandler): NodeHttpServer => {
+                fakeServer.handler = handler;
+                return fakeServer as unknown as NodeHttpServer;
+            };
+
+            SocketServerFactory.createSocketIOServer = (): SocketServer => {
+                createdSocketServer = new FakeSocketServer();
+                return createdSocketServer as unknown as SocketServer;
+            };
+
+            const serverRouter = new ServerRouter([]);
+            const authResult: UserAuthenticationResult = {
+                authToken: "token",
+                playerCharacterNames: ["Hero"],
+                username: "player"
+            };
+            const userAuthenticationService = new FakeUserAuthenticationService(authResult, null);
+            const server = new Server(createServerConfig(), serverRouter, createWorld(), userAuthenticationService);
+
+            server.start();
+
+            const fakeSocket = new FakeSocket();
+            createdSocketServer?.connectionListeners.forEach((listener) => listener(fakeSocket));
+
+            expect(fakeSocket.joinedRooms).to.deep.equal([]);
+            expect(fakeSocket.emits[0]).to.deep.equal({
+                event: "world:system",
+                payload: { category: "System", message: "Welcome! Please type 'login' or 'signup' to continue." }
+            });
+
+            fakeSocket.submitListeners.forEach((listener) => listener("login"));
+            fakeSocket.submitListeners.forEach((listener) => listener("player"));
+            fakeSocket.submitListeners.forEach((listener) => listener("password"));
+
+            expect(fakeSocket.joinedRooms.length).to.equal(1);
+            const authTokenEmit = fakeSocket.emits.find((emit) => emit.event === "auth:token");
+            expect(authTokenEmit).to.be.ok;
+            const roomEmit = fakeSocket.emits.find((emit) => emit.event === "world:room");
+            expect(roomEmit).to.be.ok;
+
             NodeHttpServerFactory.createServer = originalHttpServerFactory;
             SocketServerFactory.createSocketIOServer = originalSocketServerFactory;
         });

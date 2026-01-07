@@ -1,3 +1,4 @@
+import { type DatabaseConfig } from "./database-config";
 import { ITEM_TYPE } from "./item-type";
 import { type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { Server as SocketIOServer } from "socket.io";
@@ -107,7 +108,10 @@ export interface RoomSnapshot {
 }
 
 export interface ServerConfig {
+    authSecret: string;
+    databaseConfig: DatabaseConfig;
     port: number;
+    tokenSecret: string;
 }
 
 export interface WorldData {
@@ -171,3 +175,7 @@ export type NodeHttpServer = Server;
 export type SocketServer = SocketIOServer;
 
 export { ITEM_TYPE };
+export type { DatabaseConfig } from "./database-config";
+export type { UserAuthFlowState } from "./user-auth-flow-state";
+export type { UserAuthenticationResult } from "./user-authentication-result";
+export type { UserRecord } from "./user-record";

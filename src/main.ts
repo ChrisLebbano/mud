@@ -13,7 +13,16 @@ import { World } from "./world";
 loadEnvFile('.env');
 
 const serverConfig: ServerConfig = {
-    port: parseInt(process.env.PORT || "8080")
+    authSecret: process.env.AUTH_SECRET ? process.env.AUTH_SECRET : "dev-auth-secret",
+    databaseConfig: {
+        database: process.env.MYSQL_DATABASE ? process.env.MYSQL_DATABASE : "mud",
+        host: process.env.MYSQL_HOST ? process.env.MYSQL_HOST : "127.0.0.1",
+        password: process.env.MYSQL_PASSWORD ? process.env.MYSQL_PASSWORD : "mud_password",
+        port: parseInt(process.env.MYSQL_PORT ? process.env.MYSQL_PORT : "3306"),
+        user: process.env.MYSQL_USER ? process.env.MYSQL_USER : "mud_user"
+    },
+    port: parseInt(process.env.PORT || "8080"),
+    tokenSecret: process.env.JWT_SECRET ? process.env.JWT_SECRET : "dev-jwt-secret"
 };
 
 const worldDataPath = resolve(process.cwd(), "data", "world.json");
