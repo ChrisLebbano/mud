@@ -12,11 +12,13 @@ import { World } from "./world";
 
 loadEnvFile('.env');
 
+const mysqlHost = process.env.MYSQL_HOST ? process.env.MYSQL_HOST.trim() : "mysql";
+
 const serverConfig: ServerConfig = {
     authSecret: process.env.AUTH_SECRET ? process.env.AUTH_SECRET : "dev-auth-secret",
     databaseConfig: {
         database: process.env.MYSQL_DATABASE ? process.env.MYSQL_DATABASE : "mud",
-        host: process.env.MYSQL_HOST ? process.env.MYSQL_HOST : "mysql",
+        host: mysqlHost === "mysq" ? "mysql" : mysqlHost,
         password: process.env.MYSQL_PASSWORD ? process.env.MYSQL_PASSWORD : "mud_password",
         port: parseInt(process.env.MYSQL_PORT ? process.env.MYSQL_PORT : "3306"),
         user: process.env.MYSQL_USER ? process.env.MYSQL_USER : "mud_user"
