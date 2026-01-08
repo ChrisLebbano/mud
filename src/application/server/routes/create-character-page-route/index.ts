@@ -8,7 +8,7 @@ export class CreateCharacterPageRoute extends MethodServerRoute {
         const filePath = join(__dirname, ".", "create-character-page.html");
         const createCharacterPageHtml = readFileSync(filePath, { encoding: "utf-8" });
 
-        super("/characters/create", "GET", (_request, response) => {
+        super("/character/create", "GET", (_request, response) => {
             response.statusCode = 200;
             response.setHeader("Content-Type", "text/html");
             response.end(createCharacterPageHtml);

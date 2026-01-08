@@ -123,4 +123,54 @@ describe(`[Class] CharacterRepository`, () => {
 
     });
 
+    describe(`[Method] findByUserId`, () => {
+
+        it(`should return characters for a user`, async () => {
+            const pool = new FakePool();
+            pool.queueResult([
+                {
+                    class_name: "Warrior",
+                    id: 1,
+                    name: "Alex",
+                    race_name: "Human",
+                    user_id: 7
+                },
+                {
+                    class_name: "Cleric",
+                    id: 2,
+                    name: "Riley",
+                    race_name: "Elf",
+                    user_id: 7
+                }
+            ]);
+            const repository = new CharacterRepository(new FakeDatabaseConnection(pool));
+
+            const result = await repository.findByUserId(7);
+
+            expect(result).to.deep.equal([
+                {
+                    className: "Warrior",
+                    id: 1,
+                    name: "Alex",
+                    raceName: "Human",
+                    userId: 7
+                },
+                {
+                    className: "Cleric",
+                    id: 2,
+                    name: "Riley",
+                    raceName: "Elf",
+                    userId: 7
+                }
+            ]);
+            expect(pool.executeCalls).to.deep.equal([
+                {
+                    params: [7],
+                    statement: "SELECT id, name, user_id, race_name, class_name FROM characters WHERE user_id = ? ORDER BY name ASC"
+                }
+            ]);
+        });
+
+    });
+
 });

@@ -1,6 +1,8 @@
 import { Server } from "../../../src/application/server";
+import { type CharacterRepository } from "../../../src/application/server/character-repository";
 import { NodeHttpServerFactory } from "../../../src/application/server/node-http-server-factory";
 import { SocketServerFactory } from "../../../src/application/server/socket-server-factory";
+import { type CharacterRecord } from "../../../src/application/server/types/character";
 import { type DatabaseConnectionClient, type DatabasePoolFactory } from "../../../src/application/server/types/database";
 import { type HttpRequestHandler, type NodeHttpServer, type SocketServer } from "../../../src/application/server/types/http";
 import { type UserRecord } from "../../../src/application/server/types/user";
@@ -128,14 +130,14 @@ class FakeSocket {
     private _id: string;
     private _disconnectListeners: Array<() => void> = [];
     private _emits: Array<Record<string, unknown>> = [];
-    private _handshake: { auth?: { loginToken?: string } } = {};
+    private _handshake: { auth?: { characterName?: string; loginToken?: string } } = {};
     private _joinedRooms: Set<string> = new Set();
     private _submitListeners: Array<(command: string) => void> = [];
 
-    constructor(id?: string, loginToken?: string) {
+    constructor(id?: string, loginToken?: string, characterName?: string) {
         this._id = id ? id : "fake-socket";
         if (loginToken) {
-            this._handshake.auth = { loginToken };
+            this._handshake.auth = { characterName, loginToken };
         }
     }
 
@@ -151,7 +153,7 @@ class FakeSocket {
         this._emits.push({ event, payload });
     }
 
-    public get handshake(): { auth?: { loginToken?: string } } {
+    public get handshake(): { auth?: { characterName?: string; loginToken?: string } } {
         return this._handshake;
     }
 
@@ -200,6 +202,20 @@ class FakeSocket {
                 this._emits.push({ event: `room:${roomId}:${event}`, payload });
             }
         };
+    }
+
+}
+
+class FakeCharacterRepository {
+
+    private _character: CharacterRecord | null;
+
+    constructor(character: CharacterRecord | null) {
+        this._character = character;
+    }
+
+    public findByName(_name: string): Promise<CharacterRecord | null> {
+        return Promise.resolve(this._character);
     }
 
 }
@@ -318,7 +334,19 @@ describe(`[Class] Server`, () => {
                 return createdSocketServer as unknown as SocketServer;
             };
 
-            const server = new Server({ port: 4321 }, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
+            const server = new Server(
+                { port: 4321 },
+                createWorld(),
+                databaseConnection,
+                userRepository as unknown as UserRepository,
+                new FakeCharacterRepository({
+                    className: "Warrior",
+                    id: 1,
+                    name: "Riley",
+                    raceName: "Human",
+                    userId: 1
+                }) as unknown as CharacterRepository
+            );
 
             const startedServer = server.start();
 
@@ -355,7 +383,19 @@ describe(`[Class] Server`, () => {
                 return new FakeSocketServer() as unknown as SocketServer;
             };
 
-            const server = new Server({ port: 4321 }, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
+            const server = new Server(
+                { port: 4321 },
+                createWorld(),
+                databaseConnection,
+                userRepository as unknown as UserRepository,
+                new FakeCharacterRepository({
+                    className: "Warrior",
+                    id: 1,
+                    name: "Riley",
+                    raceName: "Human",
+                    userId: 1
+                }) as unknown as CharacterRepository
+            );
 
             server.start();
 
@@ -405,11 +445,23 @@ describe(`[Class] Server`, () => {
                 return createdSocketServer as unknown as SocketServer;
             };
 
-            const server = new Server({ port: 4321 }, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
+            const server = new Server(
+                { port: 4321 },
+                createWorld(),
+                databaseConnection,
+                userRepository as unknown as UserRepository,
+                new FakeCharacterRepository({
+                    className: "Warrior",
+                    id: 1,
+                    name: "Riley",
+                    raceName: "Human",
+                    userId: 1
+                }) as unknown as CharacterRepository
+            );
 
             server.start();
 
-            const fakeSocket = new FakeSocket("fake-socket", "token-123");
+            const fakeSocket = new FakeSocket("fake-socket", "token-123", "Riley");
 
             expect(createdSocketServer).to.be.ok;
             createdSocketServer?.connectionListeners.forEach((listener) => listener(fakeSocket));
