@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(100) NOT NULL,
   email VARCHAR(255) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
+  loginToken VARCHAR(255) NULL,
+  lastLoginOn DATETIME NULL,
   PRIMARY KEY (id),
   UNIQUE KEY unique_users_email (email),
   UNIQUE KEY unique_users_username (username)

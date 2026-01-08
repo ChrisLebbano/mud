@@ -1,3 +1,4 @@
+import { type LoginTokenGenerator } from "../login-token-generator";
 import { type JsonBodyParser } from "../json-body-parser";
 import { type PasswordHasher } from "../password-hasher";
 import { type UserLoginPayload } from "../types/user";
@@ -7,11 +8,13 @@ import { type IncomingMessage, type ServerResponse } from "node:http";
 export class LoginRequestHandler {
 
     private _jsonBodyParser: JsonBodyParser;
+    private _loginTokenGenerator: LoginTokenGenerator;
     private _passwordHasher: PasswordHasher;
     private _userRepository: UserRepository;
 
-    constructor(jsonBodyParser: JsonBodyParser, passwordHasher: PasswordHasher, userRepository: UserRepository) {
+    constructor(jsonBodyParser: JsonBodyParser, loginTokenGenerator: LoginTokenGenerator, passwordHasher: PasswordHasher, userRepository: UserRepository) {
         this._jsonBodyParser = jsonBodyParser;
+        this._loginTokenGenerator = loginTokenGenerator;
         this._passwordHasher = passwordHasher;
         this._userRepository = userRepository;
     }
@@ -63,7 +66,12 @@ export class LoginRequestHandler {
                 return;
             }
 
-            sendJson(200, { message: `Login successful for ${user.username}.` });
+            const loginToken = this._loginTokenGenerator.generate();
+            const lastLoginOn = new Date();
+
+            await this._userRepository.updateLoginToken(user.id, loginToken, lastLoginOn);
+
+            sendJson(200, { loginToken, message: `Login successful for ${user.username}.` });
         };
 
         void run().catch((error: unknown) => {

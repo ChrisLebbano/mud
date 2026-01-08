@@ -200,7 +200,17 @@
     </div>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
-        const socket = io();
+        const loginTokenKey = "loginToken";
+        const loginToken = localStorage.getItem(loginTokenKey);
+        if (!loginToken) {
+            window.location.assign("/login");
+        }
+
+        const socket = io({
+            auth: {
+                loginToken
+            }
+        });
         const commandInput = document.getElementById("command-input");
         const logContainer = document.getElementById("log");
         const roomDescription = document.getElementById("room-description");
@@ -371,6 +381,11 @@
             if (message === "You stop attacking." || message.startsWith("You have slain ")) {
                 setAttackIndicator(false);
             }
+        });
+
+        socket.on("connect_error", () => {
+            localStorage.removeItem(loginTokenKey);
+            window.location.assign("/login");
         });
 
         commandInput.focus();

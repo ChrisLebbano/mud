@@ -95,6 +95,7 @@
     </main>
     <script>
         const form = document.getElementById("login-form");
+        const loginTokenKey = "loginToken";
         const status = document.getElementById("status");
         const submitButton = document.getElementById("submit");
         const password = document.getElementById("password");
@@ -129,8 +130,15 @@
                     return;
                 }
 
+                if (!payload.loginToken) {
+                    setStatus("Login failed.", true);
+                    return;
+                }
+
+                localStorage.setItem(loginTokenKey, payload.loginToken);
                 setStatus(payload.message ?? "Login successful.", false);
                 form.reset();
+                window.location.assign("/game-client");
             } catch (error) {
                 setStatus("Login failed. Please try again.", true);
             } finally {

@@ -59,6 +59,8 @@ class FakeUserRepository {
         return Promise.resolve({
             email: userData.email,
             id: 1,
+            lastLoginOn: null,
+            loginToken: null,
             passwordHash: userData.passwordHash,
             username: userData.username
         });
@@ -120,6 +122,8 @@ describe(`[Class] SignupRequestHandler`, () => {
             const repository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 1,
+                lastLoginOn: null,
+                loginToken: null,
                 passwordHash: "hash",
                 username: "hero"
             }, null);
