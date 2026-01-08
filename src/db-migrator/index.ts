@@ -1,4 +1,4 @@
-import { type DatabaseConfig } from "../server/types/database";
+import { type DatabaseConfig } from "../application/server/types/database";
 import { type MigrationPoolFactory } from "../types/db-migrator";
 import { createPool } from "mysql2/promise";
 import { readdir, readFile } from "node:fs/promises";
@@ -93,4 +93,3 @@ if (require.main === module) {
         process.exitCode = 1;
     });
 }
-

@@ -1,4 +1,4 @@
-import { type DatabaseConfig } from "../server/types/database";
+import { type DatabaseConfig } from "../application/server/types/database";
 import { type PoolConnection } from "mysql2/promise";
 
 export interface MigrationConnection {
@@ -16,4 +16,3 @@ export interface MigrationPool {
 }
 
 export type MigrationPoolFactory = (config: DatabaseConfig) => MigrationPool;
-

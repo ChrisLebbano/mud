@@ -1,5 +1,5 @@
 import { DbMigrator } from "../../src/db-migrator";
-import { type DatabaseConfig } from "../../src/server/types/database";
+import { type DatabaseConfig } from "../../src/application/server/types/database";
 import { type MigrationPool, type MigrationPoolFactory } from "../../src/types/db-migrator";
 import { expect } from "chai";
 import { mkdtemp, writeFile } from "node:fs/promises";
