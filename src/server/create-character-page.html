@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create Character</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            align-items: center;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            justify-content: center;
+            margin: 0;
+            min-height: 100vh;
+            padding: 32px;
+        }
+
+        .card {
+            background-color: #1e293b;
+            border-radius: 16px;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+            max-width: 520px;
+            padding: 32px;
+            width: 100%;
+        }
+
+        .card h1 {
+            margin: 0 0 16px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+            gap: 8px;
+        }
+
+        input {
+            border: 1px solid #334155;
+            border-radius: 8px;
+            font-size: 16px;
+            padding: 10px 12px;
+        }
+
+        button {
+            background-color: #38bdf8;
+            border: none;
+            border-radius: 999px;
+            color: #0f172a;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 24px;
+            text-transform: uppercase;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .helper-text {
+            color: #cbd5f5;
+            font-size: 12px;
+        }
+
+        .status {
+            font-size: 14px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <h1>Create character</h1>
+        <form id="character-form">
+            <label>
+                Username
+                <input id="username" name="username" type="text" autocomplete="username" required>
+            </label>
+            <label>
+                Character name
+                <input id="character-name" name="character-name" type="text" required>
+                <span class="helper-text">4-15 letters, one word, formatted automatically.</span>
+            </label>
+            <label>
+                Character race
+                <input id="character-race" name="character-race" type="text" required>
+            </label>
+            <label>
+                Character class
+                <input id="character-class" name="character-class" type="text" required>
+            </label>
+            <button id="submit" type="submit">Create</button>
+            <p class="status" id="status" aria-live="polite"></p>
+        </form>
+    </main>
+    <script>
+        const form = document.getElementById("character-form");
+        const loginTokenKey = "loginToken";
+        const status = document.getElementById("status");
+        const submitButton = document.getElementById("submit");
+        const username = document.getElementById("username");
+        const characterName = document.getElementById("character-name");
+        const characterRace = document.getElementById("character-race");
+        const characterClass = document.getElementById("character-class");
+
+        const loginToken = localStorage.getItem(loginTokenKey);
+        if (!loginToken) {
+            window.location.assign("/login");
+        }
+
+        const formatName = (name) => {
+            const trimmedName = name.trim();
+            if (!trimmedName) {
+                return "";
+            }
+
+            const lowerCased = trimmedName.toLowerCase();
+            return lowerCased.charAt(0).toUpperCase() + lowerCased.slice(1);
+        };
+
+        const validateName = (name) => {
+            const formattedName = formatName(name);
+
+            if (!formattedName) {
+                return { error: "Character name is required.", formattedName, isValid: false };
+            }
+
+            if (formattedName.length < 4 || formattedName.length > 15) {
+                return { error: "Character name must be between 4 and 15 letters.", formattedName, isValid: false };
+            }
+
+            if (!/^[A-Za-z]+$/.test(formattedName)) {
+                return { error: "Character name must be one word with letters only.", formattedName, isValid: false };
+            }
+
+            const vowels = new Set(["a", "e", "i", "o", "u"]);
+            const lowerCasedName = formattedName.toLowerCase();
+            let repeatedVowelCount = 0;
+            let previousCharacter = "";
+
+            for (const character of lowerCasedName) {
+                if (character === previousCharacter && vowels.has(character)) {
+                    repeatedVowelCount += 1;
+                } else if (vowels.has(character)) {
+                    repeatedVowelCount = 1;
+                } else {
+                    repeatedVowelCount = 0;
+                }
+
+                if (repeatedVowelCount > 3) {
+                    return {
+                        error: "Character name cannot repeat the same vowel more than three times in a row.",
+                        formattedName,
+                        isValid: false
+                    };
+                }
+
+                previousCharacter = character;
+            }
+
+            return { error: null, formattedName, isValid: true };
+        };
+
+        const setStatus = (message, isError) => {
+            status.textContent = message;
+            status.style.color = isError ? "#fca5a5" : "#bbf7d0";
+        };
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            setStatus("", false);
+
+            if (!loginToken) {
+                setStatus("Please log in before creating a character.", true);
+                return;
+            }
+
+            const nameValidation = validateName(characterName.value);
+            characterName.value = nameValidation.formattedName;
+
+            if (!nameValidation.isValid) {
+                setStatus(nameValidation.error ?? "Invalid character name.", true);
+                return;
+            }
+
+            submitButton.disabled = true;
+
+            try {
+                const response = await fetch("/characters", {
+                    body: JSON.stringify({
+                        characterClassName: characterClass.value,
+                        characterName: nameValidation.formattedName,
+                        characterRaceName: characterRace.value,
+                        loginToken,
+                        username: username.value
+                    }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST"
+                });
+
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    setStatus(payload.error ?? "Character creation failed.", true);
+                    return;
+                }
+
+                setStatus(payload.message ?? "Character created.", false);
+                form.reset();
+            } catch (error) {
+                setStatus("Character creation failed. Please try again.", true);
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

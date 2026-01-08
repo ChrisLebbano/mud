@@ -1,0 +1,3 @@
+ALTER TABLE characters
+    ADD COLUMN race_name VARCHAR(100) NOT NULL DEFAULT '',
+    ADD COLUMN class_name VARCHAR(100) NOT NULL DEFAULT '';
