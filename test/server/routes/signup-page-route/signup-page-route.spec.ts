@@ -1,4 +1,4 @@
-import { SignupPageRoute } from "../../../src/server/signup-page-route";
+import { SignupPageRoute } from "../../../../src/server/routes/signup-page-route";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 
@@ -56,4 +56,3 @@ describe(`[Class] SignupPageRoute`, () => {
     });
 
 });
-

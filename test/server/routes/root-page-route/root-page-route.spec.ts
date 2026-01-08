@@ -1,4 +1,4 @@
-import { LoginPageRoute } from "../../../src/server/login-page-route";
+import { RootPageRoute } from "../../../../src/server/routes/root-page-route";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 
@@ -36,13 +36,13 @@ class FakeResponse {
 
 }
 
-describe(`[Class] LoginPageRoute`, () => {
+describe(`[Class] RootPageRoute`, () => {
 
     describe(`[Method] handle`, () => {
 
-        it(`should serve the login page html`, () => {
-            const route = new LoginPageRoute();
-            const request = { method: "GET", url: "/login" } as IncomingMessage;
+        it(`should serve the root page html`, () => {
+            const route = new RootPageRoute();
+            const request = { method: "GET", url: "/" } as IncomingMessage;
             const response = new FakeResponse() as unknown as ServerResponse;
 
             const handled = route.handle(request, response);
@@ -50,7 +50,7 @@ describe(`[Class] LoginPageRoute`, () => {
             expect(handled).to.equal(true);
             expect(response.statusCode).to.equal(200);
             expect(response.headers["Content-Type"]).to.equal("text/html");
-            expect(response.body).to.include("Log in");
+            expect(response.body).to.include("SIGN UP");
         });
 
     });
