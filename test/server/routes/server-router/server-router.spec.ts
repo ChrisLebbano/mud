@@ -1,5 +1,5 @@
-import { ServerRoute } from "../../../src/server/server-route";
-import { ServerRouter } from "../../../src/server/server-router";
+import { ServerRoute } from "../../../../src/server/routes/server-route";
+import { ServerRouter } from "../../../../src/server/routes/server-router";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 
@@ -79,4 +79,3 @@ describe(`[Class] ServerRouter`, () => {
     });
 
 });
-

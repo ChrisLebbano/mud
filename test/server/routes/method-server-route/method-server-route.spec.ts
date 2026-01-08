@@ -1,4 +1,4 @@
-import { MethodServerRoute } from "../../../src/server/method-server-route";
+import { MethodServerRoute } from "../../../../src/server/routes/method-server-route";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 
@@ -60,4 +60,3 @@ describe(`[Class] MethodServerRoute`, () => {
     });
 
 });
-

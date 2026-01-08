@@ -1,4 +1,4 @@
-import { RootPageRoute } from "../../../src/server/root-page-route";
+import { GameClientRoute } from "../../../../src/server/routes/game-client-route";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 
@@ -36,13 +36,13 @@ class FakeResponse {
 
 }
 
-describe(`[Class] RootPageRoute`, () => {
+describe(`[Class] GameClientRoute`, () => {
 
     describe(`[Method] handle`, () => {
 
-        it(`should serve the root page html`, () => {
-            const route = new RootPageRoute();
-            const request = { method: "GET", url: "/" } as IncomingMessage;
+        it(`should serve the game client html`, () => {
+            const route = new GameClientRoute();
+            const request = { url: "/game-client" } as IncomingMessage;
             const response = new FakeResponse() as unknown as ServerResponse;
 
             const handled = route.handle(request, response);
@@ -50,7 +50,7 @@ describe(`[Class] RootPageRoute`, () => {
             expect(handled).to.equal(true);
             expect(response.statusCode).to.equal(200);
             expect(response.headers["Content-Type"]).to.equal("text/html");
-            expect(response.body).to.include("SIGN UP");
+            expect(response.body).to.include("Game Client");
         });
 
     });
