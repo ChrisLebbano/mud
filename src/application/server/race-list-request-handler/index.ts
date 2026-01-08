@@ -1,11 +1,11 @@
-import { type RaceRepository } from "../race-repository";
+import { type RaceRepositoryClient } from "../types/race-repository";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 
 export class RaceListRequestHandler {
 
-    private _raceRepository: RaceRepository;
+    private _raceRepository: RaceRepositoryClient;
 
-    constructor(raceRepository: RaceRepository) {
+    constructor(raceRepository: RaceRepositoryClient) {
         this._raceRepository = raceRepository;
     }
 
@@ -40,4 +40,3 @@ export class RaceListRequestHandler {
     }
 
 }
-

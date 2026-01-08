@@ -70,7 +70,7 @@ describe(`[Class] RaceListRequestHandler`, () => {
             const handler = new RaceListRequestHandler(new FakeRaceRepository([
                 {
                     description: "Versatile adventurers.",
-                    id: 1,
+                    id: "human",
                     name: "Human"
                 }
             ]));
@@ -86,7 +86,7 @@ describe(`[Class] RaceListRequestHandler`, () => {
                 races: [
                     {
                         description: "Versatile adventurers.",
-                        id: 1,
+                        id: "human",
                         name: "Human"
                     }
                 ]
@@ -96,4 +96,3 @@ describe(`[Class] RaceListRequestHandler`, () => {
     });
 
 });
-

@@ -22,8 +22,10 @@ import { ServerRouter } from "./routes/server-router";
 import { SignupPageRoute } from "./routes/signup-page-route";
 import { SignupRequestHandler } from "./signup-request-handler";
 import { SocketServerFactory } from "./socket-server-factory";
+import { type CharacterClassRepositoryClient } from "./types/character-class-repository";
 import { type DatabaseConnectionClient } from "./types/database";
 import { type NodeHttpServer, type SocketServer } from "./types/http";
+import { type RaceRepositoryClient } from "./types/race-repository";
 import { type ServerConfig } from "./types/server-config";
 import { UserCommandHandler } from "./user-command-handler";
 import { UserRepository } from "./user-repository";
@@ -31,10 +33,10 @@ import { UserRepository } from "./user-repository";
 export class Server {
 
     private _characterRepository: CharacterRepository;
-    private _characterClassRepository: CharacterClassRepository;
+    private _characterClassRepository: CharacterClassRepositoryClient;
     private _databaseConnection: DatabaseConnectionClient;
     private _httpServer?: NodeHttpServer;
-    private _raceRepository: RaceRepository;
+    private _raceRepository: RaceRepositoryClient;
     private _serverConfig: ServerConfig;
     private _serverRouter: ServerRouter;
     private _socketServer?: SocketServer;
@@ -48,8 +50,8 @@ export class Server {
         databaseConnection: DatabaseConnectionClient,
         userRepository?: UserRepository,
         characterRepository?: CharacterRepository,
-        raceRepository?: RaceRepository,
-        characterClassRepository?: CharacterClassRepository
+        raceRepository?: RaceRepositoryClient,
+        characterClassRepository?: CharacterClassRepositoryClient
     ) {
         this._databaseConnection = databaseConnection;
         this._serverConfig = serverConfig;

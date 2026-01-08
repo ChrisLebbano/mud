@@ -1,8 +1,10 @@
 import { Application } from "./application";
 import { DatabaseConnection } from "./application/server/database-connection";
+import { StaticCharacterClassRepository } from "./application/server/static-character-class-repository";
+import { StaticRaceRepository } from "./application/server/static-race-repository";
 import { type DatabaseConfig } from "./application/server/types/database";
 import { type ServerConfig } from "./application/server/types/server-config";
-import { type WorldData } from "./game/types/world-data";
+import { type WorldBaseData, type WorldClassData, type WorldData, type WorldRaceData } from "./game/types/world-data";
 import { World } from "./game/world";
 import { createPool } from "mysql2/promise";
 import { readFileSync } from "node:fs";
@@ -30,11 +32,30 @@ const databaseConfig: DatabaseConfig = {
 const databaseTestTableName = "users";
 
 const worldDataPath = resolve(process.cwd(), "data", "world.json");
-const worldData = JSON.parse(readFileSync(worldDataPath, "utf8")) as WorldData;
+const classDataPath = resolve(process.cwd(), "data", "classes.json");
+const raceDataPath = resolve(process.cwd(), "data", "races.json");
+const worldBaseData = JSON.parse(readFileSync(worldDataPath, "utf8")) as WorldBaseData;
+const classData = JSON.parse(readFileSync(classDataPath, "utf8")) as WorldClassData[];
+const raceData = JSON.parse(readFileSync(raceDataPath, "utf8")) as WorldRaceData[];
+const worldData: WorldData = {
+    ...worldBaseData,
+    classes: classData,
+    races: raceData
+};
 const world = World.fromData(worldData);
 
 const databaseConnection = new DatabaseConnection(databaseConfig, createPool, databaseTestTableName);
-const application = new Application(serverConfig, world, databaseConnection);
+const raceRepository = new StaticRaceRepository(raceData.map((race) => ({
+    description: race.description,
+    id: race.id,
+    name: race.name
+})));
+const characterClassRepository = new StaticCharacterClassRepository(classData.map((characterClass) => ({
+    description: characterClass.description,
+    id: characterClass.id,
+    name: characterClass.name
+})));
+const application = new Application(serverConfig, world, databaseConnection, raceRepository, characterClassRepository);
 
 void databaseConnection.testConnection("process start");
 

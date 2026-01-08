@@ -1,11 +1,11 @@
-import { type CharacterClassRepository } from "../character-class-repository";
+import { type CharacterClassRepositoryClient } from "../types/character-class-repository";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 
 export class CharacterClassListRequestHandler {
 
-    private _characterClassRepository: CharacterClassRepository;
+    private _characterClassRepository: CharacterClassRepositoryClient;
 
-    constructor(characterClassRepository: CharacterClassRepository) {
+    constructor(characterClassRepository: CharacterClassRepositoryClient) {
         this._characterClassRepository = characterClassRepository;
     }
 
@@ -40,4 +40,3 @@ export class CharacterClassListRequestHandler {
     }
 
 }
-

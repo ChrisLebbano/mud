@@ -1,0 +1,39 @@
+[
+  {
+    "description": "Disciplined fighters who excel with weapons and armor.",
+    "id": "warrior",
+    "name": "Warrior",
+    "attributeModifiers": {
+      "strength": 2,
+      "agility": 1,
+      "dexterity": 1,
+      "perception": 0,
+      "constitution": 2,
+      "wisdom": -1,
+      "intelligence": -1,
+      "charisma": -1,
+      "resolve": 1,
+      "health": 6,
+      "mana": -2
+    }
+  },
+  {
+    "description": "Devout healers and protectors who channel divine power.",
+    "id": "cleric",
+    "name": "Cleric",
+    "attributeModifiers": {
+      "strength": -1,
+      "agility": 0,
+      "dexterity": 0,
+      "perception": 1,
+      "constitution": 1,
+      "wisdom": 2,
+      "intelligence": 2,
+      "charisma": 1,
+      "resolve": 2,
+      "health": 4,
+      "mana": 6
+    }
+  }
+]
+

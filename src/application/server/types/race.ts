@@ -2,7 +2,7 @@ import { RowDataPacket } from "mysql2";
 
 export interface RaceRecord {
     description: string | null;
-    id: number;
+    id: string;
     name: string;
 }
 
@@ -11,4 +11,3 @@ export interface RaceRow extends RowDataPacket {
     id: number;
     name: string;
 }
-

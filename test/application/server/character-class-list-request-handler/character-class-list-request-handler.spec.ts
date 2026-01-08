@@ -70,7 +70,7 @@ describe(`[Class] CharacterClassListRequestHandler`, () => {
             const handler = new CharacterClassListRequestHandler(new FakeCharacterClassRepository([
                 {
                     description: "Disciplined fighters.",
-                    id: 3,
+                    id: "fighter",
                     name: "Fighter"
                 }
             ]));
@@ -86,7 +86,7 @@ describe(`[Class] CharacterClassListRequestHandler`, () => {
                 classes: [
                     {
                         description: "Disciplined fighters.",
-                        id: 3,
+                        id: "fighter",
                         name: "Fighter"
                     }
                 ]
@@ -96,4 +96,3 @@ describe(`[Class] CharacterClassListRequestHandler`, () => {
     });
 
 });
-

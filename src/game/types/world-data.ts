@@ -1,15 +1,18 @@
 import { type CharacterAttributeValues } from "./character-attributes";
 import { ITEM_TYPE } from "./item-type";
 
-export interface WorldData {
-    classes: WorldClassData[];
+export interface WorldBaseData {
     items?: WorldItemData[];
     playerClassId: string;
     playerRaceId: string;
-    races: WorldRaceData[];
     startingRoomId: string;
     startingZoneId: string;
     zones: WorldZoneData[];
+}
+
+export interface WorldData extends WorldBaseData {
+    classes: WorldClassData[];
+    races: WorldRaceData[];
 }
 
 export interface WorldItemData {
@@ -58,4 +61,3 @@ export interface WorldRaceData {
 }
 
 export { ITEM_TYPE };
-

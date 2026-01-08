@@ -1,7 +1,8 @@
 import { type DatabaseConnectionClient } from "../types/database";
 import { type RaceRecord, type RaceRow } from "../types/race";
+import { type RaceRepositoryClient } from "../types/race-repository";
 
-export class RaceRepository {
+export class RaceRepository implements RaceRepositoryClient {
 
     private _databaseConnection: DatabaseConnectionClient;
 
@@ -18,10 +19,9 @@ export class RaceRepository {
 
         return rows.map((row) => ({
             description: row.description,
-            id: row.id,
+            id: String(row.id),
             name: row.name
         }));
     }
 
 }
-

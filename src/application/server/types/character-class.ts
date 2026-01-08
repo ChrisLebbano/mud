@@ -2,7 +2,7 @@ import { RowDataPacket } from "mysql2";
 
 export interface CharacterClassRecord {
     description: string | null;
-    id: number;
+    id: string;
     name: string;
 }
 
@@ -11,4 +11,3 @@ export interface CharacterClassRow extends RowDataPacket {
     id: number;
     name: string;
 }
-
