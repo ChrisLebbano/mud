@@ -5,13 +5,11 @@ import { World } from "../../src/game/world";
 import { Zone } from "../../src/game/zone";
 import { Server } from "../../src/server";
 import { NodeHttpServerFactory } from "../../src/server/node-http-server-factory";
-import { GameClientRoute } from "../../src/server/routes/game-client-route";
-import { ServerRouter } from "../../src/server/routes/server-router";
 import { SocketServerFactory } from "../../src/server/socket-server-factory";
 import { type DatabaseConnectionClient, type DatabasePoolFactory } from "../../src/server/types/database";
 import { type HttpRequestHandler, type NodeHttpServer, type SocketServer } from "../../src/server/types/http";
 import { type UserRecord } from "../../src/server/types/user";
-import { UserRepository } from "../../src/server/user-repository";
+import { type UserRepository } from "../../src/server/user-repository";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 
@@ -320,8 +318,7 @@ describe(`[Class] Server`, () => {
                 return createdSocketServer as unknown as SocketServer;
             };
 
-            const serverRouter = new ServerRouter([]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
+            const server = new Server({ port: 4321 }, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
 
             const startedServer = server.start();
 
@@ -358,8 +355,7 @@ describe(`[Class] Server`, () => {
                 return new FakeSocketServer() as unknown as SocketServer;
             };
 
-            const serverRouter = new ServerRouter([new GameClientRoute()]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
+            const server = new Server({ port: 4321 }, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
 
             server.start();
 
@@ -409,8 +405,7 @@ describe(`[Class] Server`, () => {
                 return createdSocketServer as unknown as SocketServer;
             };
 
-            const serverRouter = new ServerRouter([]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
+            const server = new Server({ port: 4321 }, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
 
             server.start();
 

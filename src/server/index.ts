@@ -1,7 +1,21 @@
 import { World } from "../game/world";
+import { CharacterNameValidator } from "./character-name-validator";
+import { CharacterRepository } from "./character-repository";
+import { CreateCharacterRequestHandler } from "./create-character-request-handler";
+import { JsonBodyParser } from "./json-body-parser";
+import { LoginRequestHandler } from "./login-request-handler";
+import { LoginTokenGenerator } from "./login-token-generator";
 import { NodeHttpServerFactory } from "./node-http-server-factory";
+import { PasswordHasher } from "./password-hasher";
+import { CreateCharacterPageRoute } from "./routes/create-character-page-route";
+import { GameClientRoute } from "./routes/game-client-route";
+import { LoginPageRoute } from "./routes/login-page-route";
+import { MethodServerRoute } from "./routes/method-server-route";
+import { RootPageRoute } from "./routes/root-page-route";
 import { ServerRouter } from "./routes/server-router";
+import { SignupPageRoute } from "./routes/signup-page-route";
 import { SocketServerFactory } from "./socket-server-factory";
+import { SignupRequestHandler } from "./signup-request-handler";
 import { type DatabaseConnectionClient } from "./types/database";
 import { type NodeHttpServer, type SocketServer } from "./types/http";
 import { type ServerConfig } from "./types/server-config";
@@ -19,13 +33,37 @@ export class Server {
     private _userRepository: UserRepository;
     private _world: World;
 
-    constructor(serverConfig: ServerConfig, serverRouter: ServerRouter, world: World, databaseConnection: DatabaseConnectionClient, userRepository: UserRepository, userCommandHandler?: UserCommandHandler) {
+    constructor(serverConfig: ServerConfig, world: World, databaseConnection: DatabaseConnectionClient, userRepository?: UserRepository) {
         this._databaseConnection = databaseConnection;
         this._serverConfig = serverConfig;
-        this._serverRouter = serverRouter;
-        this._userRepository = userRepository;
         this._world = world;
-        this._userCommandHandler = userCommandHandler ? userCommandHandler : new UserCommandHandler(world);
+        this._userRepository = userRepository ? userRepository : new UserRepository(databaseConnection);
+        this._userCommandHandler = new UserCommandHandler(world);
+
+        const jsonBodyParser = new JsonBodyParser();
+        const characterNameValidator = new CharacterNameValidator();
+        const loginTokenGenerator = new LoginTokenGenerator();
+        const passwordHasher = new PasswordHasher();
+        const characterRepository = new CharacterRepository(databaseConnection);
+        const createCharacterRequestHandler = new CreateCharacterRequestHandler(
+            jsonBodyParser,
+            characterNameValidator,
+            characterRepository,
+            this._userRepository
+        );
+        const loginRequestHandler = new LoginRequestHandler(jsonBodyParser, loginTokenGenerator, passwordHasher, this._userRepository);
+        const signupRequestHandler = new SignupRequestHandler(jsonBodyParser, passwordHasher, this._userRepository);
+        const serverRoutes = [
+            new RootPageRoute(),
+            new CreateCharacterPageRoute(),
+            new GameClientRoute(),
+            new LoginPageRoute(),
+            new SignupPageRoute(),
+            new MethodServerRoute("/characters", "POST", createCharacterRequestHandler.handle.bind(createCharacterRequestHandler)),
+            new MethodServerRoute("/login", "POST", loginRequestHandler.handle.bind(loginRequestHandler)),
+            new MethodServerRoute("/signup", "POST", signupRequestHandler.handle.bind(signupRequestHandler))
+        ];
+        this._serverRouter = new ServerRouter(serverRoutes);
     }
 
     private configureSocketServer(): void {
