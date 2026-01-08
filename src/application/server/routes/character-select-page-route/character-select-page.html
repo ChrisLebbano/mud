@@ -39,9 +39,9 @@
         }
 
         .character-grid {
-            display: grid;
+            display: flex;
+            flex-direction: column;
             gap: 16px;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
         }
 
         .character-button {
@@ -65,11 +65,6 @@
             opacity: 0.7;
         }
 
-        .status {
-            font-size: 14px;
-            min-height: 20px;
-            margin-top: 16px;
-        }
     </style>
 </head>
 <body>
@@ -77,23 +72,16 @@
         <h1>Select your character</h1>
         <p>Choose who you want to play as, or create a new adventurer.</p>
         <div class="character-grid" id="character-grid"></div>
-        <p class="status" id="status" aria-live="polite"></p>
     </main>
     <script>
         const characterGrid = document.getElementById("character-grid");
         const loginTokenKey = "loginToken";
         const selectedCharacterKey = "selectedCharacterName";
-        const status = document.getElementById("status");
 
         const loginToken = localStorage.getItem(loginTokenKey);
         if (!loginToken) {
             window.location.assign("/login");
         }
-
-        const setStatus = (message, isError) => {
-            status.textContent = message;
-            status.style.color = isError ? "#fca5a5" : "#bbf7d0";
-        };
 
         const createButton = (label, isCreateNew, characterName) => {
             const button = document.createElement("button");
@@ -130,14 +118,11 @@
         };
 
         const loadCharacters = async () => {
-            setStatus("", false);
-
             try {
                 const response = await fetch(`/characters?loginToken=${encodeURIComponent(loginToken ?? "")}`);
                 const payload = await response.json();
 
                 if (!response.ok) {
-                    setStatus(payload.error ?? "Unable to load characters.", true);
                     renderButtons([]);
                     return;
                 }
@@ -145,7 +130,6 @@
                 const characters = Array.isArray(payload.characters) ? payload.characters : [];
                 renderButtons(characters.slice(0, 8));
             } catch (error) {
-                setStatus("Unable to load characters.", true);
                 renderButtons([]);
             }
         };
