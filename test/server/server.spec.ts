@@ -10,6 +10,8 @@ import { ServerRouter } from "../../src/server/server-router";
 import { SocketServerFactory } from "../../src/server/socket-server-factory";
 import { type DatabaseConnectionClient, type DatabasePoolFactory } from "../../src/server/types/database";
 import { type HttpRequestHandler, type NodeHttpServer, type SocketServer } from "../../src/server/types/http";
+import { type UserRecord } from "../../src/server/types/user";
+import { UserRepository } from "../../src/server/user-repository";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 
@@ -124,18 +126,35 @@ class FakeSocketServer {
 
 class FakeSocket {
 
+    private _disconnectCalls = 0;
     private _id: string;
     private _disconnectListeners: Array<() => void> = [];
     private _emits: Array<Record<string, unknown>> = [];
+    private _handshake: { auth?: { loginToken?: string } } = {};
     private _joinedRooms: Set<string> = new Set();
     private _submitListeners: Array<(command: string) => void> = [];
 
-    constructor(id?: string) {
+    constructor(id?: string, loginToken?: string) {
         this._id = id ? id : "fake-socket";
+        if (loginToken) {
+            this._handshake.auth = { loginToken };
+        }
+    }
+
+    public disconnect(): void {
+        this._disconnectCalls += 1;
+    }
+
+    public get disconnectCalls(): number {
+        return this._disconnectCalls;
     }
 
     public emit(event: string, payload: unknown): void {
         this._emits.push({ event, payload });
+    }
+
+    public get handshake(): { auth?: { loginToken?: string } } {
+        return this._handshake;
     }
 
     public get disconnectListeners(): Array<() => void> {
@@ -206,6 +225,36 @@ class FakeDatabaseConnection implements DatabaseConnectionClient {
 
 }
 
+class FakeUserRepository {
+
+    private _user: UserRecord | null;
+
+    constructor(user: UserRecord | null) {
+        this._user = user;
+    }
+
+    public createUser(): Promise<UserRecord> {
+        throw new Error("Not implemented.");
+    }
+
+    public findByEmail(): Promise<UserRecord | null> {
+        throw new Error("Not implemented.");
+    }
+
+    public findByLoginToken(): Promise<UserRecord | null> {
+        return Promise.resolve(this._user);
+    }
+
+    public findByUsername(): Promise<UserRecord | null> {
+        throw new Error("Not implemented.");
+    }
+
+    public updateLoginToken(): Promise<void> {
+        throw new Error("Not implemented.");
+    }
+
+}
+
 const humanBaseAttributes = {
     agility: 10,
     charisma: 12,
@@ -250,6 +299,14 @@ describe(`[Class] Server`, () => {
             const originalHttpServerFactory = NodeHttpServerFactory.createServer;
             const originalSocketServerFactory = SocketServerFactory.createSocketIOServer;
             const databaseConnection = new FakeDatabaseConnection();
+            const userRepository = new FakeUserRepository({
+                email: "hero@example.com",
+                id: 1,
+                lastLoginOn: null,
+                loginToken: "token-123",
+                passwordHash: "hash",
+                username: "hero"
+            });
             const fakeServer = new FakeHttpServer();
             let createdSocketServer: FakeSocketServer | undefined;
 
@@ -264,7 +321,7 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection);
+            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
 
             const startedServer = server.start();
 
@@ -282,6 +339,14 @@ describe(`[Class] Server`, () => {
             const originalHttpServerFactory = NodeHttpServerFactory.createServer;
             const originalSocketServerFactory = SocketServerFactory.createSocketIOServer;
             const databaseConnection = new FakeDatabaseConnection();
+            const userRepository = new FakeUserRepository({
+                email: "hero@example.com",
+                id: 1,
+                lastLoginOn: null,
+                loginToken: "token-123",
+                passwordHash: "hash",
+                username: "hero"
+            });
             const fakeServer = new FakeHttpServer();
 
             NodeHttpServerFactory.createServer = (handler: HttpRequestHandler): NodeHttpServer => {
@@ -294,7 +359,7 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([new GameClientRoute()]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection);
+            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
 
             server.start();
 
@@ -311,11 +376,19 @@ describe(`[Class] Server`, () => {
             SocketServerFactory.createSocketIOServer = originalSocketServerFactory;
         });
 
-        it(`should log submitted commands from socket connections`, () => {
+        it(`should log submitted commands from socket connections`, async () => {
             const originalHttpServerFactory = NodeHttpServerFactory.createServer;
             const originalSocketServerFactory = SocketServerFactory.createSocketIOServer;
             const originalConsoleLog = console.log;
             const databaseConnection = new FakeDatabaseConnection();
+            const userRepository = new FakeUserRepository({
+                email: "hero@example.com",
+                id: 1,
+                lastLoginOn: null,
+                loginToken: "token-123",
+                passwordHash: "hash",
+                username: "hero"
+            });
             const fakeServer = new FakeHttpServer();
             const logMessages: string[] = [];
             let createdSocketServer: FakeSocketServer | undefined;
@@ -337,14 +410,15 @@ describe(`[Class] Server`, () => {
             };
 
             const serverRouter = new ServerRouter([]);
-            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection);
+            const server = new Server({ port: 4321 }, serverRouter, createWorld(), databaseConnection, userRepository as unknown as UserRepository);
 
             server.start();
 
-            const fakeSocket = new FakeSocket();
+            const fakeSocket = new FakeSocket("fake-socket", "token-123");
 
             expect(createdSocketServer).to.be.ok;
             createdSocketServer?.connectionListeners.forEach((listener) => listener(fakeSocket));
+            await new Promise((resolve) => setImmediate(resolve));
             fakeSocket.submitListeners.forEach((listener) => listener("look"));
 
             expect(logMessages).to.deep.equal([

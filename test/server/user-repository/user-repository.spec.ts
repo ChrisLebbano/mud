@@ -64,6 +64,8 @@ describe(`[Class] UserRepository`, () => {
             expect(user).to.deep.equal({
                 email: "user@example.com",
                 id: 12,
+                lastLoginOn: null,
+                loginToken: null,
                 passwordHash: "hash",
                 username: "hero"
             });
@@ -85,6 +87,8 @@ describe(`[Class] UserRepository`, () => {
                 {
                     email: "user@example.com",
                     id: 44,
+                    lastLoginOn: null,
+                    loginToken: "token-123",
                     password_hash: "hash",
                     username: "hero"
                 }
@@ -96,13 +100,15 @@ describe(`[Class] UserRepository`, () => {
             expect(result).to.deep.equal({
                 email: "user@example.com",
                 id: 44,
+                lastLoginOn: null,
+                loginToken: "token-123",
                 passwordHash: "hash",
                 username: "hero"
             });
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["user@example.com"],
-                    statement: "SELECT id, username, email, password_hash FROM users WHERE email = ? LIMIT 1"
+                    statement: "SELECT id, username, email, password_hash, loginToken, lastLoginOn FROM users WHERE email = ? LIMIT 1"
                 }
             ]);
         });
@@ -119,6 +125,52 @@ describe(`[Class] UserRepository`, () => {
 
     });
 
+    describe(`[Method] findByLoginToken`, () => {
+
+        it(`should return a user when found`, async () => {
+            const pool = new FakePool();
+            pool.queueResult([
+                {
+                    email: "user@example.com",
+                    id: 90,
+                    lastLoginOn: null,
+                    loginToken: "token-456",
+                    password_hash: "hash",
+                    username: "hero"
+                }
+            ]);
+            const repository = new UserRepository(new FakeDatabaseConnection(pool));
+
+            const result = await repository.findByLoginToken("token-456");
+
+            expect(result).to.deep.equal({
+                email: "user@example.com",
+                id: 90,
+                lastLoginOn: null,
+                loginToken: "token-456",
+                passwordHash: "hash",
+                username: "hero"
+            });
+            expect(pool.executeCalls).to.deep.equal([
+                {
+                    params: ["token-456"],
+                    statement: "SELECT id, username, email, password_hash, loginToken, lastLoginOn FROM users WHERE loginToken = ? LIMIT 1"
+                }
+            ]);
+        });
+
+        it(`should return null when no token matches`, async () => {
+            const pool = new FakePool();
+            pool.queueResult([]);
+            const repository = new UserRepository(new FakeDatabaseConnection(pool));
+
+            const result = await repository.findByLoginToken("missing");
+
+            expect(result).to.equal(null);
+        });
+
+    });
+
     describe(`[Method] findByUsername`, () => {
 
         it(`should return a user when found`, async () => {
@@ -127,6 +179,8 @@ describe(`[Class] UserRepository`, () => {
                 {
                     email: "user@example.com",
                     id: 55,
+                    lastLoginOn: null,
+                    loginToken: "token-456",
                     password_hash: "hash",
                     username: "hero"
                 }
@@ -138,13 +192,15 @@ describe(`[Class] UserRepository`, () => {
             expect(result).to.deep.equal({
                 email: "user@example.com",
                 id: 55,
+                lastLoginOn: null,
+                loginToken: "token-456",
                 passwordHash: "hash",
                 username: "hero"
             });
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["hero"],
-                    statement: "SELECT id, username, email, password_hash FROM users WHERE username = ? LIMIT 1"
+                    statement: "SELECT id, username, email, password_hash, loginToken, lastLoginOn FROM users WHERE username = ? LIMIT 1"
                 }
             ]);
         });
@@ -157,6 +213,26 @@ describe(`[Class] UserRepository`, () => {
             const result = await repository.findByUsername("missing");
 
             expect(result).to.equal(null);
+        });
+
+    });
+
+    describe(`[Method] updateLoginToken`, () => {
+
+        it(`should update the login token and timestamp`, async () => {
+            const pool = new FakePool();
+            pool.queueResult({ affectedRows: 1 });
+            const repository = new UserRepository(new FakeDatabaseConnection(pool));
+            const lastLoginOn = new Date("2024-08-30T10:00:00Z");
+
+            await repository.updateLoginToken(12, "token-999", lastLoginOn);
+
+            expect(pool.executeCalls).to.deep.equal([
+                {
+                    params: ["token-999", lastLoginOn, 12],
+                    statement: "UPDATE users SET loginToken = ?, lastLoginOn = ? WHERE id = ?"
+                }
+            ]);
         });
 
     });

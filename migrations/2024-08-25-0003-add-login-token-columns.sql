@@ -1,0 +1,4 @@
+ALTER TABLE users
+  ADD COLUMN loginToken VARCHAR(255) NULL,
+  ADD COLUMN lastLoginOn DATETIME NULL;
+

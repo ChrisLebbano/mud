@@ -1,4 +1,5 @@
 import { LoginRequestHandler } from "../../../src/server/login-request-handler";
+import { type LoginTokenGenerator } from "../../../src/server/login-token-generator";
 import { type UserLoginPayload, type UserRecord } from "../../../src/server/types/user";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
@@ -43,9 +44,24 @@ class FakePasswordHasher {
 
 }
 
+class FakeLoginTokenGenerator implements LoginTokenGenerator {
+
+    private _token: string;
+
+    constructor(token: string) {
+        this._token = token;
+    }
+
+    public generate(): string {
+        return this._token;
+    }
+
+}
+
 class FakeUserRepository {
 
     private _user: UserRecord | null;
+    private _updateCalls: Array<{ lastLoginOn: Date; loginToken: string; userId: number }> = [];
 
     constructor(user: UserRecord | null) {
         this._user = user;
@@ -53,6 +69,15 @@ class FakeUserRepository {
 
     public findByUsername(): Promise<UserRecord | null> {
         return Promise.resolve(this._user);
+    }
+
+    public get updateCalls(): Array<{ lastLoginOn: Date; loginToken: string; userId: number }> {
+        return this._updateCalls;
+    }
+
+    public updateLoginToken(userId: number, loginToken: string, lastLoginOn: Date): Promise<void> {
+        this._updateCalls.push({ lastLoginOn, loginToken, userId });
+        return Promise.resolve();
     }
 
 }
@@ -95,9 +120,10 @@ describe(`[Class] LoginRequestHandler`, () => {
 
         it(`should reject invalid credentials`, async () => {
             const parser = new FakeJsonBodyParser({ password: "pass", username: "hero" }, false);
+            const tokenGenerator = new FakeLoginTokenGenerator("token-123");
             const hasher = new FakePasswordHasher(false);
             const repository = new FakeUserRepository(null);
-            const handler = new LoginRequestHandler(parser, hasher, repository);
+            const handler = new LoginRequestHandler(parser, tokenGenerator, hasher, repository);
             const request = { method: "POST" } as IncomingMessage;
             const response = new FakeResponse() as unknown as ServerResponse;
 
@@ -110,18 +136,22 @@ describe(`[Class] LoginRequestHandler`, () => {
             expect((response as unknown as FakeResponse).statusCode).to.equal(401);
             expect(body).to.deep.equal({ error: "Invalid credentials" });
             expect(hasher.verifyCalls).to.deep.equal([]);
+            expect(repository.updateCalls).to.deep.equal([]);
         });
 
         it(`should return success for valid credentials`, async () => {
             const parser = new FakeJsonBodyParser({ password: "pass", username: "hero" }, false);
+            const tokenGenerator = new FakeLoginTokenGenerator("token-123");
             const hasher = new FakePasswordHasher(true);
             const repository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 1,
+                lastLoginOn: null,
+                loginToken: null,
                 passwordHash: "hash",
                 username: "hero"
             });
-            const handler = new LoginRequestHandler(parser, hasher, repository);
+            const handler = new LoginRequestHandler(parser, tokenGenerator, hasher, repository);
             const request = { method: "POST" } as IncomingMessage;
             const response = new FakeResponse() as unknown as ServerResponse;
 
@@ -132,25 +162,32 @@ describe(`[Class] LoginRequestHandler`, () => {
             const body = JSON.parse((response as unknown as FakeResponse).body);
 
             expect((response as unknown as FakeResponse).statusCode).to.equal(200);
-            expect(body).to.deep.equal({ message: "Login successful for hero." });
+            expect(body).to.deep.equal({ loginToken: "token-123", message: "Login successful for hero." });
             expect(hasher.verifyCalls).to.deep.equal([
                 {
                     password: "pass",
                     passwordHash: "hash"
                 }
             ]);
+            expect(repository.updateCalls).to.have.lengthOf(1);
+            expect(repository.updateCalls[0].loginToken).to.equal("token-123");
+            expect(repository.updateCalls[0].userId).to.equal(1);
+            expect(repository.updateCalls[0].lastLoginOn).to.be.instanceOf(Date);
         });
 
         it(`should reject when the password does not match`, async () => {
             const parser = new FakeJsonBodyParser({ password: "pass", username: "hero" }, false);
+            const tokenGenerator = new FakeLoginTokenGenerator("token-123");
             const hasher = new FakePasswordHasher(false);
             const repository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 1,
+                lastLoginOn: null,
+                loginToken: null,
                 passwordHash: "hash",
                 username: "hero"
             });
-            const handler = new LoginRequestHandler(parser, hasher, repository);
+            const handler = new LoginRequestHandler(parser, tokenGenerator, hasher, repository);
             const request = { method: "POST" } as IncomingMessage;
             const response = new FakeResponse() as unknown as ServerResponse;
 
@@ -168,6 +205,7 @@ describe(`[Class] LoginRequestHandler`, () => {
                     passwordHash: "hash"
                 }
             ]);
+            expect(repository.updateCalls).to.deep.equal([]);
         });
 
     });

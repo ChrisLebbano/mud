@@ -2,6 +2,7 @@ import { Server } from "..";
 import { World } from "../../game/world";
 import { GameClientRoute } from "../game-client-route";
 import { JsonBodyParser } from "../json-body-parser";
+import { LoginTokenGenerator } from "../login-token-generator";
 import { LoginPageRoute } from "../login-page-route";
 import { LoginRequestHandler } from "../login-request-handler";
 import { MethodServerRoute } from "../method-server-route";
@@ -34,9 +35,10 @@ export class Application {
     public init(): void {
         this._databaseConnection.connect();
         const jsonBodyParser = new JsonBodyParser();
+        const loginTokenGenerator = new LoginTokenGenerator();
         const passwordHasher = new PasswordHasher();
         const userRepository = new UserRepository(this._databaseConnection);
-        const loginRequestHandler = new LoginRequestHandler(jsonBodyParser, passwordHasher, userRepository);
+        const loginRequestHandler = new LoginRequestHandler(jsonBodyParser, loginTokenGenerator, passwordHasher, userRepository);
         const signupRequestHandler = new SignupRequestHandler(jsonBodyParser, passwordHasher, userRepository);
         const serverRoutes = [
             new RootPageRoute(),
@@ -47,7 +49,7 @@ export class Application {
             new MethodServerRoute("/signup", "POST", signupRequestHandler.handle.bind(signupRequestHandler))
         ];
         const serverRouter = new ServerRouter(serverRoutes);
-        this._server = new Server(this._serverConfig, serverRouter, this._world, this._databaseConnection);
+        this._server = new Server(this._serverConfig, serverRouter, this._world, this._databaseConnection, userRepository);
         this._server.start();
     }
 
