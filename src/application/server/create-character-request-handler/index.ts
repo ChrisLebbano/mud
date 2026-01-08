@@ -42,23 +42,22 @@ export class CreateCharacterRequestHandler {
             }
 
             if (!payload || typeof payload !== "object") {
-                sendJson(400, { error: "Username, login token, name, race name, and class name are required." });
+                sendJson(400, { error: "Login token, name, race name, and class name are required." });
                 return;
             }
 
-            const username = typeof payload.username === "string" ? payload.username.trim() : "";
             const loginToken = typeof payload.loginToken === "string" ? payload.loginToken.trim() : "";
             const characterName = typeof payload.characterName === "string" ? payload.characterName.trim() : "";
             const raceName = typeof payload.characterRaceName === "string" ? payload.characterRaceName.trim() : "";
             const className = typeof payload.characterClassName === "string" ? payload.characterClassName.trim() : "";
 
-            if (!username || !loginToken || !characterName || !raceName || !className) {
-                sendJson(400, { error: "Username, login token, name, race name, and class name are required." });
+            if (!loginToken || !characterName || !raceName || !className) {
+                sendJson(400, { error: "Login token, name, race name, and class name are required." });
                 return;
             }
 
-            const user = await this._userRepository.findByUsername(username);
-            if (!user || user.loginToken !== loginToken) {
+            const user = await this._userRepository.findByLoginToken(loginToken);
+            if (!user) {
                 sendJson(401, { error: "Authentication required." });
                 return;
             }
