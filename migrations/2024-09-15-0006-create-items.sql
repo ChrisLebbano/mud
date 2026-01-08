@@ -7,10 +7,3 @@ CREATE TABLE IF NOT EXISTS items (
     PRIMARY KEY (id),
     UNIQUE KEY unique_items_name (name)
 );
-
-INSERT INTO items (name, description, type)
-VALUES
-    ('slice of bread', 'A simple slice of bread.', 'FOOD'),
-    ('water flask', 'A leather-bound flask filled with water.', 'DRINK');
-
-
