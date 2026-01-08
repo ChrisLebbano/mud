@@ -201,13 +201,20 @@
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
         const loginTokenKey = "loginToken";
+        const selectedCharacterKey = "selectedCharacterName";
         const loginToken = localStorage.getItem(loginTokenKey);
+        const selectedCharacterName = localStorage.getItem(selectedCharacterKey);
         if (!loginToken) {
             window.location.assign("/login");
         }
 
+        if (!selectedCharacterName) {
+            window.location.assign("/character/select");
+        }
+
         const socket = io({
             auth: {
+                characterName: selectedCharacterName,
                 loginToken
             }
         });
@@ -385,6 +392,7 @@
 
         socket.on("connect_error", () => {
             localStorage.removeItem(loginTokenKey);
+            localStorage.removeItem(selectedCharacterKey);
             window.location.assign("/login");
         });
 

@@ -47,4 +47,20 @@ export class CharacterRepository {
         };
     }
 
+    public async findByUserId(userId: number): Promise<CharacterRecord[]> {
+        const pool = this._databaseConnection.connect();
+        const [rows] = await pool.execute<CharacterRow[]>(
+            "SELECT id, name, user_id, race_name, class_name FROM characters WHERE user_id = ? ORDER BY name ASC",
+            [userId]
+        );
+
+        return rows.map((row) => ({
+            className: row.class_name,
+            id: row.id,
+            name: row.name,
+            raceName: row.race_name,
+            userId: row.user_id
+        }));
+    }
+
 }

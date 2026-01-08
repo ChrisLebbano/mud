@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Select Character</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            align-items: center;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            justify-content: center;
+            margin: 0;
+            min-height: 100vh;
+            padding: 32px;
+        }
+
+        .card {
+            background-color: #1e293b;
+            border-radius: 16px;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+            max-width: 640px;
+            padding: 32px;
+            width: 100%;
+        }
+
+        .card h1 {
+            margin: 0 0 8px;
+        }
+
+        .card p {
+            margin: 0 0 24px;
+        }
+
+        .character-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .character-button {
+            background-color: #38bdf8;
+            border: none;
+            border-radius: 12px;
+            color: #0f172a;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 16px;
+            text-transform: uppercase;
+        }
+
+        .character-button.create-new {
+            background-color: #facc15;
+        }
+
+        .character-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+    </style>
+</head>
+<body>
+    <main class="card">
+        <h1>Select your character</h1>
+        <p>Choose who you want to play as, or create a new adventurer.</p>
+        <div class="character-grid" id="character-grid"></div>
+    </main>
+    <script>
+        const characterGrid = document.getElementById("character-grid");
+        const loginTokenKey = "loginToken";
+        const selectedCharacterKey = "selectedCharacterName";
+
+        const loginToken = localStorage.getItem(loginTokenKey);
+        if (!loginToken) {
+            window.location.assign("/login");
+        }
+
+        const createButton = (label, isCreateNew, characterName) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = `character-button${isCreateNew ? " create-new" : ""}`;
+            button.textContent = label;
+            button.addEventListener("click", () => {
+                if (isCreateNew) {
+                    localStorage.removeItem(selectedCharacterKey);
+                    window.location.assign("/character/create");
+                    return;
+                }
+
+                if (!characterName) {
+                    return;
+                }
+
+                localStorage.setItem(selectedCharacterKey, characterName);
+                window.location.assign("/game-client");
+            });
+            return button;
+        };
+
+        const renderButtons = (characters) => {
+            const slots = Array.from({ length: 8 }, (_, index) => characters[index] ?? null);
+            slots.forEach((character) => {
+                if (character) {
+                    characterGrid.append(createButton(character.name, false, character.name));
+                    return;
+                }
+
+                characterGrid.append(createButton("create character", true));
+            });
+        };
+
+        const loadCharacters = async () => {
+            try {
+                const response = await fetch(`/characters?loginToken=${encodeURIComponent(loginToken ?? "")}`);
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    renderButtons([]);
+                    return;
+                }
+
+                const characters = Array.isArray(payload.characters) ? payload.characters : [];
+                renderButtons(characters.slice(0, 8));
+            } catch (error) {
+                renderButtons([]);
+            }
+        };
+
+        void loadCharacters();
+    </script>
+</body>
+</html>

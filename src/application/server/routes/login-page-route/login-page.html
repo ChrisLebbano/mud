@@ -138,7 +138,7 @@
                 localStorage.setItem(loginTokenKey, payload.loginToken);
                 setStatus(payload.message ?? "Login successful.", false);
                 form.reset();
-                window.location.assign("/game-client");
+                window.location.assign("/character/select");
             } catch (error) {
                 setStatus("Login failed. Please try again.", true);
             } finally {

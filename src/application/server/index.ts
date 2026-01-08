@@ -1,4 +1,5 @@
 import { World } from "../../game/world";
+import { CharacterListRequestHandler } from "./character-list-request-handler";
 import { CharacterNameValidator } from "./character-name-validator";
 import { CharacterRepository } from "./character-repository";
 import { CreateCharacterRequestHandler } from "./create-character-request-handler";
@@ -7,6 +8,7 @@ import { LoginRequestHandler } from "./login-request-handler";
 import { LoginTokenGenerator } from "./login-token-generator";
 import { NodeHttpServerFactory } from "./node-http-server-factory";
 import { PasswordHasher } from "./password-hasher";
+import { CharacterSelectPageRoute } from "./routes/character-select-page-route";
 import { CreateCharacterPageRoute } from "./routes/create-character-page-route";
 import { GameClientRoute } from "./routes/game-client-route";
 import { LoginPageRoute } from "./routes/login-page-route";
@@ -24,6 +26,7 @@ import { UserRepository } from "./user-repository";
 
 export class Server {
 
+    private _characterRepository: CharacterRepository;
     private _databaseConnection: DatabaseConnectionClient;
     private _httpServer?: NodeHttpServer;
     private _serverConfig: ServerConfig;
@@ -33,10 +36,17 @@ export class Server {
     private _userRepository: UserRepository;
     private _world: World;
 
-    constructor(serverConfig: ServerConfig, world: World, databaseConnection: DatabaseConnectionClient, userRepository?: UserRepository) {
+    constructor(
+        serverConfig: ServerConfig,
+        world: World,
+        databaseConnection: DatabaseConnectionClient,
+        userRepository?: UserRepository,
+        characterRepository?: CharacterRepository
+    ) {
         this._databaseConnection = databaseConnection;
         this._serverConfig = serverConfig;
         this._world = world;
+        this._characterRepository = characterRepository ? characterRepository : new CharacterRepository(databaseConnection);
         this._userRepository = userRepository ? userRepository : new UserRepository(databaseConnection);
         this._userCommandHandler = new UserCommandHandler(world);
 
@@ -44,21 +54,26 @@ export class Server {
         const characterNameValidator = new CharacterNameValidator();
         const loginTokenGenerator = new LoginTokenGenerator();
         const passwordHasher = new PasswordHasher();
-        const characterRepository = new CharacterRepository(databaseConnection);
         const createCharacterRequestHandler = new CreateCharacterRequestHandler(
             jsonBodyParser,
             characterNameValidator,
-            characterRepository,
+            this._characterRepository,
+            this._userRepository
+        );
+        const characterListRequestHandler = new CharacterListRequestHandler(
+            this._characterRepository,
             this._userRepository
         );
         const loginRequestHandler = new LoginRequestHandler(jsonBodyParser, loginTokenGenerator, passwordHasher, this._userRepository);
         const signupRequestHandler = new SignupRequestHandler(jsonBodyParser, passwordHasher, this._userRepository);
         const serverRoutes = [
             new RootPageRoute(),
+            new CharacterSelectPageRoute(),
             new CreateCharacterPageRoute(),
             new GameClientRoute(),
             new LoginPageRoute(),
             new SignupPageRoute(),
+            new MethodServerRoute("/characters", "GET", characterListRequestHandler.handle.bind(characterListRequestHandler)),
             new MethodServerRoute("/characters", "POST", createCharacterRequestHandler.handle.bind(createCharacterRequestHandler)),
             new MethodServerRoute("/login", "POST", loginRequestHandler.handle.bind(loginRequestHandler)),
             new MethodServerRoute("/signup", "POST", signupRequestHandler.handle.bind(signupRequestHandler))
@@ -76,8 +91,11 @@ export class Server {
                 const loginToken = typeof socket.handshake?.auth?.loginToken === "string"
                     ? socket.handshake.auth.loginToken.trim()
                     : "";
+                const characterName = typeof socket.handshake?.auth?.characterName === "string"
+                    ? socket.handshake.auth.characterName.trim()
+                    : "";
 
-                if (!loginToken) {
+                if (!loginToken || !characterName) {
                     socket.emit("world:system", { category: "System", message: "Authentication required." });
                     socket.disconnect();
                     return;
@@ -90,12 +108,18 @@ export class Server {
                     return;
                 }
 
-                const playerName = user.username;
-                const joinResult = this._world.addPlayer(socket.id, playerName);
+                const character = await this._characterRepository.findByName(characterName);
+                if (!character || character.userId !== user.id) {
+                    socket.emit("world:system", { category: "System", message: "Authentication required." });
+                    socket.disconnect();
+                    return;
+                }
+
+                const joinResult = this._world.addPlayer(socket.id, character.name);
 
                 socket.join(joinResult.roomId);
                 socket.emit("world:room", joinResult.roomSnapshot);
-                socket.emit("world:system", { category: "System", message: `Welcome, ${playerName}.` });
+                socket.emit("world:system", { category: "System", message: `Welcome, ${character.name}.` });
                 socket.to(joinResult.roomId).emit("world:system", { category: "System", message: joinResult.systemMessage });
 
                 socket.on("disconnect", () => {
