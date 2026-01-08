@@ -125,7 +125,7 @@
                     return;
                 }
 
-                characterGrid.append(createButton("create new character", true));
+                characterGrid.append(createButton("create character", true));
             });
         };
 
@@ -138,17 +138,15 @@
 
                 if (!response.ok) {
                     setStatus(payload.error ?? "Unable to load characters.", true);
+                    renderButtons([]);
                     return;
                 }
 
-                if (!Array.isArray(payload.characters)) {
-                    setStatus("Unable to load characters.", true);
-                    return;
-                }
-
-                renderButtons(payload.characters.slice(0, 8));
+                const characters = Array.isArray(payload.characters) ? payload.characters : [];
+                renderButtons(characters.slice(0, 8));
             } catch (error) {
                 setStatus("Unable to load characters.", true);
+                renderButtons([]);
             }
         };
 
@@ -156,4 +154,3 @@
     </script>
 </body>
 </html>
-
