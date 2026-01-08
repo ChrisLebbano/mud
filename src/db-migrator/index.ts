@@ -30,7 +30,7 @@ export class DbMigrator {
   UNIQUE KEY unique_schema_migrations_name (name)
 )`);
 
-            const [rows] = await pool.query("SELECT name FROM schema_migrations");
+            const rows = await pool.query("SELECT name FROM schema_migrations");
             const appliedNames = new Set((rows as Array<{ name: string }>).map((row) => row.name));
             const migrationFiles = (await readdir(this._migrationsPath))
                 .filter((file) => file.endsWith(".sql"))
