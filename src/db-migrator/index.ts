@@ -23,14 +23,15 @@ export class DbMigrator {
 
         try {
             await pool.query(`CREATE TABLE IF NOT EXISTS schema_migrations (
-  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  name VARCHAR(255) NOT NULL,
-  applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (id),
-  UNIQUE KEY unique_schema_migrations_name (name)
-)`);
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL,
+                applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                UNIQUE KEY unique_schema_migrations_name (name)
+            )`);
 
-            const rows = await pool.query("SELECT name FROM schema_migrations");
+            const schemaMigrationsResults = await pool.query("SELECT name FROM schema_migrations");
+            const rows = schemaMigrationsResults[0];
             const appliedNames = new Set((rows as Array<{ name: string }>).map((row) => row.name));
             const migrationFiles = (await readdir(this._migrationsPath))
                 .filter((file) => file.endsWith(".sql"))
