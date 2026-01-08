@@ -1,10 +1,14 @@
 import { Server } from "..";
 import { World } from "../../game/world";
+import { CharacterNameValidator } from "../character-name-validator";
+import { CharacterRepository } from "../character-repository";
+import { CreateCharacterPageRoute } from "../create-character-page-route";
+import { CreateCharacterRequestHandler } from "../create-character-request-handler";
 import { GameClientRoute } from "../game-client-route";
 import { JsonBodyParser } from "../json-body-parser";
-import { LoginTokenGenerator } from "../login-token-generator";
 import { LoginPageRoute } from "../login-page-route";
 import { LoginRequestHandler } from "../login-request-handler";
+import { LoginTokenGenerator } from "../login-token-generator";
 import { MethodServerRoute } from "../method-server-route";
 import { PasswordHasher } from "../password-hasher";
 import { RootPageRoute } from "../root-page-route";
@@ -35,16 +39,26 @@ export class Application {
     public init(): void {
         this._databaseConnection.connect();
         const jsonBodyParser = new JsonBodyParser();
+        const characterNameValidator = new CharacterNameValidator();
         const loginTokenGenerator = new LoginTokenGenerator();
         const passwordHasher = new PasswordHasher();
+        const characterRepository = new CharacterRepository(this._databaseConnection);
         const userRepository = new UserRepository(this._databaseConnection);
+        const createCharacterRequestHandler = new CreateCharacterRequestHandler(
+            jsonBodyParser,
+            characterNameValidator,
+            characterRepository,
+            userRepository
+        );
         const loginRequestHandler = new LoginRequestHandler(jsonBodyParser, loginTokenGenerator, passwordHasher, userRepository);
         const signupRequestHandler = new SignupRequestHandler(jsonBodyParser, passwordHasher, userRepository);
         const serverRoutes = [
             new RootPageRoute(),
+            new CreateCharacterPageRoute(),
             new GameClientRoute(),
             new LoginPageRoute(),
             new SignupPageRoute(),
+            new MethodServerRoute("/characters", "POST", createCharacterRequestHandler.handle.bind(createCharacterRequestHandler)),
             new MethodServerRoute("/login", "POST", loginRequestHandler.handle.bind(loginRequestHandler)),
             new MethodServerRoute("/signup", "POST", signupRequestHandler.handle.bind(signupRequestHandler))
         ];

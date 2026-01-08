@@ -11,10 +11,13 @@ CREATE TABLE IF NOT EXISTS users (
   UNIQUE KEY unique_users_username (username)
 );
 
+
 CREATE TABLE IF NOT EXISTS characters (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   name VARCHAR(100) NOT NULL,
+  race_name VARCHAR(100) NOT NULL DEFAULT '',
+  class_name VARCHAR(100) NOT NULL DEFAULT '',
   user_id BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY unique_characters_name (name),
