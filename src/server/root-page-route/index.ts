@@ -5,7 +5,7 @@ import { join } from "node:path";
 export class RootPageRoute extends MethodServerRoute {
 
     constructor() {
-        const filePath = join(__dirname, "..", "root-page.html");
+        const filePath = join(__dirname, ".", "root-page.html");
         const rootPageHtml = readFileSync(filePath, { encoding: "utf-8" });
 
         super("/", "GET", (_request, response) => {

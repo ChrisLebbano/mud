@@ -5,7 +5,7 @@ import { join } from "node:path";
 export class GameClientRoute extends ServerRoute {
 
     constructor() {
-        const filePath = join(__dirname, "..", "game-client.html");
+        const filePath = join(__dirname, ".", "game-client.html");
         const gameClientHtml = readFileSync(filePath, { encoding: "utf-8" });
 
         super("/game-client", (_request, response) => {
