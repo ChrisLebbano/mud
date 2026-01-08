@@ -1,4 +1,6 @@
 import { World } from "../../game/world";
+import { CharacterClassListRequestHandler } from "./character-class-list-request-handler";
+import { CharacterClassRepository } from "./character-class-repository";
 import { CharacterListRequestHandler } from "./character-list-request-handler";
 import { CharacterNameValidator } from "./character-name-validator";
 import { CharacterRepository } from "./character-repository";
@@ -8,6 +10,8 @@ import { LoginRequestHandler } from "./login-request-handler";
 import { LoginTokenGenerator } from "./login-token-generator";
 import { NodeHttpServerFactory } from "./node-http-server-factory";
 import { PasswordHasher } from "./password-hasher";
+import { RaceListRequestHandler } from "./race-list-request-handler";
+import { RaceRepository } from "./race-repository";
 import { CharacterSelectPageRoute } from "./routes/character-select-page-route";
 import { CreateCharacterPageRoute } from "./routes/create-character-page-route";
 import { GameClientRoute } from "./routes/game-client-route";
@@ -27,8 +31,10 @@ import { UserRepository } from "./user-repository";
 export class Server {
 
     private _characterRepository: CharacterRepository;
+    private _characterClassRepository: CharacterClassRepository;
     private _databaseConnection: DatabaseConnectionClient;
     private _httpServer?: NodeHttpServer;
+    private _raceRepository: RaceRepository;
     private _serverConfig: ServerConfig;
     private _serverRouter: ServerRouter;
     private _socketServer?: SocketServer;
@@ -41,12 +47,18 @@ export class Server {
         world: World,
         databaseConnection: DatabaseConnectionClient,
         userRepository?: UserRepository,
-        characterRepository?: CharacterRepository
+        characterRepository?: CharacterRepository,
+        raceRepository?: RaceRepository,
+        characterClassRepository?: CharacterClassRepository
     ) {
         this._databaseConnection = databaseConnection;
         this._serverConfig = serverConfig;
         this._world = world;
         this._characterRepository = characterRepository ? characterRepository : new CharacterRepository(databaseConnection);
+        this._raceRepository = raceRepository ? raceRepository : new RaceRepository(databaseConnection);
+        this._characterClassRepository = characterClassRepository
+            ? characterClassRepository
+            : new CharacterClassRepository(databaseConnection);
         this._userRepository = userRepository ? userRepository : new UserRepository(databaseConnection);
         this._userCommandHandler = new UserCommandHandler(world);
 
@@ -65,6 +77,8 @@ export class Server {
             this._userRepository
         );
         const loginRequestHandler = new LoginRequestHandler(jsonBodyParser, loginTokenGenerator, passwordHasher, this._userRepository);
+        const raceListRequestHandler = new RaceListRequestHandler(this._raceRepository);
+        const characterClassListRequestHandler = new CharacterClassListRequestHandler(this._characterClassRepository);
         const signupRequestHandler = new SignupRequestHandler(jsonBodyParser, passwordHasher, this._userRepository);
         const serverRoutes = [
             new RootPageRoute(),
@@ -73,6 +87,8 @@ export class Server {
             new GameClientRoute(),
             new LoginPageRoute(),
             new SignupPageRoute(),
+            new MethodServerRoute("/races", "GET", raceListRequestHandler.handle.bind(raceListRequestHandler)),
+            new MethodServerRoute("/classes", "GET", characterClassListRequestHandler.handle.bind(characterClassListRequestHandler)),
             new MethodServerRoute("/characters", "GET", characterListRequestHandler.handle.bind(characterListRequestHandler)),
             new MethodServerRoute("/characters", "POST", createCharacterRequestHandler.handle.bind(createCharacterRequestHandler)),
             new MethodServerRoute("/login", "POST", loginRequestHandler.handle.bind(loginRequestHandler)),

@@ -129,10 +129,6 @@
         <h1>Create character</h1>
         <form id="character-form">
             <label>
-                Username
-                <input id="username" name="username" type="text" autocomplete="username" required>
-            </label>
-            <label>
                 Character name
                 <input id="character-name" name="character-name" type="text" required>
                 <span class="helper-text">4-15 letters, one word, formatted automatically.</span>
@@ -154,35 +150,9 @@
         const loginTokenKey = "loginToken";
         const status = document.getElementById("status");
         const submitButton = document.getElementById("submit");
-        const username = document.getElementById("username");
         const characterName = document.getElementById("character-name");
         const raceOptions = document.getElementById("race-options");
         const classOptions = document.getElementById("class-options");
-
-        const raceChoices = [
-            {
-                description: "Adaptable and ambitious inhabitants of the cities.",
-                id: "human",
-                name: "Human"
-            },
-            {
-                description: "Wild denizens that stalk the edges of civilization.",
-                id: "creature",
-                name: "Creature"
-            }
-        ];
-        const classChoices = [
-            {
-                description: "Disciplined fighters who excel with weapons and armor.",
-                id: "warrior",
-                name: "Warrior"
-            },
-            {
-                description: "Devout healers and protectors who channel divine power.",
-                id: "cleric",
-                name: "Cleric"
-            }
-        ];
 
         const loginToken = localStorage.getItem(loginTokenKey);
         if (!loginToken) {
@@ -229,14 +199,6 @@
                 container.append(button);
             });
         };
-
-        renderChoices(raceOptions, raceChoices, (choiceName) => {
-            selectedRace = choiceName;
-        });
-
-        renderChoices(classOptions, classChoices, (choiceName) => {
-            selectedClass = choiceName;
-        });
 
         const formatName = (name) => {
             const trimmedName = name.trim();
@@ -296,6 +258,38 @@
             status.style.color = isError ? "#fca5a5" : "#bbf7d0";
         };
 
+        const loadChoices = async (path, container, setSelection, label) => {
+            container.innerHTML = "";
+            const response = await fetch(path);
+            if (!response.ok) {
+                throw new Error(`Failed to load ${label}.`);
+            }
+
+            const payload = await response.json();
+            const choices = Array.isArray(payload[label]) ? payload[label] : [];
+            if (choices.length === 0) {
+                throw new Error(`No ${label} available.`);
+            }
+
+            renderChoices(container, choices, setSelection);
+        };
+
+        const initializeChoices = async () => {
+            try {
+                await loadChoices("/races", raceOptions, (choiceName) => {
+                    selectedRace = choiceName;
+                }, "races");
+                await loadChoices("/classes", classOptions, (choiceName) => {
+                    selectedClass = choiceName;
+                }, "classes");
+            } catch (error) {
+                const message = error instanceof Error ? error.message : "Failed to load options.";
+                setStatus(message, true);
+            }
+        };
+
+        void initializeChoices();
+
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
             setStatus("", false);
@@ -326,8 +320,7 @@
                         characterClassName: selectedClass,
                         characterName: nameValidation.formattedName,
                         characterRaceName: selectedRace,
-                        loginToken,
-                        username: username.value
+                        loginToken
                     }),
                     headers: {
                         "Content-Type": "application/json"

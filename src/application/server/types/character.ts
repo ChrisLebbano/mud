@@ -13,7 +13,6 @@ export interface CharacterCreatePayload {
     characterName: string;
     characterRaceName: string;
     loginToken: string;
-    username: string;
 }
 
 export interface CharacterNameValidationResult {

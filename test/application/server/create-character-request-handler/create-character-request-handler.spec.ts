@@ -76,7 +76,7 @@ class FakeUserRepository {
         this._user = user;
     }
 
-    public findByUsername(): Promise<UserRecord | null> {
+    public findByLoginToken(): Promise<UserRecord | null> {
         return Promise.resolve(this._user);
     }
 
@@ -123,8 +123,7 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                 characterClassName: "Warrior",
                 characterName: "Alex",
                 characterRaceName: "Human",
-                loginToken: "token-123",
-                username: "hero"
+                loginToken: "token-123"
             }, false);
             const validator = new FakeCharacterNameValidator({ error: null, formattedName: "Alex", isValid: true });
             const repository = new FakeCharacterRepository(null);
@@ -149,8 +148,7 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                 characterClassName: "Warrior",
                 characterName: "A1",
                 characterRaceName: "Human",
-                loginToken: "token-123",
-                username: "hero"
+                loginToken: "token-123"
             }, false);
             const validator = new FakeCharacterNameValidator({
                 error: "Character name must be one word with letters only.",
@@ -186,8 +184,7 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                 characterClassName: "Warrior",
                 characterName: "Alex",
                 characterRaceName: "Human",
-                loginToken: "token-123",
-                username: "hero"
+                loginToken: "token-123"
             }, false);
             const validator = new FakeCharacterNameValidator({ error: null, formattedName: "Alex", isValid: true });
             const repository = new FakeCharacterRepository(null);
