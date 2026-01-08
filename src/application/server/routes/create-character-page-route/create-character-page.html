@@ -25,7 +25,7 @@
             background-color: #1e293b;
             border-radius: 16px;
             box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
-            max-width: 520px;
+            max-width: 640px;
             padding: 32px;
             width: 100%;
         }
@@ -80,6 +80,48 @@
             font-size: 14px;
             min-height: 20px;
         }
+
+        .choice-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        .choice-button {
+            align-items: flex-start;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px;
+            text-align: left;
+            text-transform: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .choice-button strong {
+            font-size: 16px;
+        }
+
+        .choice-button span {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .choice-button:hover {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .choice-button.selected {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.6);
+        }
     </style>
 </head>
 <body>
@@ -95,14 +137,14 @@
                 <input id="character-name" name="character-name" type="text" required>
                 <span class="helper-text">4-15 letters, one word, formatted automatically.</span>
             </label>
-            <label>
-                Character race
-                <input id="character-race" name="character-race" type="text" required>
-            </label>
-            <label>
-                Character class
-                <input id="character-class" name="character-class" type="text" required>
-            </label>
+            <section>
+                <h2>Character race</h2>
+                <div class="choice-grid" id="race-options"></div>
+            </section>
+            <section>
+                <h2>Character class</h2>
+                <div class="choice-grid" id="class-options"></div>
+            </section>
             <button id="submit" type="submit">Create</button>
             <p class="status" id="status" aria-live="polite"></p>
         </form>
@@ -114,13 +156,87 @@
         const submitButton = document.getElementById("submit");
         const username = document.getElementById("username");
         const characterName = document.getElementById("character-name");
-        const characterRace = document.getElementById("character-race");
-        const characterClass = document.getElementById("character-class");
+        const raceOptions = document.getElementById("race-options");
+        const classOptions = document.getElementById("class-options");
+
+        const raceChoices = [
+            {
+                description: "Adaptable and ambitious inhabitants of the cities.",
+                id: "human",
+                name: "Human"
+            },
+            {
+                description: "Wild denizens that stalk the edges of civilization.",
+                id: "creature",
+                name: "Creature"
+            }
+        ];
+        const classChoices = [
+            {
+                description: "Disciplined fighters who excel with weapons and armor.",
+                id: "warrior",
+                name: "Warrior"
+            },
+            {
+                description: "Devout healers and protectors who channel divine power.",
+                id: "cleric",
+                name: "Cleric"
+            }
+        ];
 
         const loginToken = localStorage.getItem(loginTokenKey);
         if (!loginToken) {
             window.location.assign("/login");
         }
+
+        let selectedRace = "";
+        let selectedClass = "";
+
+        const clearSelections = (container) => {
+            const buttons = Array.from(container.querySelectorAll("button"));
+            buttons.forEach((button) => {
+                button.classList.remove("selected");
+            });
+        };
+
+        const createChoiceButton = (choice, onSelect) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "choice-button";
+            button.dataset.choice = choice.name;
+
+            const title = document.createElement("strong");
+            title.textContent = choice.name;
+            const description = document.createElement("span");
+            description.textContent = choice.description;
+
+            button.append(title, description);
+            button.addEventListener("click", () => {
+                onSelect(choice, button);
+            });
+
+            return button;
+        };
+
+        const renderChoices = (container, choices, setSelection) => {
+            container.innerHTML = "";
+            choices.forEach((choice) => {
+                const button = createChoiceButton(choice, (selectedChoice, button) => {
+                    clearSelections(container);
+                    button.classList.add("selected");
+                    setSelection(selectedChoice.name);
+                });
+                container.append(button);
+            });
+        };
+
+        renderChoices(raceOptions, raceChoices, (choiceName) => {
+            selectedRace = choiceName;
+        });
+
+        renderChoices(classOptions, classChoices, (choiceName) => {
+            selectedClass = choiceName;
+        });
 
         const formatName = (name) => {
             const trimmedName = name.trim();
@@ -189,6 +305,11 @@
                 return;
             }
 
+            if (!selectedRace || !selectedClass) {
+                setStatus("Please select a race and class.", true);
+                return;
+            }
+
             const nameValidation = validateName(characterName.value);
             characterName.value = nameValidation.formattedName;
 
@@ -202,9 +323,9 @@
             try {
                 const response = await fetch("/characters", {
                     body: JSON.stringify({
-                        characterClassName: characterClass.value,
+                        characterClassName: selectedClass,
                         characterName: nameValidation.formattedName,
-                        characterRaceName: characterRace.value,
+                        characterRaceName: selectedRace,
                         loginToken,
                         username: username.value
                     }),
@@ -223,6 +344,10 @@
 
                 setStatus(payload.message ?? "Character created.", false);
                 form.reset();
+                selectedRace = "";
+                selectedClass = "";
+                clearSelections(raceOptions);
+                clearSelections(classOptions);
             } catch (error) {
                 setStatus("Character creation failed. Please try again.", true);
             } finally {
