@@ -91,6 +91,11 @@
                 <input id="username" name="username" type="text" autocomplete="username" required>
             </label>
             <label>
+                Login token
+                <input id="login-token" name="login-token" type="text" autocomplete="off" required>
+                <span class="helper-text">Paste the login token issued after logging in.</span>
+            </label>
+            <label>
                 Character name
                 <input id="character-name" name="character-name" type="text" required>
                 <span class="helper-text">4-15 letters, one word, formatted automatically.</span>
@@ -112,14 +117,15 @@
         const loginTokenKey = "loginToken";
         const status = document.getElementById("status");
         const submitButton = document.getElementById("submit");
+        const loginTokenInput = document.getElementById("login-token");
         const username = document.getElementById("username");
         const characterName = document.getElementById("character-name");
         const characterRace = document.getElementById("character-race");
         const characterClass = document.getElementById("character-class");
 
         const loginToken = localStorage.getItem(loginTokenKey);
-        if (!loginToken) {
-            window.location.assign("/login");
+        if (loginToken) {
+            loginTokenInput.value = loginToken;
         }
 
         const formatName = (name) => {
@@ -184,8 +190,9 @@
             event.preventDefault();
             setStatus("", false);
 
-            if (!loginToken) {
-                setStatus("Please log in before creating a character.", true);
+            const trimmedLoginToken = loginTokenInput.value.trim();
+            if (!trimmedLoginToken) {
+                setStatus("Login token is required before creating a character.", true);
                 return;
             }
 
@@ -200,12 +207,12 @@
             submitButton.disabled = true;
 
             try {
-                const response = await fetch("/characters", {
+                const response = await fetch("/api/characters", {
                     body: JSON.stringify({
                         characterClassName: characterClass.value,
                         characterName: nameValidation.formattedName,
                         characterRaceName: characterRace.value,
-                        loginToken,
+                        loginToken: trimmedLoginToken,
                         username: username.value
                     }),
                     headers: {

@@ -58,6 +58,7 @@ export class Application {
             new GameClientRoute(),
             new LoginPageRoute(),
             new SignupPageRoute(),
+            new MethodServerRoute("/api/characters", "POST", createCharacterRequestHandler.handle.bind(createCharacterRequestHandler)),
             new MethodServerRoute("/characters", "POST", createCharacterRequestHandler.handle.bind(createCharacterRequestHandler)),
             new MethodServerRoute("/login", "POST", loginRequestHandler.handle.bind(loginRequestHandler)),
             new MethodServerRoute("/signup", "POST", signupRequestHandler.handle.bind(signupRequestHandler))
