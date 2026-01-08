@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node ./src/main.ts",
+    "migrate": "ts-node ./src/db-migrator/index.ts",
+    "start": "npm run migrate && ts-node ./src/main.ts",
     "test": "ts-mocha ./test/**/*.spec.ts"
   },
   "author": "",
