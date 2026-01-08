@@ -1,5 +1,5 @@
+import { type HttpRequestHandler } from "../../types/http";
 import { ServerRoute } from "../server-route";
-import { type HttpRequestHandler } from "../types/http";
 import { type IncomingMessage } from "node:http";
 
 export class MethodServerRoute extends ServerRoute {
