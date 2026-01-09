@@ -54,11 +54,37 @@ describe(`[Class] CharacterClassRepository`, () => {
             const pool = new FakePool();
             pool.queueResult([
                 {
+                    attributeModifiers: JSON.stringify({
+                        agility: 1,
+                        charisma: 0,
+                        constitution: 2,
+                        dexterity: 0,
+                        health: 6,
+                        intelligence: -1,
+                        mana: -2,
+                        perception: 0,
+                        resolve: 1,
+                        strength: 2,
+                        wisdom: -1
+                    }),
                     description: "Disciplined fighters.",
                     id: 3,
                     name: "Fighter"
                 },
                 {
+                    attributeModifiers: {
+                        agility: 0,
+                        charisma: 1,
+                        constitution: 1,
+                        dexterity: 0,
+                        health: 4,
+                        intelligence: 2,
+                        mana: 6,
+                        perception: 1,
+                        resolve: 2,
+                        strength: -1,
+                        wisdom: 2
+                    },
                     description: "Arcane scholars.",
                     id: 4,
                     name: "Wizard"
@@ -70,11 +96,37 @@ describe(`[Class] CharacterClassRepository`, () => {
 
             expect(result).to.deep.equal([
                 {
+                    attributeModifiers: {
+                        agility: 1,
+                        charisma: 0,
+                        constitution: 2,
+                        dexterity: 0,
+                        health: 6,
+                        intelligence: -1,
+                        mana: -2,
+                        perception: 0,
+                        resolve: 1,
+                        strength: 2,
+                        wisdom: -1
+                    },
                     description: "Disciplined fighters.",
                     id: 3,
                     name: "Fighter"
                 },
                 {
+                    attributeModifiers: {
+                        agility: 0,
+                        charisma: 1,
+                        constitution: 1,
+                        dexterity: 0,
+                        health: 4,
+                        intelligence: 2,
+                        mana: 6,
+                        perception: 1,
+                        resolve: 2,
+                        strength: -1,
+                        wisdom: 2
+                    },
                     description: "Arcane scholars.",
                     id: 4,
                     name: "Wizard"
@@ -83,7 +135,43 @@ describe(`[Class] CharacterClassRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: [],
-                    statement: "SELECT id, name, description FROM characterClasses ORDER BY name ASC"
+                    statement: "SELECT id, name, description, attributeModifiers FROM characterClasses ORDER BY name ASC"
+                }
+            ]);
+        });
+
+        it(`should default attribute modifiers when data is null`, async () => {
+            const pool = new FakePool();
+            pool.queueResult([
+                {
+                    attributeModifiers: null,
+                    description: "Plain class.",
+                    id: 5,
+                    name: "Commoner"
+                }
+            ]);
+            const repository = new CharacterClassRepository(new FakeDatabaseConnection(pool));
+
+            const result = await repository.findAll();
+
+            expect(result).to.deep.equal([
+                {
+                    attributeModifiers: {
+                        agility: 0,
+                        charisma: 0,
+                        constitution: 0,
+                        dexterity: 0,
+                        health: 0,
+                        intelligence: 0,
+                        mana: 0,
+                        perception: 0,
+                        resolve: 0,
+                        strength: 0,
+                        wisdom: 0
+                    },
+                    description: "Plain class.",
+                    id: 5,
+                    name: "Commoner"
                 }
             ]);
         });

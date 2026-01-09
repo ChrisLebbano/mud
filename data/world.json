@@ -1,42 +1,4 @@
 {
-  "classes": [
-    {
-      "description": "Disciplined fighters who excel with weapons and armor.",
-      "id": "warrior",
-      "name": "Warrior",
-      "attributeModifiers": {
-        "strength": 2,
-        "agility": 1,
-        "dexterity": 1,
-        "perception": 0,
-        "constitution": 2,
-        "wisdom": -1,
-        "intelligence": -1,
-        "charisma": -1,
-        "resolve": 1,
-        "health": 6,
-        "mana": -2
-      }
-    },
-    {
-      "description": "Devout healers and protectors who channel divine power.",
-      "id": "cleric",
-      "name": "Cleric",
-      "attributeModifiers": {
-        "strength": -1,
-        "agility": 0,
-        "dexterity": 0,
-        "perception": 1,
-        "constitution": 1,
-        "wisdom": 2,
-        "intelligence": 2,
-        "charisma": 1,
-        "resolve": 2,
-        "health": 4,
-        "mana": 6
-      }
-    }
-  ],
   "items": [
     {
       "description": "A small vial that restores a bit of health.",
@@ -57,7 +19,7 @@
       "maxCount": 20
     }
   ],
-  "playerClassId": "warrior",
+  "playerClassId": "1",
   "playerRaceId": "human",
   "startingRoomId": "atrium",
   "startingZoneId": "starter-zone",
@@ -76,7 +38,7 @@
           "nonPlayerCharacters": [
             {
               "hailResponse": "Move [north] to visit the training grounds and test your skills.",
-              "classId": "cleric",
+              "classId": "2",
               "id": "npc-guide",
               "name": "Terminal Guide",
               "raceId": "human"
@@ -92,14 +54,14 @@
           "name": "Training Grounds",
           "nonPlayerCharacters": [
             {
-              "classId": "warrior",
+              "classId": "1",
               "id": "npc-rat",
               "maxHealth": 20,
               "name": "a rat",
               "raceId": "creature"
             },
             {
-              "classId": "warrior",
+              "classId": "1",
               "id": "npc-snake",
               "maxHealth": 20,
               "name": "a snake",
@@ -112,3 +74,4 @@
     }
   ]
 }
+

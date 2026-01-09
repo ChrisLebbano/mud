@@ -1,14 +1,39 @@
-INSERT INTO characterClasses (name, description)
+INSERT INTO characterClasses (id, name, description, attributeModifiers)
 VALUES
-    ('Fighter', NULL),
-    ('Knight', NULL),
-    ('Dark Knight', NULL),
-    ('Bard', NULL),
-    ('Druid', NULL),
-    ('Enchanter', NULL),
-    ('Monk', NULL),
-    ('Ranger', NULL),
-    ('Wizard', NULL),
-    ('Necromancer', NULL),
-    ('Cleric', NULL);
+    (
+        1,
+        'Warrior',
+        'Disciplined fighters who excel with weapons and armor.',
+        JSON_OBJECT(
+            'strength', 2,
+            'agility', 1,
+            'dexterity', 1,
+            'perception', 0,
+            'constitution', 2,
+            'wisdom', -1,
+            'intelligence', -1,
+            'charisma', -1,
+            'resolve', 1,
+            'health', 6,
+            'mana', -2
+        )
+    ),
+    (
+        2,
+        'Cleric',
+        'Devout healers and protectors who channel divine power.',
+        JSON_OBJECT(
+            'strength', -1,
+            'agility', 0,
+            'dexterity', 0,
+            'perception', 1,
+            'constitution', 1,
+            'wisdom', 2,
+            'intelligence', 2,
+            'charisma', 1,
+            'resolve', 2,
+            'health', 4,
+            'mana', 6
+        )
+    );
 
