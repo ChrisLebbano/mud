@@ -2,9 +2,9 @@ import { CharacterClass } from "../../../src/game/character-class";
 import { NonPlayerCharacter } from "../../../src/game/non-player-character";
 import { Race } from "../../../src/game/race";
 import { Room } from "../../../src/game/room";
+import { ITEM_TYPE, type WorldData, type WorldRaceData } from "../../../src/game/types/world-data";
 import { World } from "../../../src/game/world";
 import { Zone } from "../../../src/game/zone";
-import { ITEM_TYPE, type WorldData } from "../../../src/game/types/world-data";
 import { expect } from "chai";
 
 describe(`[Class] World`, () => {
@@ -96,6 +96,7 @@ describe(`[Class] World`, () => {
 
 
 
+
     });
 
     describe(`[Method] fromData`, () => {
@@ -112,14 +113,6 @@ describe(`[Class] World`, () => {
                 ],
                 playerClassId: "warrior",
                 playerRaceId: "human",
-                races: [
-                    {
-                        baseAttributes: humanBaseAttributes,
-                        description: "Versatile adventurers.",
-                        id: "human",
-                        name: "Human"
-                    }
-                ],
                 startingRoomId: "atrium",
                 startingZoneId: "starter-zone",
                 zones: [
@@ -153,8 +146,16 @@ describe(`[Class] World`, () => {
                     }
                 ]
             };
+            const raceData: WorldRaceData[] = [
+                {
+                    baseAttributes: humanBaseAttributes,
+                    description: "Versatile adventurers.",
+                    id: "human",
+                    name: "Human"
+                }
+            ];
 
-            const world = World.fromData(worldData);
+            const world = World.fromData(worldData, raceData);
             const room = world.getRoom("atrium");
 
             expect(room?.name).to.equal("Atrium");
@@ -503,14 +504,6 @@ describe(`[Class] World`, () => {
                 ],
                 playerClassId: "warrior",
                 playerRaceId: "human",
-                races: [
-                    {
-                        baseAttributes: humanBaseAttributes,
-                        description: "Versatile adventurers.",
-                        id: "human",
-                        name: "Human"
-                    }
-                ],
                 startingRoomId: "atrium",
                 startingZoneId: "starter-zone",
                 zones: [
@@ -529,8 +522,16 @@ describe(`[Class] World`, () => {
                     }
                 ]
             };
+            const raceData: WorldRaceData[] = [
+                {
+                    baseAttributes: humanBaseAttributes,
+                    description: "Versatile adventurers.",
+                    id: "human",
+                    name: "Human"
+                }
+            ];
 
-            const world = World.fromData(worldData);
+            const world = World.fromData(worldData, raceData);
 
             expect(world.items.map((item) => item.name)).to.deep.equal(["small health potion"]);
         });

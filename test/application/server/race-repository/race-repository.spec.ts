@@ -54,14 +54,38 @@ describe(`[Class] RaceRepository`, () => {
             const pool = new FakePool();
             pool.queueResult([
                 {
+                    agility: 10,
+                    charisma: 12,
+                    constitution: 10,
                     description: "Versatile adventurers.",
+                    dexterity: 10,
+                    health: 42,
                     id: 1,
-                    name: "Human"
+                    intelligence: 10,
+                    mana: 22,
+                    name: "Human",
+                    perception: 10,
+                    race_key: "human",
+                    resolve: 10,
+                    strength: 10,
+                    wisdom: 10
                 },
                 {
+                    agility: 8,
+                    charisma: 9,
+                    constitution: 12,
                     description: "Sturdy explorers.",
+                    dexterity: 8,
+                    health: 48,
                     id: 2,
-                    name: "Dwarf"
+                    intelligence: 9,
+                    mana: 16,
+                    name: "Dwarf",
+                    perception: 9,
+                    race_key: "dwarf",
+                    resolve: 11,
+                    strength: 12,
+                    wisdom: 10
                 }
             ]);
             const repository = new RaceRepository(new FakeDatabaseConnection(pool));
@@ -70,20 +94,48 @@ describe(`[Class] RaceRepository`, () => {
 
             expect(result).to.deep.equal([
                 {
+                    baseAttributes: {
+                        agility: 10,
+                        charisma: 12,
+                        constitution: 10,
+                        dexterity: 10,
+                        health: 42,
+                        intelligence: 10,
+                        mana: 22,
+                        perception: 10,
+                        resolve: 10,
+                        strength: 10,
+                        wisdom: 10
+                    },
                     description: "Versatile adventurers.",
                     id: 1,
-                    name: "Human"
+                    name: "Human",
+                    raceKey: "human"
                 },
                 {
+                    baseAttributes: {
+                        agility: 8,
+                        charisma: 9,
+                        constitution: 12,
+                        dexterity: 8,
+                        health: 48,
+                        intelligence: 9,
+                        mana: 16,
+                        perception: 9,
+                        resolve: 11,
+                        strength: 12,
+                        wisdom: 10
+                    },
                     description: "Sturdy explorers.",
                     id: 2,
-                    name: "Dwarf"
+                    name: "Dwarf",
+                    raceKey: "dwarf"
                 }
             ]);
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: [],
-                    statement: "SELECT id, name, description FROM races ORDER BY name ASC"
+                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana FROM races ORDER BY name ASC"
                 }
             ]);
         });
@@ -91,4 +143,3 @@ describe(`[Class] RaceRepository`, () => {
     });
 
 });
-

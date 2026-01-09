@@ -6,7 +6,6 @@ export interface WorldData {
     items?: WorldItemData[];
     playerClassId: string;
     playerRaceId: string;
-    races: WorldRaceData[];
     startingRoomId: string;
     startingZoneId: string;
     zones: WorldZoneData[];
@@ -58,4 +57,3 @@ export interface WorldRaceData {
 }
 
 export { ITEM_TYPE };
-
