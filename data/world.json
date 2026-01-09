@@ -59,44 +59,6 @@
   ],
   "playerClassId": "warrior",
   "playerRaceId": "human",
-  "races": [
-    {
-      "description": "Adaptable and ambitious inhabitants of the cities.",
-      "id": "human",
-      "name": "Human",
-      "baseAttributes": {
-        "strength": 10,
-        "agility": 10,
-        "dexterity": 10,
-        "perception": 10,
-        "constitution": 10,
-        "wisdom": 10,
-        "intelligence": 10,
-        "charisma": 12,
-        "resolve": 10,
-        "health": 42,
-        "mana": 22
-      }
-    },
-    {
-      "description": "Wild denizens that stalk the edges of civilization.",
-      "id": "creature",
-      "name": "Creature",
-      "baseAttributes": {
-        "strength": 12,
-        "agility": 11,
-        "dexterity": 9,
-        "perception": 11,
-        "constitution": 12,
-        "wisdom": 8,
-        "intelligence": 8,
-        "charisma": 6,
-        "resolve": 9,
-        "health": 46,
-        "mana": 16
-      }
-    }
-  ],
   "startingRoomId": "atrium",
   "startingZoneId": "starter-zone",
   "zones": [

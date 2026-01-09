@@ -69,9 +69,23 @@ describe(`[Class] RaceListRequestHandler`, () => {
         it(`should return races`, async () => {
             const handler = new RaceListRequestHandler(new FakeRaceRepository([
                 {
+                    baseAttributes: {
+                        agility: 10,
+                        charisma: 12,
+                        constitution: 10,
+                        dexterity: 10,
+                        health: 42,
+                        intelligence: 10,
+                        mana: 22,
+                        perception: 10,
+                        resolve: 10,
+                        strength: 10,
+                        wisdom: 10
+                    },
                     description: "Versatile adventurers.",
                     id: 1,
-                    name: "Human"
+                    name: "Human",
+                    raceKey: "human"
                 }
             ]));
             const request = { method: "GET" } as IncomingMessage;
@@ -96,4 +110,3 @@ describe(`[Class] RaceListRequestHandler`, () => {
     });
 
 });
-

@@ -1,8 +1,9 @@
 import { Application } from "./application";
 import { DatabaseConnection } from "./application/server/database-connection";
+import { RaceRepository } from "./application/server/race-repository";
 import { type DatabaseConfig } from "./application/server/types/database";
 import { type ServerConfig } from "./application/server/types/server-config";
-import { type WorldData } from "./game/types/world-data";
+import { type WorldData, type WorldRaceData } from "./game/types/world-data";
 import { World } from "./game/world";
 import { createPool } from "mysql2/promise";
 import { readFileSync } from "node:fs";
@@ -31,11 +32,29 @@ const databaseTestTableName = "users";
 
 const worldDataPath = resolve(process.cwd(), "data", "world.json");
 const worldData = JSON.parse(readFileSync(worldDataPath, "utf8")) as WorldData;
-const world = World.fromData(worldData);
-
 const databaseConnection = new DatabaseConnection(databaseConfig, createPool, databaseTestTableName);
-const application = new Application(serverConfig, world, databaseConnection);
+const raceRepository = new RaceRepository(databaseConnection);
 
-void databaseConnection.testConnection("process start");
+const loadWorld = async (): Promise<World> => {
+    const races = await raceRepository.findAll();
+    const raceData: WorldRaceData[] = races.map((race) => ({
+        baseAttributes: race.baseAttributes,
+        description: race.description ?? "",
+        id: race.raceKey,
+        name: race.name
+    }));
 
-application.init();
+    return World.fromData(worldData, raceData);
+};
+
+const run = async (): Promise<void> => {
+    await databaseConnection.testConnection("process start");
+    const world = await loadWorld();
+    const application = new Application(serverConfig, world, databaseConnection);
+    application.init();
+};
+
+void run().catch((error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[ERROR] Failed to start application: ${message}`);
+});
