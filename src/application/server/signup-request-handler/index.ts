@@ -1,5 +1,5 @@
-import { type JsonBodyParser } from "../json-body-parser";
-import { type PasswordHasher } from "../password-hasher";
+import { JsonBodyParser } from "../json-body-parser";
+import { PasswordHasher } from "../password-hasher";
 import { type UserCreateData, type UserSignupPayload } from "../types/user";
 import { type UserRepository } from "../user-repository";
 import { type IncomingMessage, type ServerResponse } from "node:http";
@@ -10,9 +10,9 @@ export class SignupRequestHandler {
     private _passwordHasher: PasswordHasher;
     private _userRepository: UserRepository;
 
-    constructor(jsonBodyParser: JsonBodyParser, passwordHasher: PasswordHasher, userRepository: UserRepository) {
-        this._jsonBodyParser = jsonBodyParser;
-        this._passwordHasher = passwordHasher;
+    constructor(userRepository: UserRepository) {
+        this._jsonBodyParser = new JsonBodyParser();
+        this._passwordHasher = new PasswordHasher();
         this._userRepository = userRepository;
     }
 

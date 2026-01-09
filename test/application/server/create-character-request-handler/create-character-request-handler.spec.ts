@@ -1,22 +1,9 @@
 import { CreateCharacterRequestHandler } from "../../../../src/application/server/create-character-request-handler";
-import { type CharacterNameValidationResult, type CharacterRecord } from "../../../../src/application/server/types/character";
+import { type CharacterRecord } from "../../../../src/application/server/types/character";
 import { type UserRecord } from "../../../../src/application/server/types/user";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
-
-class FakeCharacterNameValidator {
-
-    private _result: CharacterNameValidationResult;
-
-    constructor(result: CharacterNameValidationResult) {
-        this._result = result;
-    }
-
-    public validate(): CharacterNameValidationResult {
-        return this._result;
-    }
-
-}
+import { Readable } from "node:stream";
 
 class FakeCharacterRepository {
 
@@ -25,6 +12,10 @@ class FakeCharacterRepository {
 
     constructor(existingCharacter: CharacterRecord | null) {
         this._existingCharacter = existingCharacter;
+    }
+
+    public get createCalls(): Array<{ className: string; name: string; raceName: string; userId: number }> {
+        return this._createCalls;
     }
 
     public createCharacter(data: { className: string; name: string; raceName: string; userId: number }): Promise<CharacterRecord> {
@@ -40,30 +31,6 @@ class FakeCharacterRepository {
 
     public findByName(): Promise<CharacterRecord | null> {
         return Promise.resolve(this._existingCharacter);
-    }
-
-    public get createCalls(): Array<{ className: string; name: string; raceName: string; userId: number }> {
-        return this._createCalls;
-    }
-
-}
-
-class FakeJsonBodyParser {
-
-    private _payload: unknown;
-    private _shouldReject: boolean;
-
-    constructor(payload: unknown, shouldReject: boolean) {
-        this._payload = payload;
-        this._shouldReject = shouldReject;
-    }
-
-    public parse<T>(): Promise<T> {
-        if (this._shouldReject) {
-            return Promise.reject(new Error("invalid json"));
-        }
-
-        return Promise.resolve(this._payload as T);
     }
 
 }
@@ -114,22 +81,26 @@ class FakeResponse {
 
 }
 
+const createJsonRequest = (payload: unknown): IncomingMessage => {
+    const request = Readable.from([JSON.stringify(payload)]) as IncomingMessage;
+    request.method = "POST";
+    return request;
+};
+
 describe(`[Class] CreateCharacterRequestHandler`, () => {
 
     describe(`[Method] handle`, () => {
 
         it(`should reject when authentication fails`, async () => {
-            const parser = new FakeJsonBodyParser({
+            const repository = new FakeCharacterRepository(null);
+            const userRepository = new FakeUserRepository(null);
+            const handler = new CreateCharacterRequestHandler(repository, userRepository);
+            const request = createJsonRequest({
                 characterClassName: "Warrior",
                 characterName: "Alex",
                 characterRaceName: "Human",
                 loginToken: "token-123"
-            }, false);
-            const validator = new FakeCharacterNameValidator({ error: null, formattedName: "Alex", isValid: true });
-            const repository = new FakeCharacterRepository(null);
-            const userRepository = new FakeUserRepository(null);
-            const handler = new CreateCharacterRequestHandler(parser, validator, repository, userRepository);
-            const request = { method: "POST" } as IncomingMessage;
+            });
             const response = new FakeResponse() as unknown as ServerResponse;
 
             handler.handle(request, response);
@@ -144,17 +115,6 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
         });
 
         it(`should reject invalid character names`, async () => {
-            const parser = new FakeJsonBodyParser({
-                characterClassName: "Warrior",
-                characterName: "A1",
-                characterRaceName: "Human",
-                loginToken: "token-123"
-            }, false);
-            const validator = new FakeCharacterNameValidator({
-                error: "Character name must be one word with letters only.",
-                formattedName: "A1",
-                isValid: false
-            });
             const repository = new FakeCharacterRepository(null);
             const userRepository = new FakeUserRepository({
                 email: "hero@example.com",
@@ -164,8 +124,13 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                 passwordHash: "hash",
                 username: "hero"
             });
-            const handler = new CreateCharacterRequestHandler(parser, validator, repository, userRepository);
-            const request = { method: "POST" } as IncomingMessage;
+            const handler = new CreateCharacterRequestHandler(repository, userRepository);
+            const request = createJsonRequest({
+                characterClassName: "Warrior",
+                characterName: "A1",
+                characterRaceName: "Human",
+                loginToken: "token-123"
+            });
             const response = new FakeResponse() as unknown as ServerResponse;
 
             handler.handle(request, response);
@@ -180,13 +145,6 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
         });
 
         it(`should create a character when data is valid`, async () => {
-            const parser = new FakeJsonBodyParser({
-                characterClassName: "Warrior",
-                characterName: "Alex",
-                characterRaceName: "Human",
-                loginToken: "token-123"
-            }, false);
-            const validator = new FakeCharacterNameValidator({ error: null, formattedName: "Alex", isValid: true });
             const repository = new FakeCharacterRepository(null);
             const userRepository = new FakeUserRepository({
                 email: "hero@example.com",
@@ -196,8 +154,13 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                 passwordHash: "hash",
                 username: "hero"
             });
-            const handler = new CreateCharacterRequestHandler(parser, validator, repository, userRepository);
-            const request = { method: "POST" } as IncomingMessage;
+            const handler = new CreateCharacterRequestHandler(repository, userRepository);
+            const request = createJsonRequest({
+                characterClassName: "Warrior",
+                characterName: "Alex",
+                characterRaceName: "Human",
+                loginToken: "token-123"
+            });
             const response = new FakeResponse() as unknown as ServerResponse;
 
             handler.handle(request, response);

@@ -1,6 +1,6 @@
-import { type LoginTokenGenerator } from "../login-token-generator";
-import { type JsonBodyParser } from "../json-body-parser";
-import { type PasswordHasher } from "../password-hasher";
+import { JsonBodyParser } from "../json-body-parser";
+import { LoginTokenGenerator } from "../login-token-generator";
+import { PasswordHasher } from "../password-hasher";
 import { type UserLoginPayload } from "../types/user";
 import { type UserRepository } from "../user-repository";
 import { type IncomingMessage, type ServerResponse } from "node:http";
@@ -12,10 +12,10 @@ export class LoginRequestHandler {
     private _passwordHasher: PasswordHasher;
     private _userRepository: UserRepository;
 
-    constructor(jsonBodyParser: JsonBodyParser, loginTokenGenerator: LoginTokenGenerator, passwordHasher: PasswordHasher, userRepository: UserRepository) {
-        this._jsonBodyParser = jsonBodyParser;
-        this._loginTokenGenerator = loginTokenGenerator;
-        this._passwordHasher = passwordHasher;
+    constructor(userRepository: UserRepository) {
+        this._jsonBodyParser = new JsonBodyParser();
+        this._loginTokenGenerator = new LoginTokenGenerator();
+        this._passwordHasher = new PasswordHasher();
         this._userRepository = userRepository;
     }
 

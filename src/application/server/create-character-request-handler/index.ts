@@ -1,6 +1,6 @@
-import { type CharacterNameValidator } from "../character-name-validator";
+import { CharacterNameValidator } from "../character-name-validator";
 import { type CharacterRepository } from "../character-repository";
-import { type JsonBodyParser } from "../json-body-parser";
+import { JsonBodyParser } from "../json-body-parser";
 import { type CharacterCreateData, type CharacterCreatePayload } from "../types/character";
 import { type UserRepository } from "../user-repository";
 import { type IncomingMessage, type ServerResponse } from "node:http";
@@ -12,10 +12,10 @@ export class CreateCharacterRequestHandler {
     private _jsonBodyParser: JsonBodyParser;
     private _userRepository: UserRepository;
 
-    constructor(jsonBodyParser: JsonBodyParser, characterNameValidator: CharacterNameValidator, characterRepository: CharacterRepository, userRepository: UserRepository) {
-        this._characterNameValidator = characterNameValidator;
+    constructor(characterRepository: CharacterRepository, userRepository: UserRepository) {
+        this._characterNameValidator = new CharacterNameValidator();
         this._characterRepository = characterRepository;
-        this._jsonBodyParser = jsonBodyParser;
+        this._jsonBodyParser = new JsonBodyParser();
         this._userRepository = userRepository;
     }
 
