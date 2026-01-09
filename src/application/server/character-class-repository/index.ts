@@ -24,7 +24,27 @@ export class CharacterClassRepository {
         }));
     }
 
+    private getDefaultAttributeModifiers(): CharacterClassRecord["attributeModifiers"] {
+        return {
+            agility: 0,
+            charisma: 0,
+            constitution: 0,
+            dexterity: 0,
+            health: 0,
+            intelligence: 0,
+            mana: 0,
+            perception: 0,
+            resolve: 0,
+            strength: 0,
+            wisdom: 0
+        };
+    }
+
     private parseAttributeModifiers(attributeModifiers: CharacterClassRow["attributeModifiers"]): CharacterClassRecord["attributeModifiers"] {
+        if (!attributeModifiers) {
+            return this.getDefaultAttributeModifiers();
+        }
+
         if (typeof attributeModifiers === "string") {
             return JSON.parse(attributeModifiers) as CharacterClassRecord["attributeModifiers"];
         }
