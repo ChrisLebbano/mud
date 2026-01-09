@@ -40,8 +40,8 @@ class FakeDatabaseConnection implements DatabaseConnectionClient {
         return this._pool as unknown as ReturnType<DatabasePoolFactory>;
     }
 
-    public testConnection(_stage: string): Promise<void> {
-        return Promise.resolve();
+    public testConnection(_stage: string): Promise<boolean> {
+        return Promise.resolve(true);
     }
 
 }
@@ -179,4 +179,3 @@ describe(`[Class] CharacterClassRepository`, () => {
     });
 
 });
-

@@ -22,8 +22,8 @@ class FakeDatabaseConnection implements DatabaseConnectionClient {
         return this._connectCalled;
     }
 
-    public testConnection(_stage: string): Promise<void> {
-        return Promise.resolve();
+    public testConnection(_stage: string): Promise<boolean> {
+        return Promise.resolve(true);
     }
 
 }
