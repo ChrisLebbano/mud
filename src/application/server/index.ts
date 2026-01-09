@@ -2,14 +2,10 @@ import { World } from "../../game/world";
 import { CharacterClassListRequestHandler } from "./character-class-list-request-handler";
 import { CharacterClassRepository } from "./character-class-repository";
 import { CharacterListRequestHandler } from "./character-list-request-handler";
-import { CharacterNameValidator } from "./character-name-validator";
 import { CharacterRepository } from "./character-repository";
 import { CreateCharacterRequestHandler } from "./create-character-request-handler";
-import { JsonBodyParser } from "./json-body-parser";
 import { LoginRequestHandler } from "./login-request-handler";
-import { LoginTokenGenerator } from "./login-token-generator";
 import { NodeHttpServerFactory } from "./node-http-server-factory";
-import { PasswordHasher } from "./password-hasher";
 import { RaceListRequestHandler } from "./race-list-request-handler";
 import { RaceRepository } from "./race-repository";
 import { CharacterSelectPageRoute } from "./routes/character-select-page-route";
@@ -62,13 +58,7 @@ export class Server {
         this._userRepository = userRepository ? userRepository : new UserRepository(databaseConnection);
         this._userCommandHandler = new UserCommandHandler(world);
 
-        const jsonBodyParser = new JsonBodyParser();
-        const characterNameValidator = new CharacterNameValidator();
-        const loginTokenGenerator = new LoginTokenGenerator();
-        const passwordHasher = new PasswordHasher();
         const createCharacterRequestHandler = new CreateCharacterRequestHandler(
-            jsonBodyParser,
-            characterNameValidator,
             this._characterRepository,
             this._userRepository
         );
@@ -76,10 +66,10 @@ export class Server {
             this._characterRepository,
             this._userRepository
         );
-        const loginRequestHandler = new LoginRequestHandler(jsonBodyParser, loginTokenGenerator, passwordHasher, this._userRepository);
+        const loginRequestHandler = new LoginRequestHandler(this._userRepository);
         const raceListRequestHandler = new RaceListRequestHandler(this._raceRepository);
         const characterClassListRequestHandler = new CharacterClassListRequestHandler(this._characterClassRepository);
-        const signupRequestHandler = new SignupRequestHandler(jsonBodyParser, passwordHasher, this._userRepository);
+        const signupRequestHandler = new SignupRequestHandler(this._userRepository);
         const serverRoutes = [
             new RootPageRoute(),
             new CharacterSelectPageRoute(),
