@@ -7,13 +7,11 @@ import { type IncomingMessage, type ServerResponse } from "node:http";
 
 export class LoginRequestHandler {
 
-    private _jsonBodyParser: JsonBodyParser;
     private _loginTokenGenerator: LoginTokenGenerator;
     private _passwordHasher: PasswordHasher;
     private _userRepository: UserRepository;
 
     constructor(userRepository: UserRepository) {
-        this._jsonBodyParser = new JsonBodyParser();
         this._loginTokenGenerator = new LoginTokenGenerator();
         this._passwordHasher = new PasswordHasher();
         this._userRepository = userRepository;
@@ -35,7 +33,7 @@ export class LoginRequestHandler {
             let payload: UserLoginPayload;
 
             try {
-                payload = await this._jsonBodyParser.parse<UserLoginPayload>(request);
+                payload = await JsonBodyParser.parse<UserLoginPayload>(request);
             } catch (error) {
                 sendJson(400, { error: "Invalid JSON body." });
                 return;
@@ -82,3 +80,4 @@ export class LoginRequestHandler {
     }
 
 }
+

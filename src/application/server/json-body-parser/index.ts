@@ -2,7 +2,9 @@ import { type IncomingMessage } from "node:http";
 
 export class JsonBodyParser {
 
-    public parse<T>(request: IncomingMessage): Promise<T> {
+    private constructor() {}
+
+    public static parse<T>(request: IncomingMessage): Promise<T> {
         return new Promise((resolve, reject) => {
             const chunks: Buffer[] = [];
 

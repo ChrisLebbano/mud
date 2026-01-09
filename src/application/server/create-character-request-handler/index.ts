@@ -9,13 +9,11 @@ export class CreateCharacterRequestHandler {
 
     private _characterNameValidator: CharacterNameValidator;
     private _characterRepository: CharacterRepository;
-    private _jsonBodyParser: JsonBodyParser;
     private _userRepository: UserRepository;
 
     constructor(characterRepository: CharacterRepository, userRepository: UserRepository) {
         this._characterNameValidator = new CharacterNameValidator();
         this._characterRepository = characterRepository;
-        this._jsonBodyParser = new JsonBodyParser();
         this._userRepository = userRepository;
     }
 
@@ -35,7 +33,7 @@ export class CreateCharacterRequestHandler {
             let payload: CharacterCreatePayload;
 
             try {
-                payload = await this._jsonBodyParser.parse<CharacterCreatePayload>(request);
+                payload = await JsonBodyParser.parse<CharacterCreatePayload>(request);
             } catch (error) {
                 sendJson(400, { error: "Invalid JSON body." });
                 return;
@@ -102,3 +100,4 @@ export class CreateCharacterRequestHandler {
     }
 
 }
+
