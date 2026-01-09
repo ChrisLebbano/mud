@@ -232,9 +232,9 @@ class FakeDatabaseConnection implements DatabaseConnectionClient {
         return this._testConnectionStages;
     }
 
-    public testConnection(stage: string): Promise<void> {
+    public testConnection(stage: string): Promise<boolean> {
         this._testConnectionStages.push(stage);
-        return Promise.resolve();
+        return Promise.resolve(true);
     }
 
 }

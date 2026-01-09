@@ -12,6 +12,5 @@ export type DatabasePoolFactory = (config: DatabaseConfig) => Pool;
 
 export interface DatabaseConnectionClient {
     connect: () => ReturnType<DatabasePoolFactory>;
-    testConnection: (stage: string) => Promise<void>;
+    testConnection: (stage: string) => Promise<boolean>;
 }
-

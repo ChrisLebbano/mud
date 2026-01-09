@@ -34,15 +34,17 @@ export class DatabaseConnection {
         return this._pool;
     }
 
-    public async testConnection(stage: string): Promise<void> {
+    public async testConnection(stage: string): Promise<boolean> {
         const pool = this.connect();
 
         try {
             await pool.query(`SELECT 1 FROM \`${this._testTableName}\` LIMIT 1`);
             console.log(`[INFO] Database connection test (${stage}) succeeded.`);
+            return true;
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             console.error(`[ERROR] Database connection test (${stage}) failed: ${message}`);
+            return false;
         }
     }
 

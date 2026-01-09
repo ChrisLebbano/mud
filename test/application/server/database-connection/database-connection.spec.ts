@@ -116,10 +116,11 @@ describe(`[Class] DatabaseConnection`, () => {
 
             const connection = new DatabaseConnection(databaseConfig, poolFactory, testTableName);
 
-            await connection.testConnection("startup");
+            const result = await connection.testConnection("startup");
 
             expect(fakePool.queryCalls).to.deep.equal([`SELECT 1 FROM \`${testTableName}\` LIMIT 1`]);
             expect(logs).to.deep.equal([`[INFO] Database connection test (startup) succeeded.`]);
+            expect(result).to.equal(true);
 
             console.log = originalConsoleLog;
         });
@@ -141,9 +142,10 @@ describe(`[Class] DatabaseConnection`, () => {
 
             const connection = new DatabaseConnection(databaseConfig, poolFactory, testTableName);
 
-            await connection.testConnection("startup");
+            const result = await connection.testConnection("startup");
 
             expect(errors).to.deep.equal([`[ERROR] Database connection test (startup) failed: boom`]);
+            expect(result).to.equal(false);
 
             console.error = originalConsoleError;
         });

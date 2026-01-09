@@ -66,7 +66,10 @@ const loadWorld = async (): Promise<World> => {
 };
 
 const run = async (): Promise<void> => {
-    await databaseConnection.testConnection("process start");
+    const isDatabaseReady = await databaseConnection.testConnection("process start");
+    if (!isDatabaseReady) {
+        throw new Error("Database connection failed during process start.");
+    }
     const world = await loadWorld();
     const application = new Application(serverConfig, world, databaseConnection);
     application.init();
