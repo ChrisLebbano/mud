@@ -45,10 +45,16 @@ export class DbMigrator {
                 const migrationPath = resolve(this._migrationsPath, file);
                 const sql = await readFile(migrationPath, "utf8");
                 const connection = await pool.getConnection();
+                const statements = sql
+                    .split(";")
+                    .map((statement) => statement.trim())
+                    .filter((statement) => statement.length > 0);
 
                 try {
                     await connection.beginTransaction();
-                    await connection.query(sql);
+                    for (const statement of statements) {
+                        await connection.query(statement);
+                    }
                     await connection.query("INSERT INTO schema_migrations (name) VALUES (?)", [file]);
                     await connection.commit();
                     appliedCount += 1;
