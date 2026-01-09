@@ -2,7 +2,7 @@ import { CharacterClass } from "../../../src/game/character-class";
 import { NonPlayerCharacter } from "../../../src/game/non-player-character";
 import { Race } from "../../../src/game/race";
 import { Room } from "../../../src/game/room";
-import { ITEM_TYPE, type WorldData, type WorldRaceData } from "../../../src/game/types/world-data";
+import { ITEM_TYPE, type WorldClassData, type WorldData, type WorldRaceData } from "../../../src/game/types/world-data";
 import { World } from "../../../src/game/world";
 import { Zone } from "../../../src/game/zone";
 import { expect } from "chai";
@@ -97,20 +97,13 @@ describe(`[Class] World`, () => {
 
 
 
+
     });
 
     describe(`[Method] fromData`, () => {
 
         it(`should build a world from data`, () => {
             const worldData: WorldData = {
-                classes: [
-                    {
-                        attributeModifiers: warriorModifiers,
-                        description: "Disciplined fighters.",
-                        id: "warrior",
-                        name: "Warrior"
-                    }
-                ],
                 playerClassId: "warrior",
                 playerRaceId: "human",
                 startingRoomId: "atrium",
@@ -154,8 +147,16 @@ describe(`[Class] World`, () => {
                     name: "Human"
                 }
             ];
+            const classData: WorldClassData[] = [
+                {
+                    attributeModifiers: warriorModifiers,
+                    description: "Disciplined fighters.",
+                    id: "warrior",
+                    name: "Warrior"
+                }
+            ];
 
-            const world = World.fromData(worldData, raceData);
+            const world = World.fromData(worldData, raceData, classData);
             const room = world.getRoom("atrium");
 
             expect(room?.name).to.equal("Atrium");
@@ -487,14 +488,6 @@ describe(`[Class] World`, () => {
 
         it(`should return items built from data`, () => {
             const worldData: WorldData = {
-                classes: [
-                    {
-                        attributeModifiers: warriorModifiers,
-                        description: "Disciplined fighters.",
-                        id: "warrior",
-                        name: "Warrior"
-                    }
-                ],
                 items: [
                     {
                         description: "A vial of red liquid.",
@@ -530,8 +523,16 @@ describe(`[Class] World`, () => {
                     name: "Human"
                 }
             ];
+            const classData: WorldClassData[] = [
+                {
+                    attributeModifiers: warriorModifiers,
+                    description: "Disciplined fighters.",
+                    id: "warrior",
+                    name: "Warrior"
+                }
+            ];
 
-            const world = World.fromData(worldData, raceData);
+            const world = World.fromData(worldData, raceData, classData);
 
             expect(world.items.map((item) => item.name)).to.deep.equal(["small health potion"]);
         });
@@ -539,3 +540,4 @@ describe(`[Class] World`, () => {
     });
 
 });
+

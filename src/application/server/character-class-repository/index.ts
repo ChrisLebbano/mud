@@ -12,15 +12,24 @@ export class CharacterClassRepository {
     public async findAll(): Promise<CharacterClassRecord[]> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<CharacterClassRow[]>(
-            "SELECT id, name, description FROM characterClasses ORDER BY name ASC",
+            "SELECT id, name, description, attributeModifiers FROM characterClasses ORDER BY name ASC",
             []
         );
 
         return rows.map((row) => ({
+            attributeModifiers: this.parseAttributeModifiers(row.attributeModifiers),
             description: row.description,
             id: row.id,
             name: row.name
         }));
+    }
+
+    private parseAttributeModifiers(attributeModifiers: CharacterClassRow["attributeModifiers"]): CharacterClassRecord["attributeModifiers"] {
+        if (typeof attributeModifiers === "string") {
+            return JSON.parse(attributeModifiers) as CharacterClassRecord["attributeModifiers"];
+        }
+
+        return attributeModifiers;
     }
 
 }
