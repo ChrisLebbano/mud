@@ -98,6 +98,7 @@ describe(`[Class] World`, () => {
 
 
 
+
     });
 
     describe(`[Method] fromData`, () => {
@@ -156,7 +157,7 @@ describe(`[Class] World`, () => {
                 }
             ];
 
-            const world = World.fromData(worldData, raceData, classData);
+            const world = World.fromData(worldData, raceData, classData, []);
             const room = world.getRoom("atrium");
 
             expect(room?.name).to.equal("Atrium");
@@ -488,13 +489,6 @@ describe(`[Class] World`, () => {
 
         it(`should return items built from data`, () => {
             const worldData: WorldData = {
-                items: [
-                    {
-                        description: "A vial of red liquid.",
-                        name: "small health potion",
-                        type: ITEM_TYPE.POTION
-                    }
-                ],
                 playerClassId: "warrior",
                 playerRaceId: "human",
                 startingRoomId: "atrium",
@@ -532,7 +526,13 @@ describe(`[Class] World`, () => {
                 }
             ];
 
-            const world = World.fromData(worldData, raceData, classData);
+            const world = World.fromData(worldData, raceData, classData, [
+                {
+                    description: "A vial of red liquid.",
+                    name: "small health potion",
+                    type: ITEM_TYPE.POTION
+                }
+            ]);
 
             expect(world.items.map((item) => item.name)).to.deep.equal(["small health potion"]);
         });
@@ -540,4 +540,3 @@ describe(`[Class] World`, () => {
     });
 
 });
-

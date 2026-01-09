@@ -1,10 +1,11 @@
 import { Application } from "./application";
 import { CharacterClassRepository } from "./application/server/character-class-repository";
 import { DatabaseConnection } from "./application/server/database-connection";
+import { ItemRepository } from "./application/server/item-repository";
 import { RaceRepository } from "./application/server/race-repository";
 import { type DatabaseConfig } from "./application/server/types/database";
 import { type ServerConfig } from "./application/server/types/server-config";
-import { type WorldClassData, type WorldData, type WorldRaceData } from "./game/types/world-data";
+import { type WorldClassData, type WorldData, type WorldItemData, type WorldRaceData } from "./game/types/world-data";
 import { World } from "./game/world";
 import { createPool } from "mysql2/promise";
 import { readFileSync } from "node:fs";
@@ -35,6 +36,7 @@ const worldDataPath = resolve(process.cwd(), "data", "world.json");
 const worldData = JSON.parse(readFileSync(worldDataPath, "utf8")) as WorldData;
 const databaseConnection = new DatabaseConnection(databaseConfig, createPool, databaseTestTableName);
 const characterClassRepository = new CharacterClassRepository(databaseConnection);
+const itemRepository = new ItemRepository(databaseConnection);
 const raceRepository = new RaceRepository(databaseConnection);
 
 const loadWorld = async (): Promise<World> => {
@@ -52,8 +54,15 @@ const loadWorld = async (): Promise<World> => {
         id: race.raceKey,
         name: race.name
     }));
+    const items = await itemRepository.findAll();
+    const itemData: WorldItemData[] = items.map((item) => ({
+        description: item.description ?? "",
+        maxCount: item.maxCount,
+        name: item.name,
+        type: item.type
+    }));
 
-    return World.fromData(worldData, raceData, classData);
+    return World.fromData(worldData, raceData, classData, itemData);
 };
 
 const run = async (): Promise<void> => {
@@ -67,4 +76,3 @@ void run().catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[ERROR] Failed to start application: ${message}`);
 });
-
