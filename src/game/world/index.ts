@@ -7,7 +7,7 @@ import { Race } from "../race";
 import { Room } from "../room";
 import { type ChatMessage } from "../types/message";
 import { type RoomSnapshot } from "../types/room";
-import { type WorldClassData, type WorldData, type WorldRaceData } from "../types/world-data";
+import { type WorldClassData, type WorldData, type WorldItemData, type WorldRaceData } from "../types/world-data";
 import { Zone } from "../zone";
 
 export class World {
@@ -94,7 +94,7 @@ export class World {
         });
     }
 
-    public static fromData(worldData: WorldData, raceData: WorldRaceData[], classData: WorldClassData[]): World {
+    public static fromData(worldData: WorldData, raceData: WorldRaceData[], classData: WorldClassData[], itemData?: WorldItemData[]): World {
         const classes = classData.map((classEntry) => new CharacterClass(
             classEntry.id,
             classEntry.name,
@@ -109,11 +109,11 @@ export class World {
             raceEntry.baseAttributes
         ));
         const raceMap = new Map(races.map((race) => [race.id, race]));
-        const items = (worldData.items ?? []).map((itemData) => new Item(
-            itemData.name,
-            itemData.description,
-            itemData.type,
-            itemData.maxCount
+        const items = (itemData ?? []).map((itemEntry) => new Item(
+            itemEntry.name,
+            itemEntry.description,
+            itemEntry.type,
+            itemEntry.maxCount
         ));
         const zones = worldData.zones.map((zoneData) => {
             const rooms = zoneData.rooms.map((roomData) => {
@@ -470,5 +470,5 @@ export class World {
 
 
 
-}
 
+}
