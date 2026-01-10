@@ -18,7 +18,7 @@ export class LoginRequestHandler {
     }
 
     public handle(request: IncomingMessage, response: ServerResponse): void {
-        const sendJson = (statusCode: number, payload: Record<string, string>): void => {
+        const sendJson = (statusCode: number, payload: Record<string, unknown>): void => {
             response.statusCode = statusCode;
             response.setHeader("Content-Type", "application/json");
             response.end(JSON.stringify(payload));
@@ -84,4 +84,3 @@ export class LoginRequestHandler {
     }
 
 }
-
