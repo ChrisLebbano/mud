@@ -12,7 +12,7 @@ export class ItemRepository {
     public async findAll(): Promise<ItemRecord[]> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<ItemRow[]>(
-            "SELECT id, name, description, maxCount, type FROM items ORDER BY name ASC",
+            "SELECT id, name, description, maxCount, type FROM itemDefs ORDER BY name ASC",
             []
         );
 
@@ -26,4 +26,3 @@ export class ItemRepository {
     }
 
 }
-
