@@ -12,30 +12,30 @@ import { Zone } from "../zone";
 
 export class World {
 
-    private _players: Map<string, PlayerCharacter>;
-    private _playerClassId: string;
-    private _playerRaceId: string;
     private _classes: Map<string, CharacterClass>;
+    private _classesByName: Map<string, CharacterClass>;
     private _items: Item[];
+    private _players: Map<string, PlayerCharacter>;
     private _races: Map<string, Race>;
+    private _racesByName: Map<string, Race>;
     private _rooms: Map<string, Room>;
+    private _roomZones: Map<string, Zone>;
     private _startingRoomId: string;
     private _startingZoneId: string;
     private _zones: Map<string, Zone>;
-    private _roomZones: Map<string, Zone>;
 
-    constructor(zones: Zone[], races: Race[], classes: CharacterClass[], startingZoneId: string, startingRoomId: string, playerRaceId: string, playerClassId: string, items?: Item[]) {
-        this._players = new Map();
-        this._playerClassId = playerClassId;
-        this._playerRaceId = playerRaceId;
+    constructor(zones: Zone[], races: Race[], classes: CharacterClass[], startingZoneId: string, startingRoomId: string, items?: Item[]) {
         this._classes = new Map(classes.map((characterClass) => [characterClass.id, characterClass]));
+        this._classesByName = new Map(classes.map((characterClass) => [characterClass.name.toLowerCase(), characterClass]));
         this._items = items ?? [];
+        this._players = new Map();
         this._races = new Map(races.map((race) => [race.id, race]));
+        this._racesByName = new Map(races.map((race) => [race.name.toLowerCase(), race]));
         this._rooms = new Map();
+        this._roomZones = new Map();
         this._startingRoomId = startingRoomId;
         this._startingZoneId = startingZoneId;
         this._zones = new Map(zones.map((zone) => [zone.id, zone]));
-        this._roomZones = new Map();
 
         zones.forEach((zone) => {
             zone.rooms.forEach((room) => {
@@ -54,10 +54,10 @@ export class World {
         }
     }
 
-    public addPlayer(playerId: string, playerName: string) {
+    public addPlayer(playerId: string, playerName: string, playerRaceName: string, playerClassName: string) {
         const room = this.getRoomById(this._startingRoomId);
-        const playerRace = this.getRaceById(this._playerRaceId);
-        const playerClass = this.getClassById(this._playerClassId);
+        const playerRace = this.getRaceByName(playerRaceName);
+        const playerClass = this.getClassByName(playerClassName);
         const player = new PlayerCharacter(playerId, playerName, room.id, playerRace, playerClass);
         const breadItem = this._items.find((item) => item.name === "bread");
         const waterFlaskItem = this._items.find((item) => item.name === "water flask");
@@ -145,21 +145,51 @@ export class World {
             return new Zone(zoneData.id, zoneData.name, rooms, zoneData.startingRoomId);
         });
 
-        return new World(zones, races, classes, worldData.startingZoneId, worldData.startingRoomId, worldData.playerRaceId, worldData.playerClassId, items);
+        return new World(zones, races, classes, worldData.startingZoneId, worldData.startingRoomId, items);
+    }
+
+    private getClassByName(className: string): CharacterClass {
+        const normalizedName = className.trim().toLowerCase();
+        const characterClass = this._classesByName.get(normalizedName);
+        if (!characterClass) {
+            throw new Error(`Class not found: ${className}`);
+        }
+        return characterClass;
+    }
+
+    private static getClassFromMap(classMap: Map<string, CharacterClass>, classId: string): CharacterClass {
+        const characterClass = classMap.get(classId);
+        if (!characterClass) {
+            throw new Error(`Class not found: ${classId}`);
+        }
+        return characterClass;
     }
 
     public getPlayer(playerId: string): PlayerCharacter | undefined {
         return this._players.get(playerId);
     }
 
-    public get items(): Item[] {
-        return this._items;
-    }
-
     public getPlayerNamesForZone(zoneId: string): string[] {
         return Array.from(this._players.values())
             .filter((player) => this.getZoneForRoom(player.roomId).id === zoneId)
             .map((player) => player.name);
+    }
+
+    private getRaceByName(raceName: string): Race {
+        const normalizedName = raceName.trim().toLowerCase();
+        const race = this._racesByName.get(normalizedName);
+        if (!race) {
+            throw new Error(`Race not found: ${raceName}`);
+        }
+        return race;
+    }
+
+    private static getRaceFromMap(raceMap: Map<string, Race>, raceId: string): Race {
+        const race = raceMap.get(raceId);
+        if (!race) {
+            throw new Error(`Race not found: ${raceId}`);
+        }
+        return race;
     }
 
     public getRoom(roomId: string): Room | undefined {
@@ -172,14 +202,6 @@ export class World {
             throw new Error(`Room not found: ${roomId}`);
         }
         return room;
-    }
-
-    private getRaceById(raceId: string): Race {
-        return World.getRaceFromMap(this._races, raceId);
-    }
-
-    private getClassById(classId: string): CharacterClass {
-        return World.getClassFromMap(this._classes, classId);
     }
 
     public getRoomSnapshot(roomId: string, playerId?: string): RoomSnapshot {
@@ -213,28 +235,16 @@ export class World {
         return zone;
     }
 
-    private static getRaceFromMap(raceMap: Map<string, Race>, raceId: string): Race {
-        const race = raceMap.get(raceId);
-        if (!race) {
-            throw new Error(`Race not found: ${raceId}`);
-        }
-        return race;
-    }
-
-    private static getClassFromMap(classMap: Map<string, CharacterClass>, classId: string): CharacterClass {
-        const characterClass = classMap.get(classId);
-        if (!characterClass) {
-            throw new Error(`Class not found: ${classId}`);
-        }
-        return characterClass;
-    }
-
     private getZoneForRoom(roomId: string): Zone {
         const zone = this._roomZones.get(roomId);
         if (!zone) {
             throw new Error(`Zone not found for room: ${roomId}`);
         }
         return zone;
+    }
+
+    public get items(): Item[] {
+        return this._items;
     }
 
     public movePlayer(playerId: string, direction: string) {
@@ -409,37 +419,6 @@ export class World {
         };
     }
 
-    public shout(playerId: string, message: string): { chatMessage: ChatMessage; roomIds: string[]; selfMessage: ChatMessage } | { error: string } {
-        const player = this._players.get(playerId);
-        if (!player) {
-            return { error: "Player not found." };
-        }
-
-        const trimmedMessage = message.trim();
-        if (!trimmedMessage) {
-            return { error: "What would you like to shout? (shout [message here])" };
-        }
-
-        const zone = this.getZoneForRoom(player.roomId);
-        return {
-            chatMessage: {
-                category: "Shout",
-                message: `${player.name} shouts "${trimmedMessage}".`,
-                playerId: player.id,
-                playerName: player.name,
-                roomId: player.roomId
-            },
-            roomIds: zone.rooms.map((room) => room.id),
-            selfMessage: {
-                category: "Shout",
-                message: `You shout "${trimmedMessage}".`,
-                playerId: player.id,
-                playerName: player.name,
-                roomId: player.roomId
-            }
-        };
-    }
-
     public setPrimaryTarget(playerId: string, targetName: string) {
         const player = this._players.get(playerId);
         if (!player) {
@@ -471,10 +450,38 @@ export class World {
             roomSnapshot: this.getRoomSnapshot(player.roomId, playerId),
             targetName: target.name
         };
+    }
+
+    public shout(playerId: string, message: string): { chatMessage: ChatMessage; roomIds: string[]; selfMessage: ChatMessage } | { error: string } {
+        const player = this._players.get(playerId);
+        if (!player) {
+            return { error: "Player not found." };
+        }
+
+        const trimmedMessage = message.trim();
+        if (!trimmedMessage) {
+            return { error: "What would you like to shout? (shout [message here])" };
+        }
+
+        const zone = this.getZoneForRoom(player.roomId);
+        return {
+            chatMessage: {
+                category: "Shout",
+                message: `${player.name} shouts "${trimmedMessage}".`,
+                playerId: player.id,
+                playerName: player.name,
+                roomId: player.roomId
+            },
+            roomIds: zone.rooms.map((room) => room.id),
+            selfMessage: {
+                category: "Shout",
+                message: `You shout "${trimmedMessage}".`,
+                playerId: player.id,
+                playerName: player.name,
+                roomId: player.roomId
+            }
+        };
+    }
+
 }
 
-
-
-
-
-}
