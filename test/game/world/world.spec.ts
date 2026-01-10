@@ -81,11 +81,13 @@ describe(`[Class] World`, () => {
             const zone = new Zone("starter-zone", "Starter Zone", rooms, "atrium");
             const world = new World([zone], races, classes, "starter-zone", "atrium");
             const result = world.addPlayer("player-1", "Alex", "Creature", "Cleric");
+            const player = world.getPlayer("player-1");
 
             expect(result.roomId).to.equal("atrium");
             expect(result.roomSnapshot.players).to.include("Alex");
             expect(result.roomSnapshot.player?.race.name).to.equal("Creature");
             expect(result.roomSnapshot.player?.characterClass.name).to.equal("Cleric");
+            expect(player?.inventory.slots.filter((slot) => slot !== null)).to.have.length(0);
         });
 
     });
@@ -526,4 +528,3 @@ describe(`[Class] World`, () => {
     });
 
 });
-
