@@ -63,6 +63,15 @@ describe(`[Class] ServerRoute`, () => {
             expect(matches).to.equal(true);
         });
 
+        it(`should return true when the request url matches the route with a query string`, () => {
+            const route = new ServerRoute("/characters", () => undefined);
+            const request = { url: "/characters?loginToken=token-value" } as IncomingMessage;
+
+            const matches = route.matches(request);
+
+            expect(matches).to.equal(true);
+        });
+
     });
 
 });

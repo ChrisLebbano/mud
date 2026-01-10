@@ -21,7 +21,8 @@ export class ServerRoute {
     }
 
     public matches(request: IncomingMessage): boolean {
-        return request.url === this._path;
+        const requestUrl = new URL(request.url ?? "", "http://localhost");
+        return requestUrl.pathname === this._path;
     }
 
 }
