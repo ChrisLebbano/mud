@@ -63,7 +63,24 @@
         .character-button.enter-world {
             background-color: #22c55e;
             color: #0f172a;
+        }
+
+        .character-action-row {
+            display: flex;
+            gap: 16px;
             margin-top: 16px;
+        }
+
+        .character-button.delete-character {
+            background-color: #ef4444;
+            background-image: linear-gradient(
+                90deg,
+                #b91c1c 0%,
+                #b91c1c var(--delete-progress, 0%),
+                #ef4444 var(--delete-progress, 0%),
+                #ef4444 100%
+            );
+            color: #0f172a;
         }
 
         .character-button.selected {
@@ -82,73 +99,130 @@
         <h1>Select your character</h1>
         <p>Choose who you want to play as, or create a new adventurer.</p>
         <div class="character-grid" id="character-grid"></div>
-        <button class="character-button enter-world" id="enter-world-button" type="button" disabled>Enter World</button>
+        <div class="character-action-row">
+            <button class="character-button enter-world" id="enter-world-button" type="button" disabled>Enter World</button>
+            <button class="character-button delete-character" id="delete-character-button" type="button" disabled>Delete Character</button>
+        </div>
     </main>
     <script>
         const characterGrid = document.getElementById("character-grid");
         const enterWorldButton = document.getElementById("enter-world-button");
+        const deleteCharacterButton = document.getElementById("delete-character-button");
         const loginTokenKey = "loginToken";
         const selectedCharacterKey = "selectedCharacterName";
+        const selectedCharacterIdKey = "selectedCharacterId";
 
         const loginToken = localStorage.getItem(loginTokenKey);
         let selectedCharacterName = localStorage.getItem(selectedCharacterKey);
+        let selectedCharacterId = localStorage.getItem(selectedCharacterIdKey);
         if (!loginToken) {
             window.location.assign("/login");
         }
 
-        const setSelectedCharacter = (characterName) => {
-            selectedCharacterName = characterName;
-            localStorage.setItem(selectedCharacterKey, characterName);
-            const buttons = Array.from(characterGrid.querySelectorAll("[data-character-name]"));
-            buttons.forEach((button) => {
-                button.classList.toggle("selected", button.dataset.characterName === characterName);
-            });
-            enterWorldButton.disabled = !characterName;
+        const deleteHoldDurationMs = 5000;
+        let deleteHoldIntervalId = null;
+        let deleteHoldTimeoutId = null;
+        let deleteHoldStart = null;
+        let isDeleting = false;
+
+        const resetDeleteHold = () => {
+            if (deleteHoldIntervalId) {
+                clearInterval(deleteHoldIntervalId);
+                deleteHoldIntervalId = null;
+            }
+
+            if (deleteHoldTimeoutId) {
+                clearTimeout(deleteHoldTimeoutId);
+                deleteHoldTimeoutId = null;
+            }
+
+            deleteHoldStart = null;
+            deleteCharacterButton.style.setProperty("--delete-progress", "0%");
         };
 
-        const createButton = (label, isCreateNew, characterName) => {
+        const clearSelectedCharacter = () => {
+            selectedCharacterName = null;
+            selectedCharacterId = null;
+            localStorage.removeItem(selectedCharacterIdKey);
+            localStorage.removeItem(selectedCharacterKey);
+            const buttons = Array.from(characterGrid.querySelectorAll("[data-character-id]"));
+            buttons.forEach((button) => {
+                button.classList.remove("selected");
+            });
+            enterWorldButton.disabled = true;
+            deleteCharacterButton.disabled = true;
+            resetDeleteHold();
+        };
+
+        const setSelectedCharacter = (characterId, characterName) => {
+            selectedCharacterId = characterId;
+            selectedCharacterName = characterName;
+            localStorage.setItem(selectedCharacterIdKey, characterId);
+            localStorage.setItem(selectedCharacterKey, characterName);
+            const buttons = Array.from(characterGrid.querySelectorAll("[data-character-id]"));
+            buttons.forEach((button) => {
+                button.classList.toggle("selected", button.dataset.characterId === characterId);
+            });
+            enterWorldButton.disabled = !characterName;
+            deleteCharacterButton.disabled = !characterId;
+            resetDeleteHold();
+        };
+
+        const createButton = (label, isCreateNew, characterName, characterId) => {
             const button = document.createElement("button");
             button.type = "button";
             button.className = `character-button${isCreateNew ? " create-new" : ""}`;
             button.textContent = label;
-            if (!isCreateNew && characterName) {
+            if (!isCreateNew && characterName && characterId) {
+                button.dataset.characterId = characterId;
                 button.dataset.characterName = characterName;
             }
             button.addEventListener("click", () => {
                 if (isCreateNew) {
-                    localStorage.removeItem(selectedCharacterKey);
+                    clearSelectedCharacter();
                     window.location.assign("/character/create");
                     return;
                 }
 
-                if (!characterName) {
+                if (!characterName || !characterId) {
                     return;
                 }
 
-                setSelectedCharacter(characterName);
+                setSelectedCharacter(characterId, characterName);
             });
             return button;
         };
 
         const renderButtons = (characters) => {
+            characterGrid.innerHTML = "";
             const slots = Array.from({ length: 8 }, (_, index) => characters[index] ?? null);
             slots.forEach((character) => {
                 if (character) {
-                    characterGrid.append(createButton(character.name, false, character.name));
+                    characterGrid.append(createButton(character.name, false, character.name, String(character.id)));
                     return;
                 }
 
-                characterGrid.append(createButton("create character", true));
+                characterGrid.append(createButton("create character", true, null, null));
             });
 
-            if (selectedCharacterName) {
-                const matchesExisting = characters.some((character) => character.name === selectedCharacterName);
-                if (matchesExisting) {
-                    setSelectedCharacter(selectedCharacterName);
-                } else {
-                    enterWorldButton.disabled = true;
-                }
+            const matchingById = selectedCharacterId
+                ? characters.find((character) => String(character.id) === selectedCharacterId)
+                : null;
+            const matchingByName = !matchingById && selectedCharacterName
+                ? characters.find((character) => character.name === selectedCharacterName)
+                : null;
+
+            if (matchingById) {
+                setSelectedCharacter(String(matchingById.id), matchingById.name);
+                return;
             }
+
+            if (matchingByName) {
+                setSelectedCharacter(String(matchingByName.id), matchingByName.name);
+                return;
+            }
+
+            clearSelectedCharacter();
         };
 
         enterWorldButton.addEventListener("click", () => {
@@ -175,6 +249,85 @@
                 renderButtons([]);
             }
         };
+
+        const deleteSelectedCharacter = async () => {
+            if (!selectedCharacterId || !loginToken) {
+                return;
+            }
+
+            if (deleteCharacterButton.disabled) {
+                return;
+            }
+
+            deleteCharacterButton.disabled = true;
+            const payload = {
+                characterId: Number(selectedCharacterId),
+                loginToken
+            };
+
+            try {
+                const response = await fetch("/characters", {
+                    body: JSON.stringify(payload),
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "DELETE"
+                });
+
+                if (!response.ok) {
+                    deleteCharacterButton.disabled = false;
+                    return;
+                }
+
+                clearSelectedCharacter();
+                await loadCharacters();
+            } catch (error) {
+                deleteCharacterButton.disabled = false;
+            }
+        };
+
+        const startDeleteHold = () => {
+            if (!selectedCharacterId || deleteCharacterButton.disabled || isDeleting) {
+                return;
+            }
+
+            resetDeleteHold();
+            deleteHoldStart = Date.now();
+
+            deleteHoldIntervalId = setInterval(() => {
+                if (!deleteHoldStart) {
+                    return;
+                }
+
+                const elapsed = Date.now() - deleteHoldStart;
+                const progress = Math.min(elapsed / deleteHoldDurationMs, 1);
+                deleteCharacterButton.style.setProperty("--delete-progress", `${progress * 100}%`);
+            }, 50);
+
+            deleteHoldTimeoutId = setTimeout(() => {
+                isDeleting = true;
+                void deleteSelectedCharacter().finally(() => {
+                    isDeleting = false;
+                    resetDeleteHold();
+                });
+            }, deleteHoldDurationMs);
+        };
+
+        deleteCharacterButton.addEventListener("pointerdown", (event) => {
+            if (event.button && event.button !== 0) {
+                return;
+            }
+
+            startDeleteHold();
+        });
+
+        ["pointerup", "pointerleave", "pointercancel", "pointerout"].forEach((eventName) => {
+            deleteCharacterButton.addEventListener(eventName, () => {
+                if (!isDeleting) {
+                    resetDeleteHold();
+                }
+            });
+        });
 
         void loadCharacters();
     </script>

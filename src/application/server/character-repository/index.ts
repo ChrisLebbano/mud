@@ -29,7 +29,7 @@ export class CharacterRepository {
     public async findByName(name: string): Promise<CharacterRecord | null> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<CharacterRow[]>(
-            "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE name = ? LIMIT 1",
+            "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE name = ? AND deleted_at IS NULL LIMIT 1",
             [name]
         );
 
@@ -50,7 +50,7 @@ export class CharacterRepository {
     public async findByUserId(userId: number): Promise<CharacterRecord[]> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<CharacterRow[]>(
-            "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE user_id = ? ORDER BY name ASC",
+            "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE user_id = ? AND deleted_at IS NULL ORDER BY name ASC",
             [userId]
         );
 
@@ -61,6 +61,16 @@ export class CharacterRepository {
             raceName: row.race_name,
             userId: row.user_id
         }));
+    }
+
+    public async markDeletedById(characterId: number, userId: number): Promise<boolean> {
+        const pool = this._databaseConnection.connect();
+        const [result] = await pool.execute<ResultSetHeader>(
+            "UPDATE playerCharacters SET deleted_at = NOW() WHERE id = ? AND user_id = ? AND deleted_at IS NULL",
+            [characterId, userId]
+        );
+
+        return result.affectedRows > 0;
     }
 
 }

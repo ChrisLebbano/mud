@@ -15,6 +15,11 @@ export interface CharacterCreatePayload {
     loginToken: string;
 }
 
+export interface CharacterDeletePayload {
+    characterId: number;
+    loginToken: string;
+}
+
 export interface CharacterNameValidationResult {
     error: string | null;
     formattedName: string;

@@ -1,6 +1,7 @@
 import { World } from "../../game/world";
 import { CharacterClassListRequestHandler } from "./character-class-list-request-handler";
 import { CharacterClassRepository } from "./character-class-repository";
+import { CharacterDeleteRequestHandler } from "./character-delete-request-handler";
 import { CharacterListRequestHandler } from "./character-list-request-handler";
 import { CharacterRepository } from "./character-repository";
 import { CreateCharacterRequestHandler } from "./create-character-request-handler";
@@ -73,6 +74,10 @@ export class Server {
             this._characterRepository,
             this._userRepository
         );
+        const characterDeleteRequestHandler = new CharacterDeleteRequestHandler(
+            this._characterRepository,
+            this._userRepository
+        );
         const loginRequestHandler = new LoginRequestHandler(this._userRepository);
         const raceListRequestHandler = new RaceListRequestHandler(this._raceRepository);
         const characterClassListRequestHandler = new CharacterClassListRequestHandler(this._characterClassRepository);
@@ -88,6 +93,7 @@ export class Server {
             new MethodServerRoute("/classes", "GET", characterClassListRequestHandler.handle.bind(characterClassListRequestHandler)),
             new MethodServerRoute("/characters", "GET", characterListRequestHandler.handle.bind(characterListRequestHandler)),
             new MethodServerRoute("/characters", "POST", createCharacterRequestHandler.handle.bind(createCharacterRequestHandler)),
+            new MethodServerRoute("/characters", "DELETE", characterDeleteRequestHandler.handle.bind(characterDeleteRequestHandler)),
             new MethodServerRoute("/login", "POST", loginRequestHandler.handle.bind(loginRequestHandler)),
             new MethodServerRoute("/signup", "POST", signupRequestHandler.handle.bind(signupRequestHandler))
         ];
