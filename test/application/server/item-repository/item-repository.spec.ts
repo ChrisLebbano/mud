@@ -92,7 +92,7 @@ describe(`[Class] ItemRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: [],
-                    statement: "SELECT id, name, description, maxCount, type FROM items ORDER BY name ASC"
+                    statement: "SELECT id, name, description, maxCount, type FROM itemDefs ORDER BY name ASC"
                 }
             ]);
         });
