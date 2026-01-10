@@ -60,6 +60,16 @@
             background-color: #facc15;
         }
 
+        .character-button.enter-world {
+            background-color: #22c55e;
+            color: #0f172a;
+            margin-top: 16px;
+        }
+
+        .character-button.selected {
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.6);
+        }
+
         .character-button:disabled {
             cursor: not-allowed;
             opacity: 0.7;
@@ -72,22 +82,38 @@
         <h1>Select your character</h1>
         <p>Choose who you want to play as, or create a new adventurer.</p>
         <div class="character-grid" id="character-grid"></div>
+        <button class="character-button enter-world" id="enter-world-button" type="button" disabled>Enter World</button>
     </main>
     <script>
         const characterGrid = document.getElementById("character-grid");
+        const enterWorldButton = document.getElementById("enter-world-button");
         const loginTokenKey = "loginToken";
         const selectedCharacterKey = "selectedCharacterName";
 
         const loginToken = localStorage.getItem(loginTokenKey);
+        let selectedCharacterName = localStorage.getItem(selectedCharacterKey);
         if (!loginToken) {
             window.location.assign("/login");
         }
+
+        const setSelectedCharacter = (characterName) => {
+            selectedCharacterName = characterName;
+            localStorage.setItem(selectedCharacterKey, characterName);
+            const buttons = Array.from(characterGrid.querySelectorAll("[data-character-name]"));
+            buttons.forEach((button) => {
+                button.classList.toggle("selected", button.dataset.characterName === characterName);
+            });
+            enterWorldButton.disabled = !characterName;
+        };
 
         const createButton = (label, isCreateNew, characterName) => {
             const button = document.createElement("button");
             button.type = "button";
             button.className = `character-button${isCreateNew ? " create-new" : ""}`;
             button.textContent = label;
+            if (!isCreateNew && characterName) {
+                button.dataset.characterName = characterName;
+            }
             button.addEventListener("click", () => {
                 if (isCreateNew) {
                     localStorage.removeItem(selectedCharacterKey);
@@ -99,8 +125,7 @@
                     return;
                 }
 
-                localStorage.setItem(selectedCharacterKey, characterName);
-                window.location.assign("/game-client");
+                setSelectedCharacter(characterName);
             });
             return button;
         };
@@ -115,7 +140,24 @@
 
                 characterGrid.append(createButton("create character", true));
             });
+
+            if (selectedCharacterName) {
+                const matchesExisting = characters.some((character) => character.name === selectedCharacterName);
+                if (matchesExisting) {
+                    setSelectedCharacter(selectedCharacterName);
+                } else {
+                    enterWorldButton.disabled = true;
+                }
+            }
         };
+
+        enterWorldButton.addEventListener("click", () => {
+            if (!selectedCharacterName) {
+                return;
+            }
+
+            window.location.assign("/game-client");
+        });
 
         const loadCharacters = async () => {
             try {
