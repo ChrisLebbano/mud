@@ -106,7 +106,7 @@ describe(`[Class] CharacterRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["Riley"],
-                    statement: "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE name = ? LIMIT 1"
+                    statement: "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE name = ? AND deleted_at IS NULL LIMIT 1"
                 }
             ]);
         });
@@ -166,9 +166,39 @@ describe(`[Class] CharacterRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: [7],
-                    statement: "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE user_id = ? ORDER BY name ASC"
+                    statement: "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE user_id = ? AND deleted_at IS NULL ORDER BY name ASC"
                 }
             ]);
+        });
+
+    });
+
+    describe(`[Method] markDeletedById`, () => {
+
+        it(`should return true when a character is deleted`, async () => {
+            const pool = new FakePool();
+            pool.queueResult({ affectedRows: 1 });
+            const repository = new CharacterRepository(new FakeDatabaseConnection(pool));
+
+            const result = await repository.markDeletedById(14, 5);
+
+            expect(result).to.equal(true);
+            expect(pool.executeCalls).to.deep.equal([
+                {
+                    params: [14, 5],
+                    statement: "UPDATE playerCharacters SET deleted_at = NOW() WHERE id = ? AND user_id = ? AND deleted_at IS NULL"
+                }
+            ]);
+        });
+
+        it(`should return false when no character is deleted`, async () => {
+            const pool = new FakePool();
+            pool.queueResult({ affectedRows: 0 });
+            const repository = new CharacterRepository(new FakeDatabaseConnection(pool));
+
+            const result = await repository.markDeletedById(22, 3);
+
+            expect(result).to.equal(false);
         });
 
     });
