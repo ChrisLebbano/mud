@@ -60,6 +60,7 @@ export class Server {
 
         const createCharacterRequestHandler = new CreateCharacterRequestHandler(
             this._characterRepository,
+            this._raceRepository,
             this._userRepository
         );
         const characterListRequestHandler = new CharacterListRequestHandler(

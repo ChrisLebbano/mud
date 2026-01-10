@@ -1,6 +1,7 @@
 import { CharacterNameValidator } from "../character-name-validator";
 import { type CharacterRepository } from "../character-repository";
 import { JsonBodyParser } from "../json-body-parser";
+import { type RaceRepository } from "../race-repository";
 import { type CharacterCreateData, type CharacterCreatePayload } from "../types/character";
 import { type UserRepository } from "../user-repository";
 import { type IncomingMessage, type ServerResponse } from "node:http";
@@ -9,11 +10,13 @@ export class CreateCharacterRequestHandler {
 
     private _characterNameValidator: CharacterNameValidator;
     private _characterRepository: CharacterRepository;
+    private _raceRepository: RaceRepository;
     private _userRepository: UserRepository;
 
-    constructor(characterRepository: CharacterRepository, userRepository: UserRepository) {
+    constructor(characterRepository: CharacterRepository, raceRepository: RaceRepository, userRepository: UserRepository) {
         this._characterNameValidator = new CharacterNameValidator();
         this._characterRepository = characterRepository;
+        this._raceRepository = raceRepository;
         this._userRepository = userRepository;
     }
 
@@ -63,6 +66,12 @@ export class CreateCharacterRequestHandler {
             const nameValidation = this._characterNameValidator.validate(characterName);
             if (!nameValidation.isValid) {
                 sendJson(400, { error: nameValidation.error ?? "Invalid character name." });
+                return;
+            }
+
+            const race = await this._raceRepository.findByName(raceName);
+            if (!race || !race.playerCharacterAllowed) {
+                sendJson(400, { error: "Selected race is not available for player characters." });
                 return;
             }
 

@@ -6,6 +6,7 @@ export interface RaceRecord {
     description: string | null;
     id: number;
     name: string;
+    playerCharacterAllowed: boolean;
     raceKey: string;
 }
 
@@ -21,8 +22,10 @@ export interface RaceRow extends RowDataPacket {
     mana: number;
     name: string;
     perception: number;
+    player_character_allowed: number;
     race_key: string;
     resolve: number;
     strength: number;
     wisdom: number;
 }
+

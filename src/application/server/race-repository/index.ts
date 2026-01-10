@@ -12,11 +12,29 @@ export class RaceRepository {
     public async findAll(): Promise<RaceRecord[]> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<RaceRow[]>(
-            "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana FROM races ORDER BY name ASC",
+            "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, player_character_allowed FROM races ORDER BY name ASC",
             []
         );
 
-        return rows.map((row) => ({
+        return rows.map((row) => this.mapRowToRecord(row));
+    }
+
+    public async findByName(name: string): Promise<RaceRecord | null> {
+        const pool = this._databaseConnection.connect();
+        const [rows] = await pool.execute<RaceRow[]>(
+            "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, player_character_allowed FROM races WHERE LOWER(name) = LOWER(?) LIMIT 1",
+            [name]
+        );
+
+        if (rows.length === 0) {
+            return null;
+        }
+
+        return this.mapRowToRecord(rows[0]);
+    }
+
+    private mapRowToRecord(row: RaceRow): RaceRecord {
+        return {
             baseAttributes: {
                 agility: row.agility,
                 charisma: row.charisma,
@@ -33,8 +51,10 @@ export class RaceRepository {
             description: row.description,
             id: row.id,
             name: row.name,
+            playerCharacterAllowed: row.player_character_allowed === 1,
             raceKey: row.race_key
-        }));
+        };
     }
 
 }
+

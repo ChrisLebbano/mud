@@ -85,6 +85,7 @@ describe(`[Class] RaceListRequestHandler`, () => {
                     description: "Versatile adventurers.",
                     id: 1,
                     name: "Human",
+                    playerCharacterAllowed: true,
                     raceKey: "human"
                 }
             ]));
@@ -101,7 +102,8 @@ describe(`[Class] RaceListRequestHandler`, () => {
                     {
                         description: "Versatile adventurers.",
                         id: 1,
-                        name: "Human"
+                        name: "Human",
+                        playerCharacterAllowed: true
                     }
                 ]
             });
@@ -110,3 +112,4 @@ describe(`[Class] RaceListRequestHandler`, () => {
     });
 
 });
+

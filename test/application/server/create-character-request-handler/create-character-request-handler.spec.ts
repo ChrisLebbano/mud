@@ -1,5 +1,6 @@
 import { CreateCharacterRequestHandler } from "../../../../src/application/server/create-character-request-handler";
 import { type CharacterRecord } from "../../../../src/application/server/types/character";
+import { type RaceRecord } from "../../../../src/application/server/types/race";
 import { type UserRecord } from "../../../../src/application/server/types/user";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
@@ -29,7 +30,7 @@ class FakeCharacterRepository {
         });
     }
 
-    public findByName(): Promise<CharacterRecord | null> {
+    public findByName(_name: string): Promise<CharacterRecord | null> {
         return Promise.resolve(this._existingCharacter);
     }
 
@@ -45,6 +46,20 @@ class FakeUserRepository {
 
     public findByLoginToken(): Promise<UserRecord | null> {
         return Promise.resolve(this._user);
+    }
+
+}
+
+class FakeRaceRepository {
+
+    private _race: RaceRecord | null;
+
+    constructor(race: RaceRecord | null) {
+        this._race = race;
+    }
+
+    public findByName(_name: string): Promise<RaceRecord | null> {
+        return Promise.resolve(this._race);
     }
 
 }
@@ -93,8 +108,9 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
 
         it(`should reject when authentication fails`, async () => {
             const repository = new FakeCharacterRepository(null);
+            const raceRepository = new FakeRaceRepository(null);
             const userRepository = new FakeUserRepository(null);
-            const handler = new CreateCharacterRequestHandler(repository, userRepository);
+            const handler = new CreateCharacterRequestHandler(repository, raceRepository, userRepository);
             const request = createJsonRequest({
                 characterClassName: "Warrior",
                 characterName: "Alex",
@@ -116,6 +132,7 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
 
         it(`should reject invalid character names`, async () => {
             const repository = new FakeCharacterRepository(null);
+            const raceRepository = new FakeRaceRepository(null);
             const userRepository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 1,
@@ -124,7 +141,7 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                 passwordHash: "hash",
                 username: "hero"
             });
-            const handler = new CreateCharacterRequestHandler(repository, userRepository);
+            const handler = new CreateCharacterRequestHandler(repository, raceRepository, userRepository);
             const request = createJsonRequest({
                 characterClassName: "Warrior",
                 characterName: "A1",
@@ -144,8 +161,28 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
             expect(repository.createCalls).to.deep.equal([]);
         });
 
-        it(`should create a character when data is valid`, async () => {
+        it(`should reject non-player races`, async () => {
             const repository = new FakeCharacterRepository(null);
+            const raceRepository = new FakeRaceRepository({
+                baseAttributes: {
+                    agility: 9,
+                    charisma: 8,
+                    constitution: 12,
+                    dexterity: 9,
+                    health: 44,
+                    intelligence: 9,
+                    mana: 14,
+                    perception: 11,
+                    resolve: 9,
+                    strength: 12,
+                    wisdom: 8
+                },
+                description: "Wilder kin.",
+                id: 3,
+                name: "Creature",
+                playerCharacterAllowed: false,
+                raceKey: "creature"
+            });
             const userRepository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 1,
@@ -154,7 +191,57 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                 passwordHash: "hash",
                 username: "hero"
             });
-            const handler = new CreateCharacterRequestHandler(repository, userRepository);
+            const handler = new CreateCharacterRequestHandler(repository, raceRepository, userRepository);
+            const request = createJsonRequest({
+                characterClassName: "Warrior",
+                characterName: "Alex",
+                characterRaceName: "Creature",
+                loginToken: "token-123"
+            });
+            const response = new FakeResponse() as unknown as ServerResponse;
+
+            handler.handle(request, response);
+
+            await new Promise((resolve) => setImmediate(resolve));
+
+            const body = JSON.parse((response as unknown as FakeResponse).body);
+
+            expect((response as unknown as FakeResponse).statusCode).to.equal(400);
+            expect(body).to.deep.equal({ error: "Selected race is not available for player characters." });
+            expect(repository.createCalls).to.deep.equal([]);
+        });
+
+        it(`should create a character when data is valid`, async () => {
+            const repository = new FakeCharacterRepository(null);
+            const raceRepository = new FakeRaceRepository({
+                baseAttributes: {
+                    agility: 10,
+                    charisma: 12,
+                    constitution: 10,
+                    dexterity: 10,
+                    health: 42,
+                    intelligence: 10,
+                    mana: 22,
+                    perception: 10,
+                    resolve: 10,
+                    strength: 10,
+                    wisdom: 10
+                },
+                description: "Versatile adventurers.",
+                id: 1,
+                name: "Human",
+                playerCharacterAllowed: true,
+                raceKey: "human"
+            });
+            const userRepository = new FakeUserRepository({
+                email: "hero@example.com",
+                id: 1,
+                lastLoginOn: null,
+                loginToken: "token-123",
+                passwordHash: "hash",
+                username: "hero"
+            });
+            const handler = new CreateCharacterRequestHandler(repository, raceRepository, userRepository);
             const request = createJsonRequest({
                 characterClassName: "Warrior",
                 characterName: "Alex",
@@ -192,3 +279,4 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
     });
 
 });
+
