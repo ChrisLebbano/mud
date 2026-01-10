@@ -60,7 +60,6 @@ describe(`[Class] RaceRepository`, () => {
                     constitution: 10,
                     description: "Versatile adventurers.",
                     dexterity: 10,
-                    health: 42,
                     id: 1,
                     intelligence: 10,
                     mana: 22,
@@ -79,7 +78,6 @@ describe(`[Class] RaceRepository`, () => {
                     constitution: 12,
                     description: "Sturdy explorers.",
                     dexterity: 8,
-                    health: 48,
                     id: 2,
                     intelligence: 9,
                     mana: 16,
@@ -103,7 +101,7 @@ describe(`[Class] RaceRepository`, () => {
                         charisma: 12,
                         constitution: 10,
                         dexterity: 10,
-                        health: 42,
+                        health: 0,
                         intelligence: 10,
                         mana: 22,
                         perception: 10,
@@ -124,7 +122,7 @@ describe(`[Class] RaceRepository`, () => {
                         charisma: 9,
                         constitution: 12,
                         dexterity: 8,
-                        health: 48,
+                        health: 0,
                         intelligence: 9,
                         mana: 16,
                         perception: 9,
@@ -143,7 +141,7 @@ describe(`[Class] RaceRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: [],
-                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, base_health, player_character_allowed FROM races ORDER BY name ASC"
+                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, mana, base_health, player_character_allowed FROM races ORDER BY name ASC"
                 }
             ]);
         });
@@ -162,7 +160,6 @@ describe(`[Class] RaceRepository`, () => {
                     constitution: 12,
                     description: "Wilder kin.",
                     dexterity: 9,
-                    health: 44,
                     id: 3,
                     intelligence: 9,
                     mana: 14,
@@ -185,7 +182,7 @@ describe(`[Class] RaceRepository`, () => {
                     charisma: 8,
                     constitution: 12,
                     dexterity: 9,
-                    health: 44,
+                    health: 0,
                     intelligence: 9,
                     mana: 14,
                     perception: 11,
@@ -203,7 +200,7 @@ describe(`[Class] RaceRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["Creature"],
-                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, base_health, player_character_allowed FROM races WHERE LOWER(name) = LOWER(?) LIMIT 1"
+                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, mana, base_health, player_character_allowed FROM races WHERE LOWER(name) = LOWER(?) LIMIT 1"
                 }
             ]);
         });
@@ -219,7 +216,7 @@ describe(`[Class] RaceRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["Unknown"],
-                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, base_health, player_character_allowed FROM races WHERE LOWER(name) = LOWER(?) LIMIT 1"
+                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, mana, base_health, player_character_allowed FROM races WHERE LOWER(name) = LOWER(?) LIMIT 1"
                 }
             ]);
         });

@@ -99,7 +99,7 @@ describe(`[Class] UserCommandHandler`, () => {
         charisma: 12,
         constitution: 10,
         dexterity: 10,
-        health: 42,
+        health: 0,
         intelligence: 10,
         mana: 22,
         perception: 10,

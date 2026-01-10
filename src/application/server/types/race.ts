@@ -18,7 +18,6 @@ export interface RaceRow extends RowDataPacket {
     constitution: number;
     description: string | null;
     dexterity: number;
-    health: number;
     id: number;
     intelligence: number;
     mana: number;

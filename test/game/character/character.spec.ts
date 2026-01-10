@@ -11,7 +11,7 @@ describe(`[Class] Character`, () => {
         charisma: 12,
         constitution: 10,
         dexterity: 10,
-        health: 42,
+        health: 0,
         intelligence: 10,
         mana: 22,
         perception: 10,
@@ -25,7 +25,7 @@ describe(`[Class] Character`, () => {
         charisma: 6,
         constitution: 12,
         dexterity: 9,
-        health: 46,
+        health: 0,
         intelligence: 8,
         mana: 16,
         perception: 11,
@@ -69,7 +69,7 @@ describe(`[Class] Character`, () => {
             const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
             const character = new Character("character-1", "Alex", "atrium", race, characterClass);
 
-            expect(character.attributes.health).to.equal(48);
+            expect(character.attributes.health).to.equal(6);
             expect(character.attributes.mana).to.equal(20);
             expect(character.characterClass).to.equal(characterClass);
             expect(character.id).to.equal("character-1");
