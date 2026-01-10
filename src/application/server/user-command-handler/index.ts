@@ -351,6 +351,18 @@ export class UserCommandHandler {
 
                 if ("warning" in attackResult) {
                     this.stopAttacking(socket.id);
+                    if ("damage" in attackResult && "targetName" in attackResult) {
+                        socket.emit("world:system", {
+                            category: "SelfDealingAttackDamage",
+                            message: `You hit ${attackResult.targetName} for ${attackResult.damage} damage.`
+                        });
+                        if (attackResult.targetPlayerId) {
+                            this._socketServer?.to(attackResult.targetPlayerId).emit("world:system", {
+                                category: "SelfRecieveAttackDamage",
+                                message: `You are hit by ${attackResult.attackerName} for ${attackResult.damage} damage.`
+                            });
+                        }
+                    }
                     socket.emit("world:system", { category: "System", message: attackResult.warning });
                     if (attackResult.stopMessage) {
                         socket.emit("world:system", { category: "System", message: attackResult.stopMessage });
@@ -385,6 +397,18 @@ export class UserCommandHandler {
 
                     if ("warning" in nextAttackResult) {
                         this.stopAttacking(socket.id);
+                        if ("damage" in nextAttackResult && "targetName" in nextAttackResult) {
+                            socket.emit("world:system", {
+                                category: "SelfDealingAttackDamage",
+                                message: `You hit ${nextAttackResult.targetName} for ${nextAttackResult.damage} damage.`
+                            });
+                            if (nextAttackResult.targetPlayerId) {
+                                this._socketServer?.to(nextAttackResult.targetPlayerId).emit("world:system", {
+                                    category: "SelfRecieveAttackDamage",
+                                    message: `You are hit by ${nextAttackResult.attackerName} for ${nextAttackResult.damage} damage.`
+                                });
+                            }
+                        }
                         socket.emit("world:system", { category: "System", message: nextAttackResult.warning });
                         if (nextAttackResult.stopMessage) {
                             socket.emit("world:system", { category: "System", message: nextAttackResult.stopMessage });
@@ -599,4 +623,3 @@ export class UserCommandHandler {
     }
 
 }
-

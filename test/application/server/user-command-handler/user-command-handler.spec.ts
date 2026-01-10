@@ -587,6 +587,34 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(systemMessages).to.include("You are now attacking Greeter.");
         });
 
+        it(`should log the final hit when a kill finishes a target`, () => {
+            const world = new World([
+                new Zone("starter-zone", "Starter Zone", [
+                    new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }, [
+                        new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass)
+                    ])
+                ], "atrium")
+            ], races, classes, "starter-zone", "atrium");
+            const handler = new UserCommandHandler(world);
+            const fakeSocket = new FakeSocket("player-1");
+
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
+
+            const player = world.getPlayer(fakeSocket.id);
+            if (!player) {
+                throw new Error("Expected player to exist for test setup.");
+            }
+            player.secondaryAttributes.attackDamage = 999;
+
+            handler.handleCommand(fakeSocket, "kill Greeter");
+
+            const systemMessages = fakeSocket.emits
+                .filter((emit) => emit.event === "world:system")
+                .map((emit) => (emit.payload as { message: string }).message);
+            expect(systemMessages).to.include("You hit Greeter for 999 damage.");
+            expect(systemMessages).to.include("You have slain Greeter.");
+        });
+
         it(`should toggle attacking off when issuing kill again`, () => {
             const world = new World([
                 new Zone("starter-zone", "Starter Zone", [
@@ -686,4 +714,3 @@ describe(`[Class] UserCommandHandler`, () => {
     });
 
 });
-
