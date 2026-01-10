@@ -1,6 +1,7 @@
 import { World } from "../../game/world";
 import { AdminCharacterDeleteRequestHandler } from "./admin-character-delete-request-handler";
 import { AdminCharacterListRequestHandler } from "./admin-character-list-request-handler";
+import { AdminStatusRequestHandler } from "./admin-status-request-handler";
 import { CharacterClassListRequestHandler } from "./character-class-list-request-handler";
 import { CharacterClassRepository } from "./character-class-repository";
 import { CharacterDeleteRequestHandler } from "./character-delete-request-handler";
@@ -76,6 +77,7 @@ export class Server {
             this._characterRepository,
             this._userRepository
         );
+        const adminStatusRequestHandler = new AdminStatusRequestHandler(this._userRepository);
         const createCharacterRequestHandler = new CreateCharacterRequestHandler(
             this._characterRepository,
             this._raceRepository,
@@ -110,6 +112,11 @@ export class Server {
                 "/admin/characters",
                 "GET",
                 adminCharacterListRequestHandler.handle.bind(adminCharacterListRequestHandler)
+            ),
+            new MethodServerRoute(
+                "/admin/status",
+                "GET",
+                adminStatusRequestHandler.handle.bind(adminStatusRequestHandler)
             ),
             new MethodServerRoute("/races", "GET", raceListRequestHandler.handle.bind(raceListRequestHandler)),
             new MethodServerRoute("/classes", "GET", characterClassListRequestHandler.handle.bind(characterClassListRequestHandler)),
@@ -252,4 +259,3 @@ export class Server {
     }
 
 }
-

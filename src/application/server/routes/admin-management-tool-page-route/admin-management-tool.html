@@ -130,19 +130,33 @@
         const status = document.getElementById("status");
 
         const loginToken = localStorage.getItem(loginTokenKey);
-        const isAdmin = localStorage.getItem(isAdminKey) === "true";
+        let isAdmin = localStorage.getItem(isAdminKey) === "true";
 
         if (!loginToken) {
             window.location.assign("/login");
         }
 
-        if (!isAdmin) {
-            window.location.assign("/character/select");
-        }
-
         const setStatus = (message, isError) => {
             status.textContent = message;
             status.style.color = isError ? "#fca5a5" : "#bbf7d0";
+        };
+
+        const refreshAdminStatus = async () => {
+            if (!loginToken) {
+                return false;
+            }
+
+            try {
+                const response = await fetch(`/admin/status?loginToken=${encodeURIComponent(loginToken)}`);
+                const payload = await response.json();
+                isAdmin = response.ok && payload.isAdmin === true;
+                localStorage.setItem(isAdminKey, isAdmin ? "true" : "false");
+            } catch (error) {
+                isAdmin = false;
+                localStorage.setItem(isAdminKey, "false");
+            }
+
+            return isAdmin;
         };
 
         const renderCharacters = (characters) => {
@@ -260,9 +274,18 @@
             }
         };
 
-        void loadCharacters();
+        const startAdminTool = async () => {
+            const hasAccess = await refreshAdminStatus();
+            if (!hasAccess) {
+                window.location.assign("/character/select");
+                return;
+            }
+
+            await loadCharacters();
+        };
+
+        void startAdminTool();
     </script>
 </body>
 </html>
-
 

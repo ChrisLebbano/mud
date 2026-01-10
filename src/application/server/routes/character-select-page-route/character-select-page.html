@@ -121,7 +121,7 @@
         const selectedCharacterIdKey = "selectedCharacterId";
 
         const loginToken = localStorage.getItem(loginTokenKey);
-        const isAdmin = localStorage.getItem(isAdminKey) === "true";
+        let isAdmin = localStorage.getItem(isAdminKey) === "true";
         let selectedCharacterName = localStorage.getItem(selectedCharacterKey);
         let selectedCharacterId = localStorage.getItem(selectedCharacterIdKey);
         if (!loginToken) {
@@ -234,12 +234,32 @@
             clearSelectedCharacter();
         };
 
-        if (!isAdmin) {
-            adminToolButton.style.display = "none";
-        }
+        adminToolButton.style.display = "none";
+
+        const refreshAdminStatus = async () => {
+            if (!loginToken) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/status?loginToken=${encodeURIComponent(loginToken)}`);
+                const payload = await response.json();
+                isAdmin = response.ok && payload.isAdmin === true;
+                localStorage.setItem(isAdminKey, isAdmin ? "true" : "false");
+            } catch (error) {
+                isAdmin = false;
+                localStorage.setItem(isAdminKey, "false");
+            }
+
+            adminToolButton.style.display = isAdmin ? "" : "none";
+        };
 
         adminToolButton.addEventListener("click", () => {
             if (!loginToken) {
+                return;
+            }
+
+            if (!isAdmin) {
                 return;
             }
 
@@ -351,7 +371,7 @@
         });
 
         void loadCharacters();
+        void refreshAdminStatus();
     </script>
 </body>
 </html>
-
