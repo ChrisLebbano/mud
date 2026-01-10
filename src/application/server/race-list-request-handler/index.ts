@@ -27,7 +27,8 @@ export class RaceListRequestHandler {
                 races: races.map((race) => ({
                     description: race.description,
                     id: race.id,
-                    name: race.name
+                    name: race.name,
+                    playerCharacterAllowed: race.playerCharacterAllowed
                 }))
             });
         };

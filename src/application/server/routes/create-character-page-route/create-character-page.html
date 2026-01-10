@@ -266,7 +266,10 @@
             }
 
             const payload = await response.json();
-            const choices = Array.isArray(payload[label]) ? payload[label] : [];
+            let choices = Array.isArray(payload[label]) ? payload[label] : [];
+            if (label === "races") {
+                choices = choices.filter((choice) => choice.playerCharacterAllowed);
+            }
             if (choices.length === 0) {
                 throw new Error(`No ${label} available.`);
             }
@@ -350,3 +353,4 @@
     </script>
 </body>
 </html>
+
