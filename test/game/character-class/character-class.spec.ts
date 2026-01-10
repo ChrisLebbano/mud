@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { CharacterClass } from "../../../src/game/character-class";
 
 describe(`[Class] CharacterClass`, () => {
+    const baseHealth = 10;
     const warriorModifiers = {
         agility: 1,
         charisma: -1,
@@ -34,12 +35,13 @@ describe(`[Class] CharacterClass`, () => {
     describe(`[Method] constructor`, () => {
 
         it(`should initialize with id, name, and description`, () => {
-            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, baseHealth);
 
             expect(characterClass.id).to.equal("warrior");
             expect(characterClass.name).to.equal("Warrior");
             expect(characterClass.description).to.equal("Disciplined fighters.");
             expect(characterClass.attributeModifiers).to.deep.equal(warriorModifiers);
+            expect(characterClass.baseHealth).to.equal(10);
         });
 
     });
@@ -47,7 +49,7 @@ describe(`[Class] CharacterClass`, () => {
     describe(`[Method] toSnapshot`, () => {
 
         it(`should return a snapshot of the class`, () => {
-            const characterClass = new CharacterClass("cleric", "Cleric", "Devout healers.", clericModifiers);
+            const characterClass = new CharacterClass("cleric", "Cleric", "Devout healers.", clericModifiers, baseHealth);
 
             expect(characterClass.toSnapshot()).to.deep.equal({
                 description: "Devout healers.",
@@ -59,3 +61,4 @@ describe(`[Class] CharacterClass`, () => {
     });
 
 });
+

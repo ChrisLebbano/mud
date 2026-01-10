@@ -3,6 +3,7 @@ import { RowDataPacket } from "mysql2";
 
 export interface RaceRecord {
     baseAttributes: CharacterAttributeValues;
+    baseHealth: number;
     description: string | null;
     id: number;
     name: string;
@@ -12,11 +13,11 @@ export interface RaceRecord {
 
 export interface RaceRow extends RowDataPacket {
     agility: number;
+    base_health: number;
     charisma: number;
     constitution: number;
     description: string | null;
     dexterity: number;
-    health: number;
     id: number;
     intelligence: number;
     mana: number;

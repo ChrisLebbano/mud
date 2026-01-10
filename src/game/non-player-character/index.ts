@@ -7,9 +7,8 @@ export class NonPlayerCharacter extends Character {
 
     private _hailResponse?: string;
 
-    constructor(id: string, name: string, roomId: string, race: Race, characterClass: CharacterClass, hailResponse?: string, maxHealth?: number) {
-        const resolvedMaxHealth = maxHealth ?? 40;
-        const secondaryAttributes = new CharacterSecondaryAttributes(resolvedMaxHealth, 5, 5);
+    constructor(id: string, name: string, roomId: string, race: Race, characterClass: CharacterClass, hailResponse?: string) {
+        const secondaryAttributes = new CharacterSecondaryAttributes(0, 5, 5);
         super(id, name, roomId, race, characterClass, secondaryAttributes);
         this._hailResponse = hailResponse;
     }
@@ -23,3 +22,4 @@ export class NonPlayerCharacter extends Character {
     }
 
 }
+

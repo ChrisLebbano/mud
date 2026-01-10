@@ -67,6 +67,7 @@ describe(`[Class] CharacterClassRepository`, () => {
                         strength: 2,
                         wisdom: -1
                     }),
+                    base_health: 10,
                     description: "Disciplined fighters.",
                     id: 3,
                     name: "Fighter"
@@ -85,6 +86,7 @@ describe(`[Class] CharacterClassRepository`, () => {
                         strength: -1,
                         wisdom: 2
                     },
+                    base_health: 10,
                     description: "Arcane scholars.",
                     id: 4,
                     name: "Wizard"
@@ -109,6 +111,7 @@ describe(`[Class] CharacterClassRepository`, () => {
                         strength: 2,
                         wisdom: -1
                     },
+                    baseHealth: 10,
                     description: "Disciplined fighters.",
                     id: 3,
                     name: "Fighter"
@@ -127,6 +130,7 @@ describe(`[Class] CharacterClassRepository`, () => {
                         strength: -1,
                         wisdom: 2
                     },
+                    baseHealth: 10,
                     description: "Arcane scholars.",
                     id: 4,
                     name: "Wizard"
@@ -135,7 +139,7 @@ describe(`[Class] CharacterClassRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: [],
-                    statement: "SELECT id, name, description, attributeModifiers FROM characterClasses ORDER BY name ASC"
+                    statement: "SELECT id, name, description, attributeModifiers, base_health FROM characterClasses ORDER BY name ASC"
                 }
             ]);
         });
@@ -145,6 +149,7 @@ describe(`[Class] CharacterClassRepository`, () => {
             pool.queueResult([
                 {
                     attributeModifiers: null,
+                    base_health: 10,
                     description: "Plain class.",
                     id: 5,
                     name: "Commoner"
@@ -169,6 +174,7 @@ describe(`[Class] CharacterClassRepository`, () => {
                         strength: 0,
                         wisdom: 0
                     },
+                    baseHealth: 10,
                     description: "Plain class.",
                     id: 5,
                     name: "Commoner"
@@ -179,3 +185,4 @@ describe(`[Class] CharacterClassRepository`, () => {
     });
 
 });
+

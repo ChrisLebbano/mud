@@ -169,7 +169,7 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                     charisma: 8,
                     constitution: 12,
                     dexterity: 9,
-                    health: 44,
+                    health: 0,
                     intelligence: 9,
                     mana: 14,
                     perception: 11,
@@ -177,6 +177,7 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                     strength: 12,
                     wisdom: 8
                 },
+                baseHealth: 10,
                 description: "Wilder kin.",
                 id: 3,
                 name: "Creature",
@@ -219,7 +220,7 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                     charisma: 12,
                     constitution: 10,
                     dexterity: 10,
-                    health: 42,
+                    health: 0,
                     intelligence: 10,
                     mana: 22,
                     perception: 10,
@@ -227,6 +228,7 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                     strength: 10,
                     wisdom: 10
                 },
+                baseHealth: 10,
                 description: "Versatile adventurers.",
                 id: 1,
                 name: "Human",

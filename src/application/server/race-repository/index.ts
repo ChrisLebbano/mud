@@ -12,7 +12,7 @@ export class RaceRepository {
     public async findAll(): Promise<RaceRecord[]> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<RaceRow[]>(
-            "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, player_character_allowed FROM races ORDER BY name ASC",
+            "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, mana, base_health, player_character_allowed FROM races ORDER BY name ASC",
             []
         );
 
@@ -22,7 +22,7 @@ export class RaceRepository {
     public async findByName(name: string): Promise<RaceRecord | null> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<RaceRow[]>(
-            "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, player_character_allowed FROM races WHERE LOWER(name) = LOWER(?) LIMIT 1",
+            "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, mana, base_health, player_character_allowed FROM races WHERE LOWER(name) = LOWER(?) LIMIT 1",
             [name]
         );
 
@@ -40,7 +40,7 @@ export class RaceRepository {
                 charisma: row.charisma,
                 constitution: row.constitution,
                 dexterity: row.dexterity,
-                health: row.health,
+                health: 0,
                 intelligence: row.intelligence,
                 mana: row.mana,
                 perception: row.perception,
@@ -48,6 +48,7 @@ export class RaceRepository {
                 strength: row.strength,
                 wisdom: row.wisdom
             },
+            baseHealth: row.base_health,
             description: row.description,
             id: row.id,
             name: row.name,

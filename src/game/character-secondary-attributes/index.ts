@@ -75,4 +75,12 @@ export class CharacterSecondaryAttributes {
         return this._maxHealth;
     }
 
+    public setMaxHealth(maxHealth: number, shouldResetCurrentHealth: boolean): void {
+        this._maxHealth = maxHealth;
+        if (shouldResetCurrentHealth || this._currentHealth > maxHealth) {
+            this._currentHealth = maxHealth;
+        }
+    }
+
 }
+

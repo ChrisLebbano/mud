@@ -79,6 +79,7 @@ class FakeSocket {
 }
 
 describe(`[Class] UserCommandHandler`, () => {
+    const baseHealth = 10;
     const clericModifiers = {
         agility: 0,
         charisma: 1,
@@ -98,7 +99,7 @@ describe(`[Class] UserCommandHandler`, () => {
         charisma: 12,
         constitution: 10,
         dexterity: 10,
-        health: 42,
+        health: 0,
         intelligence: 10,
         mana: 22,
         perception: 10,
@@ -121,9 +122,9 @@ describe(`[Class] UserCommandHandler`, () => {
         wisdom: -1
     };
 
-    const clericClass = new CharacterClass("cleric", "Cleric", "Devout healers.", clericModifiers);
-    const humanRace = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
-    const warriorClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
+    const clericClass = new CharacterClass("cleric", "Cleric", "Devout healers.", clericModifiers, baseHealth);
+    const humanRace = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
+    const warriorClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, baseHealth);
     const classes = [clericClass, warriorClass];
     const races = [humanRace];
 
@@ -332,8 +333,8 @@ describe(`[Class] UserCommandHandler`, () => {
                 "Intelligence: 9",
                 "Charisma: 11",
                 "Resolve: 11",
-                "Health: 48",
-                "Current Health: 48",
+                "Health: 33",
+                "Current Health: 33",
                 "Current Experience: 0",
                 "Experience Until Next Level: 1000",
                 "Damage: 10",
@@ -541,8 +542,8 @@ describe(`[Class] UserCommandHandler`, () => {
             expect(fakeSocket.emits[0].event).to.equal("world:room");
             expect(fakeSocket.emits[0].payload.player.primaryTargetName).to.equal("Greeter");
             expect(fakeSocket.emits[0].payload.player.primaryTargetVitals).to.deep.equal({
-                currentHealth: 40,
-                maxHealth: 40
+                currentHealth: 31,
+                maxHealth: 31
             });
             expect(fakeSocket.emits[1].event).to.equal("world:system");
             expect(fakeSocket.emits[1].payload.message).to.equal("Primary target set to Greeter.");

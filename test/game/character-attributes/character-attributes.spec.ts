@@ -8,7 +8,7 @@ describe(`[Class] CharacterAttributes`, () => {
         charisma: 12,
         constitution: 10,
         dexterity: 10,
-        health: 42,
+        health: 0,
         intelligence: 10,
         mana: 22,
         perception: 10,
@@ -40,7 +40,7 @@ describe(`[Class] CharacterAttributes`, () => {
             expect(attributes.charisma).to.equal(11);
             expect(attributes.constitution).to.equal(12);
             expect(attributes.dexterity).to.equal(11);
-            expect(attributes.health).to.equal(48);
+            expect(attributes.health).to.equal(6);
             expect(attributes.intelligence).to.equal(9);
             expect(attributes.mana).to.equal(20);
             expect(attributes.perception).to.equal(10);
@@ -61,7 +61,7 @@ describe(`[Class] CharacterAttributes`, () => {
                 charisma: 11,
                 constitution: 12,
                 dexterity: 11,
-                health: 48,
+                health: 6,
                 intelligence: 9,
                 mana: 20,
                 perception: 10,
@@ -74,3 +74,4 @@ describe(`[Class] CharacterAttributes`, () => {
     });
 
 });
+

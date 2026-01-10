@@ -28,11 +28,18 @@ export class Character {
         this._name = name;
         this._roomId = roomId;
         this._race = race;
-        this._secondaryAttributes = secondaryAttributes ?? new CharacterSecondaryAttributes(this._attributes.health);
+        this._secondaryAttributes = secondaryAttributes ?? new CharacterSecondaryAttributes(0);
+        this.recalculateMaxHealth(true);
     }
 
     public get attributes(): CharacterAttributes {
         return this._attributes;
+    }
+
+    private calculateMaxHealthValue(): number {
+        const baseHealth = this._race.baseHealth + this._characterClass.baseHealth;
+        const constitutionHealth = this._attributes.constitution * 2;
+        return Math.floor((this._level * 0.75) * (baseHealth + constitutionHealth));
     }
 
     public get characterClass(): CharacterClass {
@@ -61,6 +68,7 @@ export class Character {
 
     public set level(level: number) {
         this._level = level;
+        this.recalculateMaxHealth(false);
     }
 
     public get name(): string {
@@ -79,6 +87,12 @@ export class Character {
         return this._race;
     }
 
+    public recalculateMaxHealth(shouldResetCurrentHealth: boolean): number {
+        const maxHealth = this.calculateMaxHealthValue();
+        this._secondaryAttributes.setMaxHealth(maxHealth, shouldResetCurrentHealth);
+        return maxHealth;
+    }
+
     public get roomId(): string {
         return this._roomId;
     }
@@ -92,3 +106,4 @@ export class Character {
     }
 
 }
+

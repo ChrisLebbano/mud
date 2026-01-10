@@ -26,6 +26,7 @@ export interface WorldNonPlayerCharacterData {
 
 export interface WorldClassData {
     attributeModifiers: CharacterAttributeValues;
+    baseHealth: number;
     description: string;
     id: string;
     name: string;
@@ -47,6 +48,7 @@ export interface WorldZoneData {
 
 export interface WorldRaceData {
     baseAttributes: CharacterAttributeValues;
+    baseHealth: number;
     description: string;
     id: string;
     name: string;

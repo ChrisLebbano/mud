@@ -45,6 +45,7 @@ const loadWorld = async (): Promise<World> => {
     const classes = await characterClassRepository.findAll();
     const classData: WorldClassData[] = classes.map((characterClass) => ({
         attributeModifiers: characterClass.attributeModifiers,
+        baseHealth: characterClass.baseHealth,
         description: characterClass.description ?? "",
         id: characterClass.id.toString(),
         name: characterClass.name
@@ -52,6 +53,7 @@ const loadWorld = async (): Promise<World> => {
     const races = await raceRepository.findAll();
     const raceData: WorldRaceData[] = races.map((race) => ({
         baseAttributes: race.baseAttributes,
+        baseHealth: race.baseHealth,
         description: race.description ?? "",
         id: race.raceKey,
         name: race.name
@@ -91,3 +93,4 @@ void run().catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[ERROR] Failed to start application: ${message}`);
 });
+

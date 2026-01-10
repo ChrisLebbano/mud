@@ -116,4 +116,19 @@ describe(`[Class] CharacterSecondaryAttributes`, () => {
 
     });
 
+    describe(`[Method] setMaxHealth`, () => {
+
+        it(`should update max health and reset current health when requested`, () => {
+            const attributes = new CharacterSecondaryAttributes(20);
+
+            attributes.currentHealth = 5;
+            attributes.setMaxHealth(35, true);
+
+            expect(attributes.maxHealth).to.equal(35);
+            expect(attributes.currentHealth).to.equal(35);
+        });
+
+    });
+
 });
+
