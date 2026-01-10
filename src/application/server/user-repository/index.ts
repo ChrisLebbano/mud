@@ -10,6 +10,14 @@ export class UserRepository {
         this._databaseConnection = databaseConnection;
     }
 
+    public async clearLoginToken(userId: number): Promise<void> {
+        const pool = this._databaseConnection.connect();
+        await pool.execute<ResultSetHeader>(
+            "UPDATE users SET loginToken = NULL WHERE id = ?",
+            [userId]
+        );
+    }
+
     public async createUser(userData: UserCreateData): Promise<UserRecord> {
         const pool = this._databaseConnection.connect();
         const [result] = await pool.execute<ResultSetHeader>(

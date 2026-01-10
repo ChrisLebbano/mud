@@ -1,6 +1,6 @@
+import { expect } from "chai";
 import { type DatabaseConnectionClient, type DatabasePoolFactory } from "../../../../src/application/server/types/database";
 import { UserRepository } from "../../../../src/application/server/user-repository";
-import { expect } from "chai";
 
 interface ExecuteCall {
     params: unknown[];
@@ -47,6 +47,25 @@ class FakeDatabaseConnection implements DatabaseConnectionClient {
 }
 
 describe(`[Class] UserRepository`, () => {
+
+    describe(`[Method] clearLoginToken`, () => {
+
+        it(`should clear the login token`, async () => {
+            const pool = new FakePool();
+            pool.queueResult({ affectedRows: 1 });
+            const repository = new UserRepository(new FakeDatabaseConnection(pool));
+
+            await repository.clearLoginToken(27);
+
+            expect(pool.executeCalls).to.deep.equal([
+                {
+                    params: [27],
+                    statement: "UPDATE users SET loginToken = NULL WHERE id = ?"
+                }
+            ]);
+        });
+
+    });
 
     describe(`[Method] createUser`, () => {
 

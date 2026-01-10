@@ -29,6 +29,9 @@ export class Server {
     private _characterRepository: CharacterRepository;
     private _characterClassRepository: CharacterClassRepository;
     private _databaseConnection: DatabaseConnectionClient;
+    private _disconnectGracePeriodMs: number;
+    private _disconnectSocketIds: Map<number, string>;
+    private _disconnectTimeouts: Map<number, NodeJS.Timeout>;
     private _httpServer?: NodeHttpServer;
     private _raceRepository: RaceRepository;
     private _serverConfig: ServerConfig;
@@ -48,6 +51,9 @@ export class Server {
         characterClassRepository?: CharacterClassRepository
     ) {
         this._databaseConnection = databaseConnection;
+        this._disconnectGracePeriodMs = 30000;
+        this._disconnectSocketIds = new Map();
+        this._disconnectTimeouts = new Map();
         this._serverConfig = serverConfig;
         this._world = world;
         this._characterRepository = characterRepository ? characterRepository : new CharacterRepository(databaseConnection);
@@ -121,6 +127,23 @@ export class Server {
                     return;
                 }
 
+                const pendingTimeout = this._disconnectTimeouts.get(user.id);
+                if (pendingTimeout) {
+                    clearTimeout(pendingTimeout);
+                    this._disconnectTimeouts.delete(user.id);
+                    const pendingSocketId = this._disconnectSocketIds.get(user.id);
+                    if (pendingSocketId) {
+                        const removedPlayer = this._world.removePlayer(pendingSocketId);
+                        if (removedPlayer) {
+                            this._socketServer?.to(removedPlayer.roomId).emit("world:system", {
+                                category: "System",
+                                message: `${removedPlayer.playerName} has left the room.`
+                            });
+                        }
+                    }
+                    this._disconnectSocketIds.delete(user.id);
+                }
+
                 const joinResult = this._world.addPlayer(socket.id, character.name, character.raceName, character.className);
 
                 socket.join(joinResult.roomId);
@@ -129,10 +152,8 @@ export class Server {
                 socket.to(joinResult.roomId).emit("world:system", { category: "System", message: joinResult.systemMessage });
 
                 socket.on("disconnect", () => {
-                    const removedPlayer = this._world.removePlayer(socket.id);
-                    if (removedPlayer) {
-                        socket.to(removedPlayer.roomId).emit("world:system", { category: "System", message: `${removedPlayer.playerName} has left the room.` });
-                    }
+                    console.log(`[INFO] User disconnected: ${character.name} (${socket.id})`);
+                    this.handleDisconnect(user.id, socket.id);
                 });
 
                 socket.on("submit", (command) => {
@@ -147,6 +168,38 @@ export class Server {
                 socket.disconnect();
             });
         });
+    }
+
+    private handleDisconnect(userId: number, socketId: string): void {
+        const existingTimeout = this._disconnectTimeouts.get(userId);
+        if (existingTimeout) {
+            clearTimeout(existingTimeout);
+        }
+
+        this._disconnectSocketIds.set(userId, socketId);
+        const timeout = setTimeout(() => {
+            this._disconnectTimeouts.delete(userId);
+            this._disconnectSocketIds.delete(userId);
+            const removedPlayer = this._world.removePlayer(socketId);
+            if (removedPlayer) {
+                this._socketServer?.to(removedPlayer.roomId).emit("world:system", {
+                    category: "System",
+                    message: `${removedPlayer.playerName} has left the room.`
+                });
+            }
+
+            const runCleanup = async (): Promise<void> => {
+                await this._userRepository.clearLoginToken(userId);
+                console.log(`[INFO] Cleared login token for user ${userId} after disconnect.`);
+            };
+
+            void runCleanup().catch((error: unknown) => {
+                const message = error instanceof Error ? error.message : String(error);
+                console.error(`[ERROR] Failed to clear login token for user ${userId}: ${message}`);
+            });
+        }, this._disconnectGracePeriodMs);
+
+        this._disconnectTimeouts.set(userId, timeout);
     }
 
     public start(): NodeHttpServer {
@@ -170,4 +223,3 @@ export class Server {
     }
 
 }
-
