@@ -133,7 +133,7 @@ describe(`[Class] UserCommandHandler`, () => {
                 new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }),
                 new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
             ], "atrium")
-        ], races, classes, "starter-zone", "atrium", "human", "warrior");
+        ], races, classes, "starter-zone", "atrium");
     };
 
     const createWorldWithItems = (items: Item[]): World => {
@@ -142,7 +142,7 @@ describe(`[Class] UserCommandHandler`, () => {
                 new Room("atrium", "Atrium", "A neon-lit atrium with flickering signage and a humming terminal.", { north: "lounge" }),
                 new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
             ], "atrium")
-        ], races, classes, "starter-zone", "atrium", "human", "warrior", items);
+        ], races, classes, "starter-zone", "atrium", items);
     };
 
     describe(`[Method] handleCommand`, () => {
@@ -154,7 +154,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const fakeSocket = new FakeSocket("player-1");
 
             handler.setSocketServer(fakeSocketServer as unknown as SocketServer);
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "say hello there");
 
@@ -169,7 +169,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "shout hello there");
 
@@ -196,13 +196,13 @@ describe(`[Class] UserCommandHandler`, () => {
                     ]),
                     new Room("lounge", "Lounge", "A quiet lounge with battered sofas and a wall of monitors.", { south: "atrium" })
                 ], "atrium")
-            ], races, classes, "starter-zone", "atrium", "human", "warrior");
+            ], races, classes, "starter-zone", "atrium");
             const handler = new UserCommandHandler(world);
             const fakeSocketServer = new FakeSocketServer();
             const fakeSocket = new FakeSocket("player-1");
 
             handler.setSocketServer(fakeSocketServer as unknown as SocketServer);
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "say Hail Greeter");
 
@@ -218,13 +218,13 @@ describe(`[Class] UserCommandHandler`, () => {
                         new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass, "Welcome aboard.")
                     ])
                 ], "atrium")
-            ], races, classes, "starter-zone", "atrium", "human", "warrior");
+            ], races, classes, "starter-zone", "atrium");
             const handler = new UserCommandHandler(world);
             const fakeSocketServer = new FakeSocketServer();
             const fakeSocket = new FakeSocket("player-1");
 
             handler.setSocketServer(fakeSocketServer as unknown as SocketServer);
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "target Greeter");
             handler.handleCommand(fakeSocket, "Hail");
@@ -243,7 +243,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const fakeSocket = new FakeSocket("player-1");
 
             handler.setSocketServer(fakeSocketServer as unknown as SocketServer);
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "Hail");
 
@@ -257,7 +257,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "look");
 
@@ -277,7 +277,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "look north");
 
@@ -294,7 +294,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "look east");
 
@@ -311,7 +311,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "char");
 
@@ -350,7 +350,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
             const player = world.getPlayer(fakeSocket.id);
             if (!player) {
                 throw new Error("Player not found.");
@@ -375,7 +375,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "eat br");
 
@@ -390,7 +390,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
             const player = world.getPlayer(fakeSocket.id);
             if (!player) {
                 throw new Error("Player not found.");
@@ -416,7 +416,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "drink bre");
 
@@ -431,7 +431,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
             const player = world.getPlayer(fakeSocket.id);
             if (!player) {
                 throw new Error("Player not found.");
@@ -456,7 +456,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "north");
 
@@ -474,7 +474,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "n");
 
@@ -488,7 +488,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "move north");
 
@@ -507,12 +507,12 @@ describe(`[Class] UserCommandHandler`, () => {
                 new Zone("market-zone", "Market Zone", [
                     new Room("market", "Market", "A bustling market with vendors and neon signs.", { west: "atrium" })
                 ], "market")
-            ], races, classes, "starter-zone", "atrium", "human", "warrior");
+            ], races, classes, "starter-zone", "atrium");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
-            world.addPlayer("player-2", "Guest");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
+            world.addPlayer("player-2", "Guest", "Human", "Warrior");
             world.movePlayer("player-2", "east");
 
             handler.handleCommand(fakeSocket, "who");
@@ -529,11 +529,11 @@ describe(`[Class] UserCommandHandler`, () => {
                         new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass)
                     ])
                 ], "atrium")
-            ], races, classes, "starter-zone", "atrium", "human", "warrior");
+            ], races, classes, "starter-zone", "atrium");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "target Greeter");
 
@@ -553,7 +553,7 @@ describe(`[Class] UserCommandHandler`, () => {
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "kill");
 
@@ -569,11 +569,11 @@ describe(`[Class] UserCommandHandler`, () => {
                         new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass)
                     ])
                 ], "atrium")
-            ], races, classes, "starter-zone", "atrium", "human", "warrior");
+            ], races, classes, "starter-zone", "atrium");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "kill Greeter");
 
@@ -593,11 +593,11 @@ describe(`[Class] UserCommandHandler`, () => {
                         new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass)
                     ])
                 ], "atrium")
-            ], races, classes, "starter-zone", "atrium", "human", "warrior");
+            ], races, classes, "starter-zone", "atrium");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "target Greeter");
             handler.handleCommand(fakeSocket, "kill");
@@ -617,14 +617,14 @@ describe(`[Class] UserCommandHandler`, () => {
                         new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass)
                     ])
                 ], "atrium")
-            ], races, classes, "starter-zone", "atrium", "human", "warrior");
+            ], races, classes, "starter-zone", "atrium");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
             const originalNow = Date.now;
 
             try {
                 Date.now = () => 1000;
-                world.addPlayer(fakeSocket.id, "Tester");
+                world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
                 handler.handleCommand(fakeSocket, "target Greeter");
                 handler.handleCommand(fakeSocket, "kill");
@@ -651,11 +651,11 @@ describe(`[Class] UserCommandHandler`, () => {
                         new NonPlayerCharacter("npc-greeter", "Greeter", "atrium", humanRace, clericClass)
                     ])
                 ], "atrium")
-            ], races, classes, "starter-zone", "atrium", "human", "warrior");
+            ], races, classes, "starter-zone", "atrium");
             const handler = new UserCommandHandler(world);
             const fakeSocket = new FakeSocket("player-1");
 
-            world.addPlayer(fakeSocket.id, "Tester");
+            world.addPlayer(fakeSocket.id, "Tester", "Human", "Warrior");
 
             handler.handleCommand(fakeSocket, "target Greeter");
             handler.handleCommand(fakeSocket, "kill");
@@ -685,3 +685,4 @@ describe(`[Class] UserCommandHandler`, () => {
     });
 
 });
+

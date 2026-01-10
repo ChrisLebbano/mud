@@ -1,6 +1,4 @@
 {
-  "playerClassId": "1",
-  "playerRaceId": "human",
   "startingRoomId": "atrium",
   "startingZoneId": "starter-zone",
   "zones": [
@@ -29,3 +27,4 @@
     }
   ]
 }
+

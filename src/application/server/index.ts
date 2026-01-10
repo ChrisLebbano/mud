@@ -121,7 +121,7 @@ export class Server {
                     return;
                 }
 
-                const joinResult = this._world.addPlayer(socket.id, character.name);
+                const joinResult = this._world.addPlayer(socket.id, character.name, character.raceName, character.className);
 
                 socket.join(joinResult.roomId);
                 socket.emit("world:room", joinResult.roomSnapshot);
@@ -170,3 +170,4 @@ export class Server {
     }
 
 }
+

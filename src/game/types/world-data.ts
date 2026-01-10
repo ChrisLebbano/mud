@@ -2,8 +2,6 @@ import { type CharacterAttributeValues } from "./character-attributes";
 import { ITEM_TYPE } from "./item-type";
 
 export interface WorldData {
-    playerClassId: string;
-    playerRaceId: string;
     startingRoomId: string;
     startingZoneId: string;
     zones: WorldZoneData[];
@@ -55,3 +53,4 @@ export interface WorldRaceData {
 }
 
 export { ITEM_TYPE };
+

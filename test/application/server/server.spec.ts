@@ -302,7 +302,7 @@ const createWorld = (): World => {
     const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
     return new World([new Zone("test-zone", "Test Zone", [
         new Room("test-room", "Test Room", "A test room.", {})
-    ], "test-room")], [race], [characterClass], "test-zone", "test-room", "human", "warrior");
+    ], "test-room")], [race], [characterClass], "test-zone", "test-room");
 };
 
 describe(`[Class] Server`, () => {
@@ -482,3 +482,4 @@ describe(`[Class] Server`, () => {
     });
 
 });
+
