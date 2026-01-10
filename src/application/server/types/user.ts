@@ -14,6 +14,7 @@ export interface UserLoginPayload {
 export interface UserRecord {
     email: string;
     id: number;
+    isAdmin: boolean;
     lastLoginOn: Date | null;
     loginToken: string | null;
     passwordHash: string;
@@ -23,6 +24,7 @@ export interface UserRecord {
 export interface UserRow extends RowDataPacket {
     email: string;
     id: number;
+    is_admin: number;
     lastLoginOn: Date | null;
     loginToken: string | null;
     password_hash: string;
@@ -34,3 +36,4 @@ export interface UserSignupPayload {
     password: string;
     username: string;
 }
+

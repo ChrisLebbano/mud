@@ -100,6 +100,7 @@ describe(`[Class] CharacterDeleteRequestHandler`, () => {
             const userRepository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 7,
+                isAdmin: false,
                 lastLoginOn: null,
                 loginToken: "token-123",
                 passwordHash: "hash",
@@ -123,6 +124,7 @@ describe(`[Class] CharacterDeleteRequestHandler`, () => {
             const userRepository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 7,
+                isAdmin: false,
                 lastLoginOn: null,
                 loginToken: "token-123",
                 passwordHash: "hash",
@@ -144,3 +146,4 @@ describe(`[Class] CharacterDeleteRequestHandler`, () => {
     });
 
 });
+

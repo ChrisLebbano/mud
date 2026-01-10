@@ -94,6 +94,7 @@ describe(`[Class] LoginRequestHandler`, () => {
             const repository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 1,
+                isAdmin: false,
                 lastLoginOn: null,
                 loginToken: null,
                 passwordHash,
@@ -107,9 +108,14 @@ describe(`[Class] LoginRequestHandler`, () => {
 
             await new Promise((resolve) => setImmediate(resolve));
 
-            const body = JSON.parse((response as unknown as FakeResponse).body) as { loginToken: string; message: string };
+            const body = JSON.parse((response as unknown as FakeResponse).body) as {
+                isAdmin: boolean;
+                loginToken: string;
+                message: string;
+            };
 
             expect((response as unknown as FakeResponse).statusCode).to.equal(200);
+            expect(body.isAdmin).to.equal(false);
             expect(body.message).to.equal("Login successful for hero.");
             expect(body.loginToken).to.be.a("string");
             expect(repository.updateCalls).to.have.lengthOf(1);
@@ -124,6 +130,7 @@ describe(`[Class] LoginRequestHandler`, () => {
             const repository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 1,
+                isAdmin: false,
                 lastLoginOn: null,
                 loginToken: null,
                 passwordHash,

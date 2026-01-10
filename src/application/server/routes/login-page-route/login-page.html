@@ -95,6 +95,7 @@
     </main>
     <script>
         const form = document.getElementById("login-form");
+        const isAdminKey = "isAdmin";
         const loginTokenKey = "loginToken";
         const status = document.getElementById("status");
         const submitButton = document.getElementById("submit");
@@ -136,6 +137,7 @@
                 }
 
                 localStorage.setItem(loginTokenKey, payload.loginToken);
+                localStorage.setItem(isAdminKey, payload.isAdmin ? "true" : "false");
                 setStatus(payload.message ?? "Login successful.", false);
                 form.reset();
                 window.location.assign("/character/select");
@@ -148,3 +150,4 @@
     </script>
 </body>
 </html>
+

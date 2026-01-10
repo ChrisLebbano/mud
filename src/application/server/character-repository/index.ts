@@ -1,4 +1,10 @@
-import { type CharacterCreateData, type CharacterRecord, type CharacterRow } from "../types/character";
+import {
+    type AdminCharacterRecord,
+    type AdminCharacterRow,
+    type CharacterCreateData,
+    type CharacterRecord,
+    type CharacterRow
+} from "../types/character";
 import { type DatabaseConnectionClient } from "../types/database";
 import { type ResultSetHeader } from "mysql2/promise";
 
@@ -24,6 +30,26 @@ export class CharacterRepository {
             raceName: characterData.raceName,
             userId: characterData.userId
         };
+    }
+
+    public async findAllWithUsers(): Promise<AdminCharacterRecord[]> {
+        const pool = this._databaseConnection.connect();
+        const [rows] = await pool.execute<AdminCharacterRow[]>(
+            `SELECT playerCharacters.id, playerCharacters.name, playerCharacters.user_id, playerCharacters.race_name, playerCharacters.class_name, users.username
+            FROM playerCharacters
+            JOIN users ON users.id = playerCharacters.user_id
+            WHERE playerCharacters.deleted_at IS NULL
+            ORDER BY playerCharacters.name ASC`
+        );
+
+        return rows.map((row) => ({
+            className: row.class_name,
+            id: row.id,
+            name: row.name,
+            raceName: row.race_name,
+            userId: row.user_id,
+            username: row.username
+        }));
     }
 
     public async findByName(name: string): Promise<CharacterRecord | null> {
@@ -73,4 +99,15 @@ export class CharacterRepository {
         return result.affectedRows > 0;
     }
 
+    public async markDeletedByIdForAdmin(characterId: number): Promise<boolean> {
+        const pool = this._databaseConnection.connect();
+        const [result] = await pool.execute<ResultSetHeader>(
+            "UPDATE playerCharacters SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL",
+            [characterId]
+        );
+
+        return result.affectedRows > 0;
+    }
+
 }
+

@@ -83,6 +83,7 @@ describe(`[Class] UserRepository`, () => {
             expect(user).to.deep.equal({
                 email: "user@example.com",
                 id: 12,
+                isAdmin: false,
                 lastLoginOn: null,
                 loginToken: null,
                 passwordHash: "hash",
@@ -106,6 +107,7 @@ describe(`[Class] UserRepository`, () => {
                 {
                     email: "user@example.com",
                     id: 44,
+                    is_admin: 0,
                     lastLoginOn: null,
                     loginToken: "token-123",
                     password_hash: "hash",
@@ -119,6 +121,7 @@ describe(`[Class] UserRepository`, () => {
             expect(result).to.deep.equal({
                 email: "user@example.com",
                 id: 44,
+                isAdmin: false,
                 lastLoginOn: null,
                 loginToken: "token-123",
                 passwordHash: "hash",
@@ -127,7 +130,7 @@ describe(`[Class] UserRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["user@example.com"],
-                    statement: "SELECT id, username, email, password_hash, loginToken, lastLoginOn FROM users WHERE email = ? LIMIT 1"
+                    statement: "SELECT id, username, email, password_hash, loginToken, lastLoginOn, is_admin FROM users WHERE email = ? LIMIT 1"
                 }
             ]);
         });
@@ -152,6 +155,7 @@ describe(`[Class] UserRepository`, () => {
                 {
                     email: "user@example.com",
                     id: 90,
+                    is_admin: 1,
                     lastLoginOn: null,
                     loginToken: "token-456",
                     password_hash: "hash",
@@ -165,6 +169,7 @@ describe(`[Class] UserRepository`, () => {
             expect(result).to.deep.equal({
                 email: "user@example.com",
                 id: 90,
+                isAdmin: true,
                 lastLoginOn: null,
                 loginToken: "token-456",
                 passwordHash: "hash",
@@ -173,7 +178,7 @@ describe(`[Class] UserRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["token-456"],
-                    statement: "SELECT id, username, email, password_hash, loginToken, lastLoginOn FROM users WHERE loginToken = ? LIMIT 1"
+                    statement: "SELECT id, username, email, password_hash, loginToken, lastLoginOn, is_admin FROM users WHERE loginToken = ? LIMIT 1"
                 }
             ]);
         });
@@ -198,6 +203,7 @@ describe(`[Class] UserRepository`, () => {
                 {
                     email: "user@example.com",
                     id: 55,
+                    is_admin: 0,
                     lastLoginOn: null,
                     loginToken: "token-456",
                     password_hash: "hash",
@@ -211,6 +217,7 @@ describe(`[Class] UserRepository`, () => {
             expect(result).to.deep.equal({
                 email: "user@example.com",
                 id: 55,
+                isAdmin: false,
                 lastLoginOn: null,
                 loginToken: "token-456",
                 passwordHash: "hash",
@@ -219,7 +226,7 @@ describe(`[Class] UserRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["hero"],
-                    statement: "SELECT id, username, email, password_hash, loginToken, lastLoginOn FROM users WHERE username = ? LIMIT 1"
+                    statement: "SELECT id, username, email, password_hash, loginToken, lastLoginOn, is_admin FROM users WHERE username = ? LIMIT 1"
                 }
             ]);
         });
@@ -257,3 +264,4 @@ describe(`[Class] UserRepository`, () => {
     });
 
 });
+

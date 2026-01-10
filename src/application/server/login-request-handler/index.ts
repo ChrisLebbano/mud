@@ -69,7 +69,11 @@ export class LoginRequestHandler {
 
             await this._userRepository.updateLoginToken(user.id, loginToken, lastLoginOn);
 
-            sendJson(200, { loginToken, message: `Login successful for ${user.username}.` });
+            sendJson(200, {
+                isAdmin: user.isAdmin,
+                loginToken,
+                message: `Login successful for ${user.username}.`
+            });
         };
 
         void run().catch((error: unknown) => {
