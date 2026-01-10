@@ -7,7 +7,7 @@ import { Race } from "../race";
 import { Room } from "../room";
 import { type ChatMessage } from "../types/message";
 import { type RoomSnapshot } from "../types/room";
-import { type WorldClassData, type WorldData, type WorldItemData, type WorldRaceData } from "../types/world-data";
+import { type WorldClassData, type WorldData, type WorldItemData, type WorldNonPlayerCharacterData, type WorldRaceData } from "../types/world-data";
 import { Zone } from "../zone";
 
 export class World {
@@ -94,7 +94,7 @@ export class World {
         });
     }
 
-    public static fromData(worldData: WorldData, raceData: WorldRaceData[], classData: WorldClassData[], itemData?: WorldItemData[]): World {
+    public static fromData(worldData: WorldData, raceData: WorldRaceData[], classData: WorldClassData[], itemData?: WorldItemData[], nonPlayerCharacterData?: WorldNonPlayerCharacterData[]): World {
         const classes = classData.map((classEntry) => new CharacterClass(
             classEntry.id,
             classEntry.name,
@@ -115,16 +115,22 @@ export class World {
             itemEntry.type,
             itemEntry.maxCount
         ));
+        const nonPlayerCharactersByRoom = new Map<string, WorldNonPlayerCharacterData[]>();
+        (nonPlayerCharacterData ?? []).forEach((nonPlayerCharacter) => {
+            const entries = nonPlayerCharactersByRoom.get(nonPlayerCharacter.roomId) ?? [];
+            entries.push(nonPlayerCharacter);
+            nonPlayerCharactersByRoom.set(nonPlayerCharacter.roomId, entries);
+        });
         const zones = worldData.zones.map((zoneData) => {
             const rooms = zoneData.rooms.map((roomData) => {
-                const nonPlayerCharacters = (roomData.nonPlayerCharacters ?? []).map((nonPlayerCharacterData) => new NonPlayerCharacter(
-                    nonPlayerCharacterData.id,
-                    nonPlayerCharacterData.name,
+                const nonPlayerCharacters = (nonPlayerCharactersByRoom.get(roomData.id) ?? []).map((nonPlayerCharacter) => new NonPlayerCharacter(
+                    nonPlayerCharacter.id,
+                    nonPlayerCharacter.name,
                     roomData.id,
-                    World.getRaceFromMap(raceMap, nonPlayerCharacterData.raceId),
-                    World.getClassFromMap(classMap, nonPlayerCharacterData.classId),
-                    nonPlayerCharacterData.hailResponse,
-                    nonPlayerCharacterData.maxHealth
+                    World.getRaceFromMap(raceMap, nonPlayerCharacter.raceId),
+                    World.getClassFromMap(classMap, nonPlayerCharacter.classId),
+                    nonPlayerCharacter.hailResponse,
+                    nonPlayerCharacter.maxHealth
                 ));
 
                 return new Room(

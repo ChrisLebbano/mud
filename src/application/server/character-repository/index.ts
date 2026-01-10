@@ -13,7 +13,7 @@ export class CharacterRepository {
     public async createCharacter(characterData: CharacterCreateData): Promise<CharacterRecord> {
         const pool = this._databaseConnection.connect();
         const [result] = await pool.execute<ResultSetHeader>(
-            "INSERT INTO characters (name, user_id, race_name, class_name) VALUES (?, ?, ?, ?)",
+            "INSERT INTO playerCharacters (name, user_id, race_name, class_name) VALUES (?, ?, ?, ?)",
             [characterData.name, characterData.userId, characterData.raceName, characterData.className]
         );
 
@@ -29,7 +29,7 @@ export class CharacterRepository {
     public async findByName(name: string): Promise<CharacterRecord | null> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<CharacterRow[]>(
-            "SELECT id, name, user_id, race_name, class_name FROM characters WHERE name = ? LIMIT 1",
+            "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE name = ? LIMIT 1",
             [name]
         );
 
@@ -50,7 +50,7 @@ export class CharacterRepository {
     public async findByUserId(userId: number): Promise<CharacterRecord[]> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<CharacterRow[]>(
-            "SELECT id, name, user_id, race_name, class_name FROM characters WHERE user_id = ? ORDER BY name ASC",
+            "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE user_id = ? ORDER BY name ASC",
             [userId]
         );
 

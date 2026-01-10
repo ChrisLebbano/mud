@@ -118,16 +118,7 @@ describe(`[Class] World`, () => {
                                 description: "A bright room.",
                                 exits: { north: "lounge" },
                                 id: "atrium",
-                                name: "Atrium",
-                                nonPlayerCharacters: [
-                                    {
-                                        classId: "warrior",
-                                        hailResponse: "Hello there.",
-                                        id: "npc-1",
-                                        name: "Greeter",
-                                        raceId: "human"
-                                    }
-                                ]
+                                name: "Atrium"
                             },
                             {
                                 description: "A quiet lounge.",
@@ -156,8 +147,18 @@ describe(`[Class] World`, () => {
                     name: "Warrior"
                 }
             ];
+            const nonPlayerCharacterData = [
+                {
+                    classId: "warrior",
+                    hailResponse: "Hello there.",
+                    id: "npc-1",
+                    name: "Greeter",
+                    raceId: "human",
+                    roomId: "atrium"
+                }
+            ];
 
-            const world = World.fromData(worldData, raceData, classData, []);
+            const world = World.fromData(worldData, raceData, classData, [], nonPlayerCharacterData);
             const room = world.getRoom("atrium");
 
             expect(room?.name).to.equal("Atrium");

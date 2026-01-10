@@ -2,10 +2,11 @@ import { Application } from "./application";
 import { CharacterClassRepository } from "./application/server/character-class-repository";
 import { DatabaseConnection } from "./application/server/database-connection";
 import { ItemRepository } from "./application/server/item-repository";
+import { NonPlayerCharacterRepository } from "./application/server/non-player-character-repository";
 import { RaceRepository } from "./application/server/race-repository";
 import { type DatabaseConfig } from "./application/server/types/database";
 import { type ServerConfig } from "./application/server/types/server-config";
-import { type WorldClassData, type WorldData, type WorldItemData, type WorldRaceData } from "./game/types/world-data";
+import { type WorldClassData, type WorldData, type WorldItemData, type WorldNonPlayerCharacterData, type WorldRaceData } from "./game/types/world-data";
 import { World } from "./game/world";
 import { createPool } from "mysql2/promise";
 import { readFileSync } from "node:fs";
@@ -37,6 +38,7 @@ const worldData = JSON.parse(readFileSync(worldDataPath, "utf8")) as WorldData;
 const databaseConnection = new DatabaseConnection(databaseConfig, createPool, databaseTestTableName);
 const characterClassRepository = new CharacterClassRepository(databaseConnection);
 const itemRepository = new ItemRepository(databaseConnection);
+const nonPlayerCharacterRepository = new NonPlayerCharacterRepository(databaseConnection);
 const raceRepository = new RaceRepository(databaseConnection);
 
 const loadWorld = async (): Promise<World> => {
@@ -61,8 +63,18 @@ const loadWorld = async (): Promise<World> => {
         name: item.name,
         type: item.type
     }));
+    const nonPlayerCharacters = await nonPlayerCharacterRepository.findAll();
+    const nonPlayerCharacterData: WorldNonPlayerCharacterData[] = nonPlayerCharacters.map((nonPlayerCharacter) => ({
+        classId: nonPlayerCharacter.classId,
+        hailResponse: nonPlayerCharacter.hailResponse ?? undefined,
+        id: nonPlayerCharacter.id,
+        maxHealth: nonPlayerCharacter.maxHealth ?? undefined,
+        name: nonPlayerCharacter.name,
+        raceId: nonPlayerCharacter.raceId,
+        roomId: nonPlayerCharacter.roomId
+    }));
 
-    return World.fromData(worldData, raceData, classData, itemData);
+    return World.fromData(worldData, raceData, classData, itemData, nonPlayerCharacterData);
 };
 
 const run = async (): Promise<void> => {

@@ -72,7 +72,7 @@ describe(`[Class] CharacterRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["Alex", 11, "Human", "Warrior"],
-                    statement: "INSERT INTO characters (name, user_id, race_name, class_name) VALUES (?, ?, ?, ?)"
+                    statement: "INSERT INTO playerCharacters (name, user_id, race_name, class_name) VALUES (?, ?, ?, ?)"
                 }
             ]);
         });
@@ -106,7 +106,7 @@ describe(`[Class] CharacterRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["Riley"],
-                    statement: "SELECT id, name, user_id, race_name, class_name FROM characters WHERE name = ? LIMIT 1"
+                    statement: "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE name = ? LIMIT 1"
                 }
             ]);
         });
@@ -166,7 +166,7 @@ describe(`[Class] CharacterRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: [7],
-                    statement: "SELECT id, name, user_id, race_name, class_name FROM characters WHERE user_id = ? ORDER BY name ASC"
+                    statement: "SELECT id, name, user_id, race_name, class_name FROM playerCharacters WHERE user_id = ? ORDER BY name ASC"
                 }
             ]);
         });
