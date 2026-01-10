@@ -7,6 +7,23 @@ export interface CharacterCreateData {
     userId: number;
 }
 
+export interface AdminCharacterRecord {
+    className: string;
+    id: number;
+    name: string;
+    raceName: string;
+    userId: number;
+    username: string;
+}
+
+export interface AdminCharacterRow extends RowDataPacket {
+    class_name: string;
+    id: number;
+    name: string;
+    race_name: string;
+    user_id: number;
+    username: string;
+}
 
 export interface CharacterCreatePayload {
     characterClassName: string;
@@ -41,3 +58,4 @@ export interface CharacterRow extends RowDataPacket {
     race_name: string;
     user_id: number;
 }
+

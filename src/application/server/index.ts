@@ -1,4 +1,7 @@
 import { World } from "../../game/world";
+import { AdminCharacterDeleteRequestHandler } from "./admin-character-delete-request-handler";
+import { AdminCharacterListRequestHandler } from "./admin-character-list-request-handler";
+import { AdminStatusRequestHandler } from "./admin-status-request-handler";
 import { CharacterClassListRequestHandler } from "./character-class-list-request-handler";
 import { CharacterClassRepository } from "./character-class-repository";
 import { CharacterDeleteRequestHandler } from "./character-delete-request-handler";
@@ -9,6 +12,7 @@ import { LoginRequestHandler } from "./login-request-handler";
 import { NodeHttpServerFactory } from "./node-http-server-factory";
 import { RaceListRequestHandler } from "./race-list-request-handler";
 import { RaceRepository } from "./race-repository";
+import { AdminManagementToolPageRoute } from "./routes/admin-management-tool-page-route";
 import { CharacterSelectPageRoute } from "./routes/character-select-page-route";
 import { CreateCharacterPageRoute } from "./routes/create-character-page-route";
 import { GameClientRoute } from "./routes/game-client-route";
@@ -65,6 +69,15 @@ export class Server {
         this._userRepository = userRepository ? userRepository : new UserRepository(databaseConnection);
         this._userCommandHandler = new UserCommandHandler(world);
 
+        const adminCharacterDeleteRequestHandler = new AdminCharacterDeleteRequestHandler(
+            this._characterRepository,
+            this._userRepository
+        );
+        const adminCharacterListRequestHandler = new AdminCharacterListRequestHandler(
+            this._characterRepository,
+            this._userRepository
+        );
+        const adminStatusRequestHandler = new AdminStatusRequestHandler(this._userRepository);
         const createCharacterRequestHandler = new CreateCharacterRequestHandler(
             this._characterRepository,
             this._raceRepository,
@@ -84,11 +97,27 @@ export class Server {
         const signupRequestHandler = new SignupRequestHandler(this._userRepository);
         const serverRoutes = [
             new RootPageRoute(),
+            new AdminManagementToolPageRoute(this._userRepository),
             new CharacterSelectPageRoute(),
             new CreateCharacterPageRoute(),
             new GameClientRoute(),
             new LoginPageRoute(),
             new SignupPageRoute(),
+            new MethodServerRoute(
+                "/admin/characters",
+                "DELETE",
+                adminCharacterDeleteRequestHandler.handle.bind(adminCharacterDeleteRequestHandler)
+            ),
+            new MethodServerRoute(
+                "/admin/characters",
+                "GET",
+                adminCharacterListRequestHandler.handle.bind(adminCharacterListRequestHandler)
+            ),
+            new MethodServerRoute(
+                "/admin/status",
+                "GET",
+                adminStatusRequestHandler.handle.bind(adminStatusRequestHandler)
+            ),
             new MethodServerRoute("/races", "GET", raceListRequestHandler.handle.bind(raceListRequestHandler)),
             new MethodServerRoute("/classes", "GET", characterClassListRequestHandler.handle.bind(characterClassListRequestHandler)),
             new MethodServerRoute("/characters", "GET", characterListRequestHandler.handle.bind(characterListRequestHandler)),

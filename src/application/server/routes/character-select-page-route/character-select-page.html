@@ -83,6 +83,11 @@
             color: #0f172a;
         }
 
+        .character-button.admin-tool {
+            background-color: #a855f7;
+            color: #0f172a;
+        }
+
         .character-button.selected {
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.6);
         }
@@ -102,17 +107,21 @@
         <div class="character-action-row">
             <button class="character-button enter-world" id="enter-world-button" type="button" disabled>Enter World</button>
             <button class="character-button delete-character" id="delete-character-button" type="button" disabled>Delete Character</button>
+            <button class="character-button admin-tool" id="admin-tool-button" type="button">Admin</button>
         </div>
     </main>
     <script>
+        const adminToolButton = document.getElementById("admin-tool-button");
         const characterGrid = document.getElementById("character-grid");
         const enterWorldButton = document.getElementById("enter-world-button");
         const deleteCharacterButton = document.getElementById("delete-character-button");
+        const isAdminKey = "isAdmin";
         const loginTokenKey = "loginToken";
         const selectedCharacterKey = "selectedCharacterName";
         const selectedCharacterIdKey = "selectedCharacterId";
 
         const loginToken = localStorage.getItem(loginTokenKey);
+        let isAdmin = localStorage.getItem(isAdminKey) === "true";
         let selectedCharacterName = localStorage.getItem(selectedCharacterKey);
         let selectedCharacterId = localStorage.getItem(selectedCharacterIdKey);
         if (!loginToken) {
@@ -225,6 +234,39 @@
             clearSelectedCharacter();
         };
 
+        adminToolButton.style.display = isAdmin ? "" : "none";
+
+        const refreshAdminStatus = async () => {
+            if (!loginToken) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/status?loginToken=${encodeURIComponent(loginToken)}`);
+                const payload = await response.json();
+                if (response.ok) {
+                    isAdmin = payload.isAdmin === true;
+                    localStorage.setItem(isAdminKey, isAdmin ? "true" : "false");
+                }
+            } catch (error) {
+                isAdmin = isAdmin === true;
+            }
+
+            adminToolButton.style.display = isAdmin ? "" : "none";
+        };
+
+        adminToolButton.addEventListener("click", () => {
+            if (!loginToken) {
+                return;
+            }
+
+            if (!isAdmin) {
+                return;
+            }
+
+            window.location.assign(`/admin/manegement-tool?loginToken=${encodeURIComponent(loginToken)}`);
+        });
+
         enterWorldButton.addEventListener("click", () => {
             if (!selectedCharacterName) {
                 return;
@@ -330,6 +372,7 @@
         });
 
         void loadCharacters();
+        void refreshAdminStatus();
     </script>
 </body>
 </html>

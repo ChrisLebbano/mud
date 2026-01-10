@@ -1,22 +1,7 @@
-import { CharacterListRequestHandler } from "../../../../src/application/server/character-list-request-handler";
-import { type CharacterRecord } from "../../../../src/application/server/types/character";
+import { AdminStatusRequestHandler } from "../../../../src/application/server/admin-status-request-handler";
 import { type UserRecord } from "../../../../src/application/server/types/user";
 import { expect } from "chai";
 import { type IncomingMessage, type ServerResponse } from "node:http";
-
-class FakeCharacterRepository {
-
-    private _characters: CharacterRecord[];
-
-    constructor(characters: CharacterRecord[]) {
-        this._characters = characters;
-    }
-
-    public findByUserId(_userId: number): Promise<CharacterRecord[]> {
-        return Promise.resolve(this._characters);
-    }
-
-}
 
 class FakeUserRepository {
 
@@ -64,15 +49,14 @@ class FakeResponse {
 
 }
 
-describe(`[Class] CharacterListRequestHandler`, () => {
+describe(`[Class] AdminStatusRequestHandler`, () => {
 
     describe(`[Method] handle`, () => {
 
         it(`should reject requests without a login token`, async () => {
-            const characterRepository = new FakeCharacterRepository([]);
             const userRepository = new FakeUserRepository(null);
-            const handler = new CharacterListRequestHandler(characterRepository, userRepository);
-            const request = { method: "GET", url: "/characters" } as IncomingMessage;
+            const handler = new AdminStatusRequestHandler(userRepository);
+            const request = { method: "GET", url: "/admin/status" } as IncomingMessage;
             const response = new FakeResponse() as unknown as ServerResponse;
 
             handler.handle(request, response);
@@ -83,34 +67,18 @@ describe(`[Class] CharacterListRequestHandler`, () => {
             expect(JSON.parse((response as unknown as FakeResponse).body)).to.deep.equal({ error: "Authentication required." });
         });
 
-        it(`should return character names for a valid user`, async () => {
-            const characterRepository = new FakeCharacterRepository([
-                {
-                    className: "Cleric",
-                    id: 9,
-                    name: "Riley",
-                    raceName: "Elf",
-                    userId: 12
-                },
-                {
-                    className: "Warrior",
-                    id: 10,
-                    name: "Alex",
-                    raceName: "Human",
-                    userId: 12
-                }
-            ]);
+        it(`should return admin status for authenticated users`, async () => {
             const userRepository = new FakeUserRepository({
-                email: "hero@example.com",
-                id: 12,
-                isAdmin: false,
+                email: "admin@example.com",
+                id: 1,
+                isAdmin: true,
                 lastLoginOn: null,
                 loginToken: "token-123",
                 passwordHash: "hash",
-                username: "hero"
+                username: "admin"
             });
-            const handler = new CharacterListRequestHandler(characterRepository, userRepository);
-            const request = { method: "GET", url: "/characters?loginToken=token-123" } as IncomingMessage;
+            const handler = new AdminStatusRequestHandler(userRepository);
+            const request = { method: "GET", url: "/admin/status?loginToken=token-123" } as IncomingMessage;
             const response = new FakeResponse() as unknown as ServerResponse;
 
             handler.handle(request, response);
@@ -118,12 +86,7 @@ describe(`[Class] CharacterListRequestHandler`, () => {
             await new Promise((resolve) => setImmediate(resolve));
 
             expect((response as unknown as FakeResponse).statusCode).to.equal(200);
-            expect(JSON.parse((response as unknown as FakeResponse).body)).to.deep.equal({
-                characters: [
-                    { id: 9, name: "Riley" },
-                    { id: 10, name: "Alex" }
-                ]
-            });
+            expect(JSON.parse((response as unknown as FakeResponse).body)).to.deep.equal({ isAdmin: true });
         });
 
     });

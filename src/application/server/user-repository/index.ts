@@ -28,6 +28,7 @@ export class UserRepository {
         return {
             email: userData.email,
             id: result.insertId,
+            isAdmin: false,
             lastLoginOn: null,
             loginToken: null,
             passwordHash: userData.passwordHash,
@@ -38,7 +39,7 @@ export class UserRepository {
     public async findByEmail(email: string): Promise<UserRecord | null> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<UserRow[]>(
-            "SELECT id, username, email, password_hash, loginToken, lastLoginOn FROM users WHERE email = ? LIMIT 1",
+            "SELECT id, username, email, password_hash, loginToken, lastLoginOn, is_admin FROM users WHERE email = ? LIMIT 1",
             [email]
         );
 
@@ -50,6 +51,7 @@ export class UserRepository {
         return {
             email: row.email,
             id: row.id,
+            isAdmin: row.is_admin === 1,
             lastLoginOn: row.lastLoginOn,
             loginToken: row.loginToken,
             passwordHash: row.password_hash,
@@ -60,7 +62,7 @@ export class UserRepository {
     public async findByLoginToken(loginToken: string): Promise<UserRecord | null> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<UserRow[]>(
-            "SELECT id, username, email, password_hash, loginToken, lastLoginOn FROM users WHERE loginToken = ? LIMIT 1",
+            "SELECT id, username, email, password_hash, loginToken, lastLoginOn, is_admin FROM users WHERE loginToken = ? LIMIT 1",
             [loginToken]
         );
 
@@ -72,6 +74,7 @@ export class UserRepository {
         return {
             email: row.email,
             id: row.id,
+            isAdmin: row.is_admin === 1,
             lastLoginOn: row.lastLoginOn,
             loginToken: row.loginToken,
             passwordHash: row.password_hash,
@@ -82,7 +85,7 @@ export class UserRepository {
     public async findByUsername(username: string): Promise<UserRecord | null> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<UserRow[]>(
-            "SELECT id, username, email, password_hash, loginToken, lastLoginOn FROM users WHERE username = ? LIMIT 1",
+            "SELECT id, username, email, password_hash, loginToken, lastLoginOn, is_admin FROM users WHERE username = ? LIMIT 1",
             [username]
         );
 
@@ -94,6 +97,7 @@ export class UserRepository {
         return {
             email: row.email,
             id: row.id,
+            isAdmin: row.is_admin === 1,
             lastLoginOn: row.lastLoginOn,
             loginToken: row.loginToken,
             passwordHash: row.password_hash,
@@ -110,3 +114,4 @@ export class UserRepository {
     }
 
 }
+

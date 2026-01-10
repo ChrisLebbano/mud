@@ -123,6 +123,48 @@ describe(`[Class] CharacterRepository`, () => {
 
     });
 
+    describe(`[Method] findAllWithUsers`, () => {
+
+        it(`should return all characters with usernames`, async () => {
+            const pool = new FakePool();
+            pool.queueResult([
+                {
+                    class_name: "Warrior",
+                    id: 3,
+                    name: "Alex",
+                    race_name: "Human",
+                    user_id: 7,
+                    username: "hero"
+                }
+            ]);
+            const repository = new CharacterRepository(new FakeDatabaseConnection(pool));
+
+            const result = await repository.findAllWithUsers();
+
+            expect(result).to.deep.equal([
+                {
+                    className: "Warrior",
+                    id: 3,
+                    name: "Alex",
+                    raceName: "Human",
+                    userId: 7,
+                    username: "hero"
+                }
+            ]);
+            expect(pool.executeCalls).to.deep.equal([
+                {
+                    params: undefined,
+                    statement: `SELECT playerCharacters.id, playerCharacters.name, playerCharacters.user_id, playerCharacters.race_name, playerCharacters.class_name, users.username
+            FROM playerCharacters
+            JOIN users ON users.id = playerCharacters.user_id
+            WHERE playerCharacters.deleted_at IS NULL
+            ORDER BY playerCharacters.name ASC`
+                }
+            ]);
+        });
+
+    });
+
     describe(`[Method] findByUserId`, () => {
 
         it(`should return characters for a user`, async () => {
@@ -203,4 +245,25 @@ describe(`[Class] CharacterRepository`, () => {
 
     });
 
+    describe(`[Method] markDeletedByIdForAdmin`, () => {
+
+        it(`should delete a character by id without a user scope`, async () => {
+            const pool = new FakePool();
+            pool.queueResult({ affectedRows: 1 });
+            const repository = new CharacterRepository(new FakeDatabaseConnection(pool));
+
+            const result = await repository.markDeletedByIdForAdmin(14);
+
+            expect(result).to.equal(true);
+            expect(pool.executeCalls).to.deep.equal([
+                {
+                    params: [14],
+                    statement: "UPDATE playerCharacters SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL"
+                }
+            ]);
+        });
+
+    });
+
 });
+

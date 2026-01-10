@@ -316,6 +316,7 @@ describe(`[Class] Server`, () => {
             const userRepository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 1,
+                isAdmin: false,
                 lastLoginOn: null,
                 loginToken: "token-123",
                 passwordHash: "hash",
@@ -367,6 +368,7 @@ describe(`[Class] Server`, () => {
             const userRepository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 1,
+                isAdmin: false,
                 lastLoginOn: null,
                 loginToken: "token-123",
                 passwordHash: "hash",
@@ -420,6 +422,7 @@ describe(`[Class] Server`, () => {
             const userRepository = new FakeUserRepository({
                 email: "hero@example.com",
                 id: 1,
+                isAdmin: false,
                 lastLoginOn: null,
                 loginToken: "token-123",
                 passwordHash: "hash",
