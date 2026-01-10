@@ -23,6 +23,7 @@ export interface WorldNonPlayerCharacterData {
     maxHealth?: number;
     name: string;
     raceId: string;
+    roomId: string;
 }
 
 export interface WorldClassData {
@@ -37,7 +38,6 @@ export interface WorldRoomData {
     exits: Record<string, string>;
     id: string;
     name: string;
-    nonPlayerCharacters?: WorldNonPlayerCharacterData[];
 }
 
 export interface WorldZoneData {

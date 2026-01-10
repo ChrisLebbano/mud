@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 
-CREATE TABLE IF NOT EXISTS characters (
+CREATE TABLE IF NOT EXISTS playerCharacters (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   name VARCHAR(100) NOT NULL,
@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS characters (
   class_name VARCHAR(100) NOT NULL DEFAULT '',
   user_id BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY unique_characters_name (name),
-  KEY index_characters_user_id (user_id),
-  CONSTRAINT fk_characters_users FOREIGN KEY (user_id) REFERENCES users (id)
+  UNIQUE KEY unique_player_characters_name (name),
+  KEY index_player_characters_user_id (user_id),
+  CONSTRAINT fk_player_characters_users FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 
@@ -52,6 +52,19 @@ CREATE TABLE IF NOT EXISTS items (
   type ENUM('POTION', 'FOOD', 'DRINK') NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY unique_items_name (name)
+);
+
+CREATE TABLE IF NOT EXISTS nonPlayerCharacters (
+  id VARCHAR(100) NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  room_id VARCHAR(100) NOT NULL,
+  class_id BIGINT UNSIGNED NOT NULL,
+  race_key VARCHAR(100) NOT NULL,
+  hail_response TEXT NULL,
+  max_health INT NULL,
+  PRIMARY KEY (id),
+  KEY index_non_player_characters_room_id (room_id),
+  KEY index_non_player_characters_race_key (race_key)
 );
 
 INSERT INTO races (name, description)
@@ -109,3 +122,32 @@ VALUES
   ('slice of bread', 'A simple slice of bread.', 'FOOD'),
   ('water flask', 'A leather-bound flask filled with water.', 'DRINK');
 
+INSERT INTO nonPlayerCharacters (id, name, room_id, class_id, race_key, hail_response, max_health)
+VALUES
+  (
+    'npc-guide',
+    'Terminal Guide',
+    'atrium',
+    2,
+    'human',
+    'Move [north] to visit the training grounds and test your skills.',
+    NULL
+  ),
+  (
+    'npc-rat',
+    'a rat',
+    'training-grounds',
+    1,
+    'creature',
+    NULL,
+    20
+  ),
+  (
+    'npc-snake',
+    'a snake',
+    'training-grounds',
+    1,
+    'creature',
+    NULL,
+    20
+  );

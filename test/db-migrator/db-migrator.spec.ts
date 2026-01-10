@@ -94,7 +94,7 @@ describe(`[Class] DbMigrator`, () => {
     const createMigrationsDir = async (): Promise<string> => {
         const directory = await mkdtemp(join(tmpdir(), "mud-migrations-"));
         await writeFile(join(directory, "2024-08-25-0001-create-users.sql"), "CREATE TABLE users (id INT);");
-        await writeFile(join(directory, "2024-08-25-0002-create-characters.sql"), "CREATE TABLE characters (id INT);");
+        await writeFile(join(directory, "2024-08-25-0002-create-characters.sql"), "CREATE TABLE playerCharacters (id INT);");
         return directory;
     };
 
@@ -117,7 +117,7 @@ describe(`[Class] DbMigrator`, () => {
                 "INSERT INTO schema_migrations (name) VALUES (?)"
             ]);
             expect(pool.connections[1].queries).to.deep.equal([
-                "CREATE TABLE characters (id INT);",
+                "CREATE TABLE playerCharacters (id INT);",
                 "INSERT INTO schema_migrations (name) VALUES (?)"
             ]);
         });
@@ -135,7 +135,7 @@ describe(`[Class] DbMigrator`, () => {
             expect(appliedCount).to.equal(1);
             expect(pool.connections).to.have.lengthOf(1);
             expect(pool.connections[0].queries).to.deep.equal([
-                "CREATE TABLE characters (id INT);",
+                "CREATE TABLE playerCharacters (id INT);",
                 "INSERT INTO schema_migrations (name) VALUES (?)"
             ]);
         });

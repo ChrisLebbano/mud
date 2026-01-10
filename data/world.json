@@ -14,16 +14,7 @@
             "north": "training-grounds"
           },
           "id": "atrium",
-          "name": "Atrium",
-          "nonPlayerCharacters": [
-            {
-              "hailResponse": "Move [north] to visit the training grounds and test your skills.",
-              "classId": "2",
-              "id": "npc-guide",
-              "name": "Terminal Guide",
-              "raceId": "human"
-            }
-          ]
+          "name": "Atrium"
         },
         {
           "description": "A fenced training ground with scuffed earth and scattered practice dummies.",
@@ -31,23 +22,7 @@
             "south": "atrium"
           },
           "id": "training-grounds",
-          "name": "Training Grounds",
-          "nonPlayerCharacters": [
-            {
-              "classId": "1",
-              "id": "npc-rat",
-              "maxHealth": 20,
-              "name": "a rat",
-              "raceId": "creature"
-            },
-            {
-              "classId": "1",
-              "id": "npc-snake",
-              "maxHealth": 20,
-              "name": "a snake",
-              "raceId": "creature"
-            }
-          ]
+          "name": "Training Grounds"
         }
       ],
       "startingRoomId": "atrium"
