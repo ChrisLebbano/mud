@@ -339,11 +339,7 @@
                 }
 
                 setStatus(payload.message ?? "Character created.", false);
-                form.reset();
-                selectedRace = "";
-                selectedClass = "";
-                clearSelections(raceOptions);
-                clearSelections(classOptions);
+                window.location.assign("/character/select");
             } catch (error) {
                 setStatus("Character creation failed. Please try again.", true);
             } finally {
@@ -353,4 +349,3 @@
     </script>
 </body>
 </html>
-
