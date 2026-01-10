@@ -234,7 +234,7 @@
             clearSelectedCharacter();
         };
 
-        adminToolButton.style.display = "none";
+        adminToolButton.style.display = isAdmin ? "" : "none";
 
         const refreshAdminStatus = async () => {
             if (!loginToken) {
@@ -244,11 +244,12 @@
             try {
                 const response = await fetch(`/admin/status?loginToken=${encodeURIComponent(loginToken)}`);
                 const payload = await response.json();
-                isAdmin = response.ok && payload.isAdmin === true;
-                localStorage.setItem(isAdminKey, isAdmin ? "true" : "false");
+                if (response.ok) {
+                    isAdmin = payload.isAdmin === true;
+                    localStorage.setItem(isAdminKey, isAdmin ? "true" : "false");
+                }
             } catch (error) {
-                isAdmin = false;
-                localStorage.setItem(isAdminKey, "false");
+                isAdmin = isAdmin === true;
             }
 
             adminToolButton.style.display = isAdmin ? "" : "none";
