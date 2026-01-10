@@ -55,6 +55,7 @@ describe(`[Class] RaceRepository`, () => {
             pool.queueResult([
                 {
                     agility: 10,
+                    base_health: 10,
                     charisma: 12,
                     constitution: 10,
                     description: "Versatile adventurers.",
@@ -73,6 +74,7 @@ describe(`[Class] RaceRepository`, () => {
                 },
                 {
                     agility: 8,
+                    base_health: 10,
                     charisma: 9,
                     constitution: 12,
                     description: "Sturdy explorers.",
@@ -109,6 +111,7 @@ describe(`[Class] RaceRepository`, () => {
                         strength: 10,
                         wisdom: 10
                     },
+                    baseHealth: 10,
                     description: "Versatile adventurers.",
                     id: 1,
                     name: "Human",
@@ -129,6 +132,7 @@ describe(`[Class] RaceRepository`, () => {
                         strength: 12,
                         wisdom: 10
                     },
+                    baseHealth: 10,
                     description: "Sturdy explorers.",
                     id: 2,
                     name: "Dwarf",
@@ -139,7 +143,7 @@ describe(`[Class] RaceRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: [],
-                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, player_character_allowed FROM races ORDER BY name ASC"
+                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, base_health, player_character_allowed FROM races ORDER BY name ASC"
                 }
             ]);
         });
@@ -153,6 +157,7 @@ describe(`[Class] RaceRepository`, () => {
             pool.queueResult([
                 {
                     agility: 9,
+                    base_health: 10,
                     charisma: 8,
                     constitution: 12,
                     description: "Wilder kin.",
@@ -188,6 +193,7 @@ describe(`[Class] RaceRepository`, () => {
                     strength: 12,
                     wisdom: 8
                 },
+                baseHealth: 10,
                 description: "Wilder kin.",
                 id: 3,
                 name: "Creature",
@@ -197,7 +203,7 @@ describe(`[Class] RaceRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["Creature"],
-                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, player_character_allowed FROM races WHERE LOWER(name) = LOWER(?) LIMIT 1"
+                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, base_health, player_character_allowed FROM races WHERE LOWER(name) = LOWER(?) LIMIT 1"
                 }
             ]);
         });
@@ -213,7 +219,7 @@ describe(`[Class] RaceRepository`, () => {
             expect(pool.executeCalls).to.deep.equal([
                 {
                     params: ["Unknown"],
-                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, player_character_allowed FROM races WHERE LOWER(name) = LOWER(?) LIMIT 1"
+                    statement: "SELECT id, race_key, name, description, strength, agility, dexterity, perception, constitution, wisdom, intelligence, charisma, resolve, health, mana, base_health, player_character_allowed FROM races WHERE LOWER(name) = LOWER(?) LIMIT 1"
                 }
             ]);
         });

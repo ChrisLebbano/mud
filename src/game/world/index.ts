@@ -89,14 +89,16 @@ export class World {
             classEntry.id,
             classEntry.name,
             classEntry.description,
-            classEntry.attributeModifiers
+            classEntry.attributeModifiers,
+            classEntry.baseHealth
         ));
         const classMap = new Map(classes.map((characterClass) => [characterClass.id, characterClass]));
         const races = raceData.map((raceEntry) => new Race(
             raceEntry.id,
             raceEntry.name,
             raceEntry.description,
-            raceEntry.baseAttributes
+            raceEntry.baseAttributes,
+            raceEntry.baseHealth
         ));
         const raceMap = new Map(races.map((race) => [race.id, race]));
         const items = (itemData ?? []).map((itemEntry) => new Item(
@@ -119,8 +121,7 @@ export class World {
                     roomData.id,
                     World.getRaceFromMap(raceMap, nonPlayerCharacter.raceId),
                     World.getClassFromMap(classMap, nonPlayerCharacter.classId),
-                    nonPlayerCharacter.hailResponse,
-                    nonPlayerCharacter.maxHealth
+                    nonPlayerCharacter.hailResponse
                 ));
 
                 return new Room(
@@ -474,3 +475,4 @@ export class World {
     }
 
 }
+

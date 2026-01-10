@@ -6,6 +6,7 @@ import { Race } from "../../../src/game/race";
 import { Room } from "../../../src/game/room";
 
 describe(`[Class] Room`, () => {
+    const baseHealth = 10;
     const humanBaseAttributes = {
         agility: 10,
         charisma: 12,
@@ -34,8 +35,8 @@ describe(`[Class] Room`, () => {
         wisdom: -1
     };
 
-    const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
-    const humanRace = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
+    const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, baseHealth);
+    const humanRace = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
 
     describe(`[Method] addNonPlayerCharacter`, () => {
 
@@ -113,3 +114,4 @@ describe(`[Class] Room`, () => {
     });
 
 });
+

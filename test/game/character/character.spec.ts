@@ -5,6 +5,7 @@ import { CharacterClass } from "../../../src/game/character-class";
 import { Race } from "../../../src/game/race";
 
 describe(`[Class] Character`, () => {
+    const baseHealth = 10;
     const humanBaseAttributes = {
         agility: 10,
         charisma: 12,
@@ -64,8 +65,8 @@ describe(`[Class] Character`, () => {
     describe(`[Method] constructor`, () => {
 
         it(`should initialize the character with id, name, and room`, () => {
-            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
-            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, baseHealth);
+            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
             const character = new Character("character-1", "Alex", "atrium", race, characterClass);
 
             expect(character.attributes.health).to.equal(48);
@@ -80,7 +81,7 @@ describe(`[Class] Character`, () => {
             expect(character.race).to.equal(race);
             expect(character.roomId).to.equal("atrium");
             expect(character.secondaryAttributes.attackDelaySeconds).to.equal(5);
-            expect(character.secondaryAttributes.currentHealth).to.equal(48);
+            expect(character.secondaryAttributes.currentHealth).to.equal(33);
             expect(character.secondaryAttributes.attackDamage).to.equal(10);
         });
 
@@ -89,8 +90,8 @@ describe(`[Class] Character`, () => {
     describe(`[Method] roomId`, () => {
 
         it(`should update the room id`, () => {
-            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
-            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, baseHealth);
+            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
             const character = new Character("character-2", "Riley", "atrium", race, characterClass);
 
             character.roomId = "lounge";
@@ -103,10 +104,10 @@ describe(`[Class] Character`, () => {
     describe(`[Method] primaryTarget`, () => {
 
         it(`should update the primary target`, () => {
-            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
-            const targetClass = new CharacterClass("cleric", "Cleric", "Devout healers.", clericModifiers);
-            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
-            const creatureRace = new Race("creature", "Creature", "Wild denizens.", creatureBaseAttributes);
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, baseHealth);
+            const targetClass = new CharacterClass("cleric", "Cleric", "Devout healers.", clericModifiers, baseHealth);
+            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
+            const creatureRace = new Race("creature", "Creature", "Wild denizens.", creatureBaseAttributes, baseHealth);
             const character = new Character("character-3", "Quinn", "atrium", race, characterClass);
             const target = new Character("character-4", "Morgan", "lounge", creatureRace, targetClass);
 
@@ -120,13 +121,14 @@ describe(`[Class] Character`, () => {
     describe(`[Method] level`, () => {
 
         it(`should update the level`, () => {
-            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
-            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, baseHealth);
+            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
             const character = new Character("character-6", "Jordan", "atrium", race, characterClass);
 
             character.level = 2;
 
             expect(character.level).to.equal(2);
+            expect(character.secondaryAttributes.maxHealth).to.equal(66);
         });
 
     });
@@ -134,8 +136,8 @@ describe(`[Class] Character`, () => {
     describe(`[Method] isAttacking`, () => {
 
         it(`should update the attacking state`, () => {
-            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
-            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, baseHealth);
+            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
             const character = new Character("character-5", "Casey", "atrium", race, characterClass);
 
             character.isAttacking = true;
@@ -145,4 +147,21 @@ describe(`[Class] Character`, () => {
 
     });
 
+    describe(`[Method] recalculateMaxHealth`, () => {
+
+        it(`should update the max health based on stats`, () => {
+            const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, baseHealth);
+            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
+            const character = new Character("character-7", "Sam", "atrium", race, characterClass);
+
+            character.secondaryAttributes.currentHealth = 10;
+            character.recalculateMaxHealth(true);
+
+            expect(character.secondaryAttributes.maxHealth).to.equal(33);
+            expect(character.secondaryAttributes.currentHealth).to.equal(33);
+        });
+
+    });
+
 });
+

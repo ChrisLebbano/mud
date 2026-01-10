@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS races (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(100) NOT NULL,
   description TEXT NULL,
+  base_health INT NOT NULL DEFAULT 10,
   player_character_allowed TINYINT(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (id),
   UNIQUE KEY unique_races_name (name)
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS characterClasses (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(100) NOT NULL,
   description TEXT NULL,
+  base_health INT NOT NULL DEFAULT 10,
   attributeModifiers JSON NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY unique_character_classes_name (name)
@@ -167,3 +169,4 @@ VALUES
     NULL,
     20
   );
+

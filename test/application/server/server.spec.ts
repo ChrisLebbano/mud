@@ -298,8 +298,8 @@ const warriorModifiers = {
 };
 
 const createWorld = (): World => {
-    const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
-    const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
+    const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, 10);
+    const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, 10);
     return new World([new Zone("test-zone", "Test Zone", [
         new Room("test-room", "Test Room", "A test room.", {})
     ], "test-room")], [race], [characterClass], "test-zone", "test-room");

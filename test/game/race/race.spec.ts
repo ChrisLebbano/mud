@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { Race } from "../../../src/game/race";
 
 describe(`[Class] Race`, () => {
+    const baseHealth = 10;
     const humanBaseAttributes = {
         agility: 10,
         charisma: 12,
@@ -34,12 +35,13 @@ describe(`[Class] Race`, () => {
     describe(`[Method] constructor`, () => {
 
         it(`should initialize with id, name, and description`, () => {
-            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
+            const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
 
             expect(race.id).to.equal("human");
             expect(race.name).to.equal("Human");
             expect(race.description).to.equal("Versatile adventurers.");
             expect(race.baseAttributes).to.deep.equal(humanBaseAttributes);
+            expect(race.baseHealth).to.equal(10);
         });
 
     });
@@ -47,7 +49,7 @@ describe(`[Class] Race`, () => {
     describe(`[Method] toSnapshot`, () => {
 
         it(`should return a snapshot of the race`, () => {
-            const race = new Race("creature", "Creature", "Wild denizens.", creatureBaseAttributes);
+            const race = new Race("creature", "Creature", "Wild denizens.", creatureBaseAttributes, baseHealth);
 
             expect(race.toSnapshot()).to.deep.equal({
                 description: "Wild denizens.",
@@ -59,3 +61,4 @@ describe(`[Class] Race`, () => {
     });
 
 });
+

@@ -29,6 +29,7 @@ class FakeDatabaseConnection implements DatabaseConnectionClient {
 }
 
 describe(`[Class] Application`, () => {
+    const baseHealth = 10;
     const humanBaseAttributes = {
         agility: 10,
         charisma: 12,
@@ -58,8 +59,8 @@ describe(`[Class] Application`, () => {
     };
 
     const createWorld = (): World => {
-        const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
-        const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
+        const characterClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, baseHealth);
+        const race = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
         return new World([new Zone("test-zone", "Test Zone", [
             new Room("test-room", "Test Room", "A test room.", {})
         ], "test-room")], [race], [characterClass], "test-zone", "test-room");

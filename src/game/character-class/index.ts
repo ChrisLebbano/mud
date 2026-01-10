@@ -4,12 +4,14 @@ import { type CharacterClassSnapshot } from "../types/character-class";
 export class CharacterClass {
 
     private _attributeModifiers: CharacterAttributeValues;
+    private _baseHealth: number;
     private _description: string;
     private _id: string;
     private _name: string;
 
-    constructor(id: string, name: string, description: string, attributeModifiers: CharacterAttributeValues) {
+    constructor(id: string, name: string, description: string, attributeModifiers: CharacterAttributeValues, baseHealth: number) {
         this._attributeModifiers = attributeModifiers;
+        this._baseHealth = baseHealth;
         this._description = description;
         this._id = id;
         this._name = name;
@@ -17,6 +19,10 @@ export class CharacterClass {
 
     public get attributeModifiers(): CharacterAttributeValues {
         return this._attributeModifiers;
+    }
+
+    public get baseHealth(): number {
+        return this._baseHealth;
     }
 
     public get description(): string {
@@ -40,3 +46,4 @@ export class CharacterClass {
     }
 
 }
+

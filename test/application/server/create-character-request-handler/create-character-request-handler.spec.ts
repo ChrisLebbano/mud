@@ -177,6 +177,7 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                     strength: 12,
                     wisdom: 8
                 },
+                baseHealth: 10,
                 description: "Wilder kin.",
                 id: 3,
                 name: "Creature",
@@ -227,6 +228,7 @@ describe(`[Class] CreateCharacterRequestHandler`, () => {
                     strength: 10,
                     wisdom: 10
                 },
+                baseHealth: 10,
                 description: "Versatile adventurers.",
                 id: 1,
                 name: "Human",

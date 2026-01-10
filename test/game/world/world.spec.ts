@@ -8,6 +8,7 @@ import { Zone } from "../../../src/game/zone";
 import { expect } from "chai";
 
 describe(`[Class] World`, () => {
+    const baseHealth = 10;
     const clericModifiers = {
         agility: 0,
         charisma: 1,
@@ -64,10 +65,10 @@ describe(`[Class] World`, () => {
         wisdom: 10
     };
 
-    const clericClass = new CharacterClass("cleric", "Cleric", "Devout healers.", clericModifiers);
-    const creatureRace = new Race("creature", "Creature", "Wild denizens.", creatureBaseAttributes);
-    const humanRace = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes);
-    const warriorClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers);
+    const clericClass = new CharacterClass("cleric", "Cleric", "Devout healers.", clericModifiers, baseHealth);
+    const creatureRace = new Race("creature", "Creature", "Wild denizens.", creatureBaseAttributes, baseHealth);
+    const humanRace = new Race("human", "Human", "Versatile adventurers.", humanBaseAttributes, baseHealth);
+    const warriorClass = new CharacterClass("warrior", "Warrior", "Disciplined fighters.", warriorModifiers, baseHealth);
     const classes = [clericClass, warriorClass];
     const races = [creatureRace, humanRace];
 
@@ -123,6 +124,7 @@ describe(`[Class] World`, () => {
             const raceData: WorldRaceData[] = [
                 {
                     baseAttributes: humanBaseAttributes,
+                    baseHealth,
                     description: "Versatile adventurers.",
                     id: "human",
                     name: "Human"
@@ -131,6 +133,7 @@ describe(`[Class] World`, () => {
             const classData: WorldClassData[] = [
                 {
                     attributeModifiers: warriorModifiers,
+                    baseHealth,
                     description: "Disciplined fighters.",
                     id: "warrior",
                     name: "Warrior"
@@ -329,9 +332,9 @@ describe(`[Class] World`, () => {
                     id: "warrior",
                     name: "Warrior"
                 },
-                currentHealth: 48,
+                currentHealth: 33,
                 id: "player-1",
-                maxHealth: 48,
+                maxHealth: 33,
                 name: "Alex",
                 primaryTargetName: undefined,
                 primaryTargetVitals: undefined,
@@ -370,7 +373,7 @@ describe(`[Class] World`, () => {
 
             expect(attackResult.damage).to.equal(10);
             expect(attackResult.targetName).to.equal("Guard");
-            expect(attackResult.targetCurrentHealth).to.equal(30);
+            expect(attackResult.targetCurrentHealth).to.equal(23);
         });
 
         it(`should warn when attacking a dead target`, () => {
@@ -424,7 +427,7 @@ describe(`[Class] World`, () => {
 
             expect(attackResult.attackerName).to.equal("Guard");
             expect(attackResult.damage).to.equal(5);
-            expect(attackResult.targetCurrentHealth).to.equal(43);
+            expect(attackResult.targetCurrentHealth).to.equal(28);
         });
 
     });
@@ -500,6 +503,7 @@ describe(`[Class] World`, () => {
             const raceData: WorldRaceData[] = [
                 {
                     baseAttributes: humanBaseAttributes,
+                    baseHealth,
                     description: "Versatile adventurers.",
                     id: "human",
                     name: "Human"
@@ -508,6 +512,7 @@ describe(`[Class] World`, () => {
             const classData: WorldClassData[] = [
                 {
                     attributeModifiers: warriorModifiers,
+                    baseHealth,
                     description: "Disciplined fighters.",
                     id: "warrior",
                     name: "Warrior"
@@ -528,3 +533,4 @@ describe(`[Class] World`, () => {
     });
 
 });
+

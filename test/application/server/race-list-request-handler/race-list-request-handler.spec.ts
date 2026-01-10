@@ -82,6 +82,7 @@ describe(`[Class] RaceListRequestHandler`, () => {
                         strength: 10,
                         wisdom: 10
                     },
+                    baseHealth: 10,
                     description: "Versatile adventurers.",
                     id: 1,
                     name: "Human",

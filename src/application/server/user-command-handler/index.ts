@@ -205,7 +205,7 @@ export class UserCommandHandler {
                 `Intelligence: ${attributes.intelligence}`,
                 `Charisma: ${attributes.charisma}`,
                 `Resolve: ${attributes.resolve}`,
-                `Health: ${attributes.health}`,
+                `Health: ${secondaryAttributes.maxHealth}`,
                 `Current Health: ${secondaryAttributes.currentHealth}`,
                 `Current Experience: ${secondaryAttributes.currentExperience}`,
                 `Experience Until Next Level: ${secondaryAttributes.experienceUntilNextLevel}`,
@@ -599,3 +599,4 @@ export class UserCommandHandler {
     }
 
 }
+

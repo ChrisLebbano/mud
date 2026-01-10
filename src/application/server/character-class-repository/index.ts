@@ -12,12 +12,13 @@ export class CharacterClassRepository {
     public async findAll(): Promise<CharacterClassRecord[]> {
         const pool = this._databaseConnection.connect();
         const [rows] = await pool.execute<CharacterClassRow[]>(
-            "SELECT id, name, description, attributeModifiers FROM characterClasses ORDER BY name ASC",
+            "SELECT id, name, description, attributeModifiers, base_health FROM characterClasses ORDER BY name ASC",
             []
         );
 
         return rows.map((row) => ({
             attributeModifiers: this.parseAttributeModifiers(row.attributeModifiers),
+            baseHealth: row.base_health,
             description: row.description,
             id: row.id,
             name: row.name
